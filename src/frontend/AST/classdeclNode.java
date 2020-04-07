@@ -1,6 +1,6 @@
 package compilerjava.AST;
 import compilerjava.util.position;
-
+import compilerjava.Env.*;
 import java.util.List;
 
 
@@ -12,9 +12,18 @@ public class classdeclNode extends declNode{
     private classsymbol classname;
 
 
+    public classdeclNode(String ID,List<funcdeclNode> funcdeclList,List<vardeclNode>
+                         vardeclList,position pos){
+        super(pos);
+        this.ID=ID;
+        this.funcdeclNodeList=funcdeclList;
+        this.vardeclNodeList=vardeclList;
+    }
+
+
     @Override
     public void accept(ASTvisitor visitor){
-        visitor.visitor(this);
+        visitor.visit(this);
     }
 
     public String getID(){

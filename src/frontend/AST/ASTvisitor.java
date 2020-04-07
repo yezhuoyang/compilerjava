@@ -1,12 +1,12 @@
-package compilerjava.AST
+package compilerjava.AST;
 
 
 
 public interface ASTvisitor{
 
-    void visit(ProgramNode node);
+    void visit(programNode node);
 
-    void visit(VariabledeclNode node);
+    void visit(vardeclNode node);
 
     void visit(funcdeclNode node);
 
@@ -65,6 +65,7 @@ public interface ASTvisitor{
     void visit(nullliteralNode node);
 
     void visit(stringliteralNode node);
+
 
 
 }

@@ -2,55 +2,54 @@ package compilerjava.semantic;
 
 import compilerjava.AST.*;
 import compilerjava.Env.*;
-import compilerjava.util.semanticError;
-import compilerjava.util.position;
+import compilerjava.util.*;
 
 
 public class globalfuncdeclcollector implements ASTvisitor{
     private globalfield _globalfield;
 
     public static type Node2Type(typeNode tpnode,globalfield _globalfield){
-        type tp=_globalfield.resolveyType(tpnode);
+        type tp=_globalfield.resolvetype(tpnode);
         if(tpnode instanceof arraytypeNode)
             return new arraytype(tp,((arraytypeNode)tpnode).getDims());
         else return tp;
     }
 
-    public globalfuncdeclcollectorr(globalfield _globalfield){
-        this.globalfield=_globalfield;
+    public globalfuncdeclcollector(globalfield _globalfield){
+        this._globalfield=_globalfield;
     }
 
 
     private void MainfunctionChecker(symbol main){
         if(main.gettype() instanceof  basesymbol){
-            if(!main.gettype().getWord().equals("int"))
+            if(!main.gettype().getTypeName().equals("int"))
                 throw new semanticError("Return type of main ought to be int",new position(0,0));
-            if(!(((funcdeclNode)main.getdef()).getParameterList().isEmpty()))
+            if(!(((funcdeclNode)main.getDefNode()).getParameterList().isEmpty()))
                 throw new semanticError("Parameter list of main ought to be empty ",new position(0,0));
         }else throw new semanticError("Return type of main ought to be int",new position(0,0));
     }
 
     @Override
-    public void visit(ProgramNode node){
+    public void visit(programNode node){
         node.getDeclNodeList().forEach(x->x.accept(this));
         MainfunctionChecker(_globalfield.resolveMain());
     }
 
     @Override
-    public void visit(VariabledeclNode node){
+    public void visit(vardeclNode node){
     }
 
     @Override
     public void visit(funcdeclNode node){
-        if(node.gettype()==null)
+        if(node.gettypeNode()==null)
             throw new semanticError("Global function should have return type",node.getpos());
-        type returnType=Node2Type(node.gettype(),_globalfield);
+        type returnType=Node2Type(node.gettypeNode(),_globalfield);
         funcsymbol _funcsymbol=new funcsymbol(node.getID(),returnType,node,_globalfield);
-        node.setFunctionSymbol(_funcsymbol);
-        for(vardeclNode vardecclNode:node.getParameterList()){
-            type parameterType=Node2Type(vardecclNode.gettype(),_globalfield);
-            varsymbol _varsymbol=new varsymbol(vardeclNode.getID(),parameterType,vardecclNode);
-            vardecclNode.setvarsymbol(_varsymbol);
+        node.setfuncsymbol(_funcsymbol);
+        for(vardeclNode _vardeclNode:node.getParameterList()){
+            type parameterType=Node2Type(_vardeclNode.gettypeNode(),_globalfield);
+            varsymbol _varsymbol=new varsymbol(_vardeclNode.getID(),parameterType,_vardeclNode);
+            _vardeclNode.setvarsymbol(_varsymbol);
             _funcsymbol.defvar(_varsymbol);
         }
         _globalfield.deffunc(_funcsymbol);

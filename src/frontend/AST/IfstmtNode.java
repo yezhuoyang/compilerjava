@@ -1,6 +1,6 @@
 package compilerjava.AST;
 
-import compilerjava.position;
+import compilerjava.util.position;
 
 
 public class IfstmtNode extends  stmtNode{

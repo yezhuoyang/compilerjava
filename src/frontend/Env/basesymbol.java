@@ -3,7 +3,7 @@ package compilerjava.Env;
 
 import compilerjava.config;
 import compilerjava.util.position;
-import compiler.util.semanticError;
+import compilerjava.util.semanticError;
 
 public class basesymbol extends symbol implements type{
 
@@ -20,38 +20,37 @@ public class basesymbol extends symbol implements type{
     public void compatible(type tp,position pos){
         if(!tp.getTypeName().equals("void")){
             if(getTypeName().equals(tp.getTypeName())){
-
             }else throw new semanticError("Type "+getTypeName()+" not compatible with"+tp.getTypeName(),pos);
         }else throw new semanticError("void on the right side!",pos);
     }
 
     @Override
-    boolean isbaseType(){
-        return true
+    public boolean isBaseType(){
+        return true;
     }
 
     @Override
-    boolean isClassType(){
+    public boolean isClassType(){
         return false;
     }
 
     @Override
-    boolean isArrayType(){
+    public boolean isArrayType(){
         return false;
     }
 
     @Override
-    boolean isNullType(){
+    public boolean isNullType(){
         return false;
     }
 
     @Override
-    boolean isPointerType(){
+    public boolean isPointerType(){
         return false;
     }
 
     @Override
-    boolean int getTypeSize(){
+    public int getTypeSize(){
         return config.basetypesize();
     }
 

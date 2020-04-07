@@ -22,7 +22,7 @@ public class ASTcreator extends MXBaseVisitor<Node>{
                 if(decl instanceof classdeclNode)hasclassdeclNode=true;
 	        }
 	    }
-        return new programNode(decls,new position(pos.getStart(),hasclassdeclNode);
+        return new programNode(decls,new position(ctx.getStart()),hasclassdeclNode);
 	}
 
 
@@ -43,10 +43,10 @@ public class ASTcreator extends MXBaseVisitor<Node>{
             List<vardeclNode> parameterList=new ArrayList<>();
             if(ctx.params()!=null){
                 Node decl=visit(ctx.params());
-                programParts.addAll( ((vardecllistNode)decl).getDecls());
+                parameterList.addAll( ((vardecllistNode)decl).getDecls());
             }
             blockstmtNode block=(blockstmtNode) visit(ctx.block());
-            return new funcdeclNode(tpnode,ID,parameterList,block,new position(ctx.getStart());
+            return new funcdeclNode(tpnode,ID,parameterList,block,new position(ctx.getStart()));
 	}
 
 
@@ -58,8 +58,8 @@ public class ASTcreator extends MXBaseVisitor<Node>{
 	       for(ParserRuleContext decl:ctx.functionDecl())
 	            funcdeclList.add((funcdeclNode) visit(decl));
            for(ParserRuleContext decl:ctx.variableDecl())
-                vardeclList.addAll((vardecllistNode)visit(decl).getDecls());
-           return new classdeclNode(ID,funcdeclList,vardeclList,new position(ctx.getStart());
+                vardeclList.addAll(((vardecllistNode)visit(decl)).getDecls());
+           return new classdeclNode(ID,funcdeclList,vardeclList,new position(ctx.getStart()));
 	}
 
 
@@ -67,7 +67,7 @@ public class ASTcreator extends MXBaseVisitor<Node>{
 	 public Node visitVariableDecl(MXParser.VariableDeclContext ctx) {
           typeNode tpnode=(typeNode) visit(ctx.type());
           vardecllistNode vardeclList=(vardecllistNode) visit(ctx.variableList());
-          vardeclList.setType(type);
+          vardeclList.setType(tpnode);
           return vardeclList;
 	 }
 
@@ -91,7 +91,7 @@ public class ASTcreator extends MXBaseVisitor<Node>{
 
 	@Override
 	public Node visitParams(MXParser.ParamsContext ctx) {
-        vardecllistNode parameterdeclListNode=new vardecllistNode(new position(ctx.getStart(()));
+        vardecllistNode parameterdeclListNode=new vardecllistNode(new position(ctx.getStart()));
         for(ParserRuleContext  paramdecl:ctx.paramDecl())
                 parameterdeclListNode.addVar((vardeclNode)visit(paramdecl));
         return parameterdeclListNode;
@@ -109,7 +109,7 @@ public class ASTcreator extends MXBaseVisitor<Node>{
 
 	@Override
 	public Node visitArrayType(MXParser.ArrayTypeContext ctx) {
-         return  arraytypeNode((typeNode) visit(ctx.type()),new position(ctx.getStart()));
+         return  new arraytypeNode((typeNode)visit(ctx.type()),new position(ctx.getStart()));
 	}
 
 
@@ -130,7 +130,7 @@ public class ASTcreator extends MXBaseVisitor<Node>{
 
 	@Override
 	public Node visitNarrayTypeInt(MXParser.NarrayTypeIntContext ctx) {
-        return  new inttypeNode(new position(ctx.getStart));
+        return  new inttypeNode(new position(ctx.getStart()));
 	}
 
 
@@ -172,19 +172,19 @@ public class ASTcreator extends MXBaseVisitor<Node>{
 
 	@Override
 	public Node visitConditionstmt(MXParser.ConditionstmtContext ctx) {
-	      return  visit(ctx.conditionStmt());
-	}
+	       return  visit(ctx.conditionStatement());
+	 }
 
 
 	@Override
 	public Node visitLoopstmt(MXParser.LoopstmtContext ctx) {
-	        return visit(ctx.loopStmt());
+	        return visit(ctx.loopStatement());
 	}
 
 
 	@Override
 	public Node visitJumpstmt(MXParser.JumpstmtContext ctx) {
-	        return visit(ctx.jumpStmt());
+	        return visit(ctx.jumpStatement());
 	}
 
 
@@ -205,11 +205,12 @@ public class ASTcreator extends MXBaseVisitor<Node>{
            return new blockstmtNode(stmtList,new position(ctx.getStart()));
 	}
 
+
 	@Override
-	public Node visitConditionStmt(MXParser.ConditionStmtContext ctx) {
+	public Node visitConditionStatement(MXParser.ConditionStatementContext ctx) {
 	        stmtNode thenStmt=(stmtNode) visit(ctx.thenStmt);
 	        stmtNode elseStmt=ctx.elseStmt==null?null:(stmtNode) visit(ctx.elseStmt);
-            if(!(thenStmt) instanceof blockstmtNode)
+            if(!((thenStmt) instanceof blockstmtNode))
                     thenStmt=new blockstmtNode(thenStmt,new position(ctx.getStart()));
             if(elseStmt!=null&&!(elseStmt instanceof blockstmtNode))
                     elseStmt=new blockstmtNode(elseStmt,new position(ctx.getStart()));
@@ -236,8 +237,8 @@ public class ASTcreator extends MXBaseVisitor<Node>{
 	            ctx.cond==null?null:(exprNode) visit(ctx.cond),
 	            ctx.step==null?null:(exprNode) visit(ctx.step),
 	            stnode,
-	            new position(ctx.getStart());
-	        )
+	            new position(ctx.getStart())
+	        );
 	}
 
 
@@ -271,7 +272,7 @@ public class ASTcreator extends MXBaseVisitor<Node>{
 	        case "--":
 	               op=unaryexprNode.Op.PRE_SUB;
 	                break;
-	        case "+"
+	        case "+":
 	        	    op=unaryexprNode.Op.POS;
 	                break;
 	        case "-":
@@ -304,7 +305,7 @@ public class ASTcreator extends MXBaseVisitor<Node>{
 
 	@Override
 	public Node visitSubscript(MXParser.SubscriptContext ctx) {
-	        return new arraytypeNode((exprNode)visit(ctx.array),(exprNode)visit(ctx.index),new position(ctx.getStart()));
+	        return new arrayindexNode((exprNode)visit(ctx.array),(exprNode)visit(ctx.index),new position(ctx.getStart()));
 	}
 
 
@@ -324,7 +325,7 @@ public class ASTcreator extends MXBaseVisitor<Node>{
 	public Node visitFunctioncall(MXParser.FunctioncallContext ctx) {
 	        List<exprNode> parameterList=new ArrayList<>();
 	        if(ctx.params()!=null){
-	            for(ParserRuleContext parameter:ctx.params().expr())
+	            for(ParserRuleContext parameter:ctx.params().paramDecl())
 	                parameterList.add((exprNode) visit(parameter));
 	        }
             return new funccallexprNode((exprNode)visit(ctx.expr()),parameterList,new position(ctx.getStart()));
@@ -333,70 +334,70 @@ public class ASTcreator extends MXBaseVisitor<Node>{
 
 	@Override
 	public Node visitBinaryexpr(MXParser.BinaryexprContext ctx) {
-	        binaryexprNode.Op op;
+	        binaryexprNode.Optype op;
 	        switch(ctx.op.getText()){
 	           case "*":
-	            op=binaryexprNode.Op.MUL;
+	            op=binaryexprNode.Optype.MUL;
 	            break;
 	           case "/":
-	            op=binaryexprNode.Op.DIV;
+	            op=binaryexprNode.Optype.DIV;
 	            break;
 	           case "%":
-		        op=binaryexprNode.Op.MOD;
+		        op=binaryexprNode.Optype.MOD;
 	            break;
 	           case "+":
-	           	op=binaryexprNode.Op.ADD;
+	           	op=binaryexprNode.Optype.ADD;
 	            break;
 	           case "-":
-	           	op=binaryexprNode.Op.SUB;
+	           	op=binaryexprNode.Optype.SUB;
 	            break;
 	           case "<<":
-	           op=binaryexprNode.Op.SHL;
+	           op=binaryexprNode.Optype.BITL;
 	           break;
 	           case ">>":
-	            op=binaryexprNode.Op.SHR;
-	            break
+	            op=binaryexprNode.Optype.BITR;
+	            break;
 	           case "<":
-	            op=binaryexprNode.Op.LT;
+	            op=binaryexprNode.Optype.LT;
 	            break;
 	           case ">":
-	            op=binaryexprNode.Op.GT;
+	            op=binaryexprNode.Optype.GT;
 	            break;
 	           case "<=":
-	     	    op=binaryexprNode.Op.LEQ;
+	     	    op=binaryexprNode.Optype.LEQ;
 	            break;
 	           case ">=":
-	     	    op=binaryexprNode.Op.GEQ;
+	     	    op=binaryexprNode.Optype.GEQ;
 	            break;
 	           case "==":
-	     	    op=binaryexprNode.Op.EQ;
+	     	    op=binaryexprNode.Optype.EQ;
 	            break;
 	           case "!=":
-	     	    op=binaryexprNode.Op.NEQ;
+	     	    op=binaryexprNode.Optype.NEQ;
 	            break;
 	 	       case "&":
-	     	    op=binaryexprNode.Op.AND;
+	     	    op=binaryexprNode.Optype.BITAND;
      	        break;
      	       case "^":
-	     	    op=binaryexprNode.Op.XOR;
+	     	    op=binaryexprNode.Optype.XOR;
      	        break;
      	       case "|":
-	     	    op=binaryexprNode.Op.OR;
+	     	    op=binaryexprNode.Optype.BITOR;
      	        break;
      	       case "&&":
-     	  	    op=binaryexprNode.Op.ANDL;
+     	  	    op=binaryexprNode.Optype.AND;
      	        break;
       	       case "||":
-  	     	    op=binaryexprNode.Op.ORL;
+  	     	    op=binaryexprNode.Optype.OR;
       	        break;
       	       case "=":
-  	     	    op=binaryexprNode.Op.ASSIGN;
+  	     	    op=binaryexprNode.Optype.ASSIGN;
       	        break;
      	       default:
      	        	 op=null;
 	        }
-	        return new binaryexprNode((exprNode) visit(ctx.lhs),
-	           (exprNode) visit(ctx.rhs),
+	        return new binaryexprNode((exprNode) visit(ctx.src1),
+	           (exprNode) visit(ctx.src2),
 	           op,
 	           new position(ctx.getStart()));
 	}
@@ -436,8 +437,8 @@ public class ASTcreator extends MXBaseVisitor<Node>{
 	       return new newexprNode( (typeNode)visit(ctx.nonArraytype()),
 	           (ctx.getChildCount()-ctx.expr().size()-1)/2,
 	           exprNodeList,
-	           new position(ctx.getStart());
-	           )
+	           new position(ctx.getStart())
+	           );
 	}
 
 

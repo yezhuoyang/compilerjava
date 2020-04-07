@@ -1,5 +1,5 @@
 package compilerjava.AST;
-import compilerjava.position;
+import compilerjava.util.position;
 
 
 public class nullliteralNode extends constexprNode{

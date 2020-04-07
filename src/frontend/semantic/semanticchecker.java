@@ -3,39 +3,38 @@ package compilerjava.semantic;
 
 import compilerjava.AST.*;
 import compilerjava.Env.*;
-import compilerjava.util.semanticError;
-
+import compilerjava.util.*;
 import java.util.Iterator;
 import java.util.Map;
 
 public class semanticchecker implements ASTvisitor{
     private globalfield  _globalfield;
-    private classsymbol  stringtypesymbol;
+    private classsymbol  stringsymbol;
     private basesymbol  intsymbol,boolsymbol,voidsymbol;
 
     public semanticchecker(globalfield gf){
         this._globalfield=gf;
         this.intsymbol=gf.getIntsymbol();
         this.boolsymbol=gf.getBoolsymbol();
-        this.stringtypesymbol=gf.getClasssym();
+        this.stringsymbol=gf.getString();
         this.voidsymbol=gf.getVoidsymbol();
     }
 
     @Override
-    public void visit(ProgramNode node){
+    public void visit(programNode node){
         node.getDeclNodeList().forEach(x->x.accept(this));
     }
 
 
     @Override
-    public void visit(VariabledeclNode node){
+    public void visit(vardeclNode node){
         if(node.getExpr()!=null){
             node.getExpr().accept(this);
             node.getTypeAfterresolve().compatible(node.getExpr().gettype(),node.getpos());
         }else{
             type tp=node.getTypeAfterresolve();
-            if(tp.isBasetype()){
-                if(tp.getID().equals("int")) {
+            if(tp.isBaseType()){
+                if(tp.getTypeName().equals("int")) {
                     node.setExpr(new intliteralNode(0, null));
                 }
                 else{
@@ -44,7 +43,7 @@ public class semanticchecker implements ASTvisitor{
                 node.getExpr().accept(this);
             }
             else if(tp.isArrayType()||tp.isClassType()||tp.isNullType()){
-                if(!type.getID().equals("string")){
+                if(!tp.getTypeName().equals("string")){
                     node.setExpr(new nullliteralNode(null));
                 }
                 else{
@@ -69,37 +68,30 @@ public class semanticchecker implements ASTvisitor{
 
     @Override
     public void visit(arraytypeNode node){
-
     }
 
 
     @Override
     public void visit(classtypeNode node){
-
     }
-
 
     @Override
     public void visit(booltypeNode node){
-
     }
 
 
     @Override
     public void visit(inttypeNode node){
-
     }
 
 
     @Override
     public void visit(voidtypeNode node){
-
     }
 
 
     @Override
     public void visit(stringtypeNode node){
-
     }
 
 
@@ -110,7 +102,8 @@ public class semanticchecker implements ASTvisitor{
 
     @Override
     public void visit(vardeclstmtNode node){
-        node.getVardeclList().getDecls().forEach(x->{x.accept(this);
+        node.getVardeclList().getDecls().forEach(x->{
+                    x.accept(this);
                     if(x.getExpr()!=null)
                         x.getTypeAfterresolve().compatible(x.getExpr().gettype(),node.getpos());
                         });
@@ -159,13 +152,13 @@ public class semanticchecker implements ASTvisitor{
     public void visit(returnNode node){
         type returntype=node.getfuncsymbol().gettype();
         if(node.getExpr()!=null){
-            if(((funcdeclNode)node.getfuncsymbol().getDefNode().gettype()==null))
+            if(((funcdeclNode)node.getfuncsymbol().getDefNode()).gettypeNode()==null)
                 throw new semanticError("Constructor shouldn't have return statement!",node.getpos());
             node.getExpr().accept(this);
             returntype.compatible(node.getExpr().gettype(),node.getpos());
         }
         else{
-            if(!returntype.getWord().equals("void")||((funcdeclNode)node.getfuncsymbol().getDefNode().gettype()==null ))
+            if(!(returntype.getTypeName().equals("void")||((funcdeclNode)node.getfuncsymbol().getDefNode()).gettypeNode()==null ))
                 throw new semanticError("Return without expression!",node.getpos());
         }
     }
@@ -173,12 +166,10 @@ public class semanticchecker implements ASTvisitor{
 
     @Override
     public void visit(breakNode node){
-
     }
 
     @Override
     public void visit(continueNode node){
-
     }
 
     @Override
@@ -192,8 +183,8 @@ public class semanticchecker implements ASTvisitor{
                 if(index.isInteger()){
                     node.setCat(exprNode.Category.LVALUE);
                     node.settype(((arraytype)array.gettype()).getDims()==1
-                            ?((arraytype)array.gettype()).getBaseType()
-                            : new arraytype( ((arraytype)array.gettype()).getBaseType(),((arraytype)array.gettype()).getDims()-1));
+                            ?((arraytype)array.gettype()).getBasetype()
+                            : new arraytype( ((arraytype)array.gettype()).getBasetype(),((arraytype)array.gettype()).getDims()-1));
                 }else throw new semanticError("Subscript ought to be int ",node.getpos());
             }else throw new semanticError("Array expression ought to be array type",node.getpos());
         }
@@ -201,8 +192,8 @@ public class semanticchecker implements ASTvisitor{
 
     @Override
     public void visit(binaryexprNode node){
-        exprNode lhs=node.getLhs();
-        exprNode rhs=node.getRhs();
+        exprNode lhs=node.getlhs();
+        exprNode rhs=node.getrhs();
         lhs.accept(this);
         rhs.accept(this);
         switch (node.getOp()){
@@ -210,8 +201,8 @@ public class semanticchecker implements ASTvisitor{
             case DIV:
             case MOD:
             case SUB:
-            case SHL:
-            case SHR:
+            case BITL:
+            case BITR:
             case AND:
             case XOR:
             case OR:{
@@ -224,10 +215,10 @@ public class semanticchecker implements ASTvisitor{
             case ADD:{
                 if(lhs.isString()&&rhs.isString()){
                     node.setCat(exprNode.Category.RVALUE);
-                    node.settype(stringtypesymbol);
+                    node.settype(stringsymbol);
                 }
                 else if(lhs.isInteger()&&rhs.isInteger()){
-                    node.setCategory(exprNode.Category.RVALUE);
+                    node.setCat(exprNode.Category.RVALUE);
                     node.settype(intsymbol);
                 }else throw new semanticError("Operands ought to be both integers or strings",node.getpos());
                 break;
@@ -259,8 +250,8 @@ public class semanticchecker implements ASTvisitor{
                     throw new semanticError("Operands ought to be both integers or strings",node.getpos());
                 break;
             }
-            case ANDL:
-            case ORL:{
+            case BITAND:
+            case BITOR:{
                 if(lhs.isBoolean()&&rhs.isBoolean()){
                     node.setCat(exprNode.Category.RVALUE);
                     node.settype(boolsymbol);
@@ -281,22 +272,22 @@ public class semanticchecker implements ASTvisitor{
     public void visit(classmemberNode node) {
         node.getExpr().accept(this);
         if (node.getExpr().isAccessable()){
-            classsymbol classSymbol=(classsymbol) node.getExpr().getType();
-            symbol membersymbol=classSymbol.resolveMember(node.getID(),node.getpos());
-            node.setSymbol(membersymbol);
+            classsymbol classSymbol=(classsymbol) node.getExpr().gettype();
+            symbol membersymbol=classSymbol.resolvemember(node.getID(),node.getpos());
+            node.setSym(membersymbol);
             if (membersymbol.isVarsymbol()){
                 node.setCat(exprNode.Category.LVALUE);
-                node.setType(membersymbol.getType());
-            } else if (membersymbol.isFunctionSymbol()) {
+                node.settype(membersymbol.gettype());
+            } else if (membersymbol.isFuncsymbol()) {
                 node.setCat(exprNode.Category.FUNCTION);
-                node.setType(membersymbol.getType());
-                node.setFunctionSymbol((FunctionSymbol) membersymbol);
+                node.settype(membersymbol.gettype());
+                node.setfuncsymbol((funcsymbol) membersymbol);
             }
-        } else if (node.getExpr().getType().isArrayType()){
+        } else if (node.getExpr().gettype().isArrayType()){
             if(node.getID().equals("size")){
                 node.setCat(exprNode.Category.FUNCTION);
-                node.setType(intsymbol);
-                node.setFunctionSymbol(_globalfield.getArrayfunctionsymbol());
+                node.settype(intsymbol);
+                node.setfuncsymbol(_globalfield.getArrayfunctionsymbol());
             }else throw new semanticError("Type array builtin function call error",node.getpos());
         }else throw new semanticError("Member Access error, expression not a class type variable",node.getpos());
     }
@@ -308,23 +299,24 @@ public class semanticchecker implements ASTvisitor{
         function.accept(this);
         node.getParameterList().forEach(x->x.accept(this));
         if(function.isCallable()){
-            if(node.getParameterList().size()==function.getfunctionsymbol().getArguments().size()){
-                funcsymbol _funcsymbol=function.getfunctionsymbol();
+            if(node.getParameterList().size()==function.getfuncsymbol().getArguments().size()){
+                funcsymbol _funcsymbol=function.getfuncsymbol();
                 Iterator<exprNode> iterator=node.getParameterList().iterator();
-                for(Map.Entry<String,varsymbol> entry:funcsymbol.getArguments().entrySet()){
+                for(Map.Entry<String,varsymbol> entry:_funcsymbol.getArguments().entrySet()){
                     String ID=entry.getKey();
                     varsymbol variablesymbol=entry.getValue();
                     exprNode exprnode=iterator.next();
-                    if(!exprNode.isValue())
+                    if(!exprnode.isValue())
                         throw new semanticError("Function call expression error, parameter not a valid value",node.getpos());
-                    variablesymbol.getType().compatible(exprNode.getType(),node.getpos());
+                    variablesymbol.gettype().compatible(exprnode.gettype(),node.getpos());
                 }
                 node.setCat(exprNode.Category.RVALUE);
-                node.setType(function.getFunctioinSymbol().getType());
+                node.settype(function.getfuncsymbol().gettype());
             }else
                 throw new semanticError("Function call expression error, parameter list length not match",node.getpos());
         }else throw new semanticError("Function call expression error, expression not a function",node.getpos());
     }
+
 
     @Override
     public void visit(IDexprNode node){
@@ -332,13 +324,13 @@ public class semanticchecker implements ASTvisitor{
         if(_symbol.isVarsymbol()){
             node.setCat(exprNode.Category.LVALUE);
             node.settype(_symbol.gettype());
-        }else if(_symbol.isClassSymbol()){
+        }else if(_symbol.isClasssymbol()){
             node.setCat(exprNode.Category.LVALUE);
             node.settype((classsymbol) _symbol);
-        }else if(symbol.isFunctionSymbol()){
+        }else if(_symbol.isFuncsymbol()){
             node.setCat(exprNode.Category.FUNCTION);
-            node.settype(symbol.gettype());
-            node.setFunctionSymbol((funcsymbol)symbol);
+            node.settype(_symbol.gettype());
+            node.setfuncsymbol((funcsymbol)_symbol);
         }
     }
 
@@ -347,32 +339,33 @@ public class semanticchecker implements ASTvisitor{
         node.getExprNodeList().forEach(x->{
             x.accept(this);
             if(!(x.isInteger()))throw new semanticError("Array subscript ought to be integers",node.getpos());
-        })
+        });
         type tp=node.getBaseTypeAfterResolve();
         if(node.getNumDims()==0){
             if(tp.isClassType()){
                 if(tp.getTypeName().equals("string")){
                     node.setCat(exprNode.Category.RVALUE);
-                    node.setType(tp);
-                } else{
-                  if(((classsymbol)tp).getConstructor()==null){
-                    node.setCat(exprNode.Category.RVALUE);
                     node.settype(tp);
-                  }else{
-                    node.setCat(exprNode.Category.RVALUE);
-                    node.settype(tp);
-                    node.setfuncsymbol(((classsymbol)tp).getConstructor());
-                  }
+                } else {
+                    if (((classsymbol) tp).getConstructor() == null) {
+                        node.setCat(exprNode.Category.RVALUE);
+                        node.settype(tp);
+                    } else {
+                        node.setCat(exprNode.Category.RVALUE);
+                        node.settype(tp);
+                        node.setfuncsymbol(((classsymbol) tp).getConstructor());
+                    }
+                }
                 }else{
                     node.setCat(exprNode.Category.RVALUE);
                     node.settype(tp);
                 }
               }else{
-                node.setCat(exprNode.Catgory.RVALUE);
+                node.setCat(exprNode.Category.RVALUE);
                 node.settype(new arraytype(tp,node.getNumDims()));
-            }
+              }
         }
-    }
+
 
 
     @Override
@@ -396,8 +389,8 @@ public class semanticchecker implements ASTvisitor{
             }
             case SUF_ADD:
             case SUF_SUB:{
-                if(node.getExpr().isInvar()){
-                    node.setCategory(exprNode.Category,RVALUE);
+                if(node.getExpr().isIntvar()){
+                    node.setCat(exprNode.Category.RVALUE);
                     node.settype(intsymbol);
                 }else throw new semanticError("Non-int variable",node.getpos());
                 break;
@@ -440,7 +433,7 @@ public class semanticchecker implements ASTvisitor{
     @Override
     public void visit(nullliteralNode node){
         node.setCat(exprNode.Category.RVALUE);
-        node.settype(new NullType());
+        node.settype(new Nulltype());
     }
 
 

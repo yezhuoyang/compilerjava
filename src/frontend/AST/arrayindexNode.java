@@ -1,6 +1,6 @@
 package compilerjava.AST;
 
-import compiler.util.position;
+import compilerjava.util.position;
 
 
 public class arrayindexNode extends exprNode{
@@ -25,5 +25,11 @@ public class arrayindexNode extends exprNode{
     public void accept(ASTvisitor visitor){
         visitor.visit(this);
     }
+
+    @Override
+    public String toString(){
+        return "array("+array.toString()+")"+"["+index.toString()+"]";
+    }
+
 
 }

@@ -1,9 +1,9 @@
 package compilerjava.AST;
-import compilerjava.position;
+import compilerjava.util.position;
 
 
 
-public abstract constexprNode extends exprNode{
+public abstract class constexprNode extends exprNode{
     public constexprNode(position pos){
         super(pos);
     }

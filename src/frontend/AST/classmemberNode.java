@@ -26,7 +26,7 @@ public class classmemberNode extends exprNode{
         return sym;
     }
 
-    public void setSymbol(symbol sym) {
+    public void setSym(symbol sym) {
         this.sym = sym;
     }
 

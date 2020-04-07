@@ -1,4 +1,4 @@
-package compilerjava.util
+package compilerjava.util;
 import org.antlr.v4.runtime.Token;
 
 public class position{
@@ -17,11 +17,11 @@ public class position{
 
     public position(Token tok){
         this.row=tok.getLine();
-        this.col=tok.getCharPositionLine();
+        this.col=tok.getCharPositionInLine();
     }
 
     public String toString(){
-        return "line:"+row=" col: "+col+"\n";
+        return "line:"+row+" col: "+col+"\n";
     }
 
 }

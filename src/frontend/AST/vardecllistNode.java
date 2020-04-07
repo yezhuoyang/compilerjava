@@ -1,5 +1,5 @@
 package compilerjava.AST;
-import compilerjava.position;
+import compilerjava.util.position;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,19 +7,19 @@ import java.util.List;
 
 
 public class vardecllistNode extends declNode{
-    private List<vardecllistNode> decls;
+    private List<vardeclNode> decls;
 
     public vardecllistNode(position pos){
         super(pos);
-        this.decls=new ArrayListM<>();
+        this.decls=new ArrayList<>();
     }
 
-    public vardecllistNode(List<vardecllistNode> decls,position pos){
+    public vardecllistNode(List<vardeclNode> decls,position pos){
         super(pos);
         this.decls=decls;
     }
 
-    public List<vardecllistNode> getDecls() {
+    public List<vardeclNode> getDecls() {
         return decls;
     }
 

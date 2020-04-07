@@ -1,12 +1,12 @@
 package compilerjava.AST;
-import compilerjava.position;
+import compilerjava.util.position;
 
 
 public class stringliteralNode extends constexprNode{
 
     private String val;
 
-    public StringliteralNode(String val,position pos){
+    public stringliteralNode(String val,position pos){
         super(pos);
         this.val=val;
     }

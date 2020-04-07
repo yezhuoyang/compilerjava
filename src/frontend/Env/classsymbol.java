@@ -17,7 +17,9 @@ public class classsymbol extends symbol implements field, type{
     private Map<String,varsymbol> varsymbolMap=new LinkedHashMap<>();
     private Map<String,funcsymbol> funcsymbolMap=new LinkedHashMap<>();
 
-    public classsymbol(String name,classsdeclNode classnode,field outerfield){
+    private int size;
+
+    public classsymbol(String name,classdeclNode classnode,field outerfield){
         super(name,null,classnode);
         this.outerfield=outerfield;
         constructor=null;
@@ -25,16 +27,16 @@ public class classsymbol extends symbol implements field, type{
 
     @Override
     public String getfieldName(){
-        return super.getSymbolName();
+        return super.getWord();
     }
 
     @Override
     public String getTypeName(){
-        return super.getSymbolName();
+        return super.getWord();
     }
 
     @Override
-    public getOuterfield(){
+    public field getOuterfield(){
         return outerfield;
     }
 
@@ -48,19 +50,19 @@ public class classsymbol extends symbol implements field, type{
 
     @Override
     public void defvar(varsymbol symbol){
-        if(varsymbolMap.containsKey(symbol.getSymbolName())||funcsymbolMap.containsKey(symbol.getSymbolName()))
+        if(varsymbolMap.containsKey(symbol.getWord())||funcsymbolMap.containsKey(symbol.getWord()))
             throw new semanticError("Duplicate ID",symbol.getDefNode().getpos());
-        varsymbolMap.put(symbol.getSymbolName(),symbol);
+        varsymbolMap.put(symbol.getWord(),symbol);
         symbol.setfield(this);
     }
 
     @Override
     public void deffunc(funcsymbol symbol){
-        if(varsymbolMap.containsKey(symbol.getSymbolName())||funcsymbolMap.containsKey(symbol.getSymbolName()))
+        if(varsymbolMap.containsKey(symbol.getWord())||funcsymbolMap.containsKey(symbol.getWord()))
             throw new semanticError("Duplicate ID",symbol.getDefNode().getpos());
-        symbol.setMemberfunction();
+        symbol.setMemberFunc();
         symbol.setfield(this);
-        funcsymbolMap.put(symbol.getSymbolName(),symbol);
+        funcsymbolMap.put(symbol.getWord(),symbol);
     }
 
     @Override
@@ -68,12 +70,82 @@ public class classsymbol extends symbol implements field, type{
 
     }
 
-    @Override
-    public Symbol resolvesymbol(){
 
+
+    @Override
+    public symbol resolvesymbol(String ID,position pos){
+        symbol varsymbol=varsymbolMap.get(ID);
+        symbol funcsymbol=funcsymbolMap.get(ID);
+        if(varsymbol!=null)return varsymbol;
+        if(funcsymbol!=null)return funcsymbol;
+        return outerfield.resolvesymbol(ID,pos);
+    }
+
+
+    public symbol resolvemember(String ID,position pos){
+        symbol varsymbol=varsymbolMap.get(ID);
+        symbol funcsymbol=funcsymbolMap.get(ID);
+        if(varsymbol!=null)return varsymbol;
+        if(funcsymbol!=null)return funcsymbol;
+        throw new semanticError(ID+" is not a member of "+ getWord(),pos);
+    }
+
+    @Override
+    public void compatible(type tp,position pos){
+        if(getTypeName().equals("string")){
+            if(tp.getTypeName().equals("string")){
+
+            }else throw new semanticError("Type string is not compatible with type "+ getTypeName(),pos);
+        }else{
+            if(tp.getTypeName().equals("null")||tp.getTypeName().equals(getTypeName())){
+
+            }else
+                throw new semanticError("Type "+getTypeName()+" is not compatible with type "+ getTypeName(),pos);
+        }
+    }
+
+    @Override
+    public boolean isClasssymbol(){
+        return true;
     }
 
 
 
+    @Override
+    public boolean isBaseType(){
+        return false;
+    }
+
+
+    @Override
+    public boolean isClassType(){
+        return true;
+    }
+
+
+    @Override
+    public boolean isArrayType(){
+        return false;
+    }
+
+    @Override
+    public boolean isNullType(){
+        return false;
+    }
+
+    @Override
+    public boolean isPointerType(){
+        return true;
+    }
+
+    @Override
+    public int getTypeSize(){
+        return config.pointersize();
+    }
+
+
+    public int getObjectSize(){
+        return size;
+    }
 
 }

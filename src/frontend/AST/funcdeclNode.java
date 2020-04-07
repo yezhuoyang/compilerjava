@@ -1,13 +1,13 @@
 package compilerjava.AST;
-import compilerjava.position;
+import compilerjava.util.position;
 import compilerjava.Env.funcsymbol;
 
-
+import java.util.List;
 
 
 
 public class funcdeclNode extends declNode{
-    private TypeNode type;
+    private typeNode tpnode;
     private String ID;
     private List<vardeclNode> parameterList;
     private blockstmtNode block;
@@ -15,7 +15,7 @@ public class funcdeclNode extends declNode{
 
     public funcdeclNode(typeNode tp,String ID,List<vardeclNode> parameterList,blockstmtNode block,position pos){
         super(pos);
-        this.type=tp;
+        this.tpnode=tp;
         this.ID=ID;
         this.parameterList=parameterList;
         this.block=block;
@@ -26,8 +26,8 @@ public class funcdeclNode extends declNode{
         return ID;
     }
 
-    public typeNode getType(){
-        return type;
+    public typeNode gettypeNode(){
+        return tpnode;
     }
 
     public List<vardeclNode> getParameterList() {

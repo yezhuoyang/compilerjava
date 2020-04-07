@@ -1,5 +1,5 @@
 package compilerjava.Env;
-import compilerjava.position;
+import compilerjava.util.position;
 
 
 public interface type{
@@ -18,5 +18,6 @@ public interface type{
     boolean isPointerType();
 
     int getTypeSize();
+
 
 }

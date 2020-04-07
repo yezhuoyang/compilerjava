@@ -3,7 +3,7 @@ import compilerjava.util.position;
 
 
 
-public class typeNode extends Node{
+public abstract class typeNode extends Node{
     private String typeID;
 
     public typeNode(String typeID,position pos){
@@ -14,5 +14,6 @@ public class typeNode extends Node{
     public String gettypeID(){
         return typeID;
     }
+
 
 }

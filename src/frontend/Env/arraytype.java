@@ -44,8 +44,8 @@ public class arraytype implements type{
 
 
     @Override
-    void compatible(type tp,position pos){
-        if(tp.gettypeName().equals("null")){}
+    public void compatible(type tp,position pos){
+        if(tp.getTypeName().equals("null")){}
         else if(tp instanceof arraytype){
             basetype.compatible(((arraytype) tp).getBasetype(),pos);
             if(dims==((arraytype)tp).getDims()){
@@ -61,36 +61,41 @@ public class arraytype implements type{
 
 
     @Override
-    boolean isbaseType(){
+    public boolean isBaseType(){
         return false;
     }
 
     @Override
-    boolean isClassType(){
+    public boolean isClassType(){
         return false;
     }
 
     @Override
-    boolean isArrayType(){
+    public boolean isArrayType(){
         return false;
     }
 
     @Override
-    boolean isNullType(){
+    public boolean isNullType(){
         return false;
     }
 
     @Override
-    boolean isPointerType(){
+    public boolean isPointerType(){
         return false;
     }
 
 
     @Override
-    int getTypeSize(){
+    public int getTypeSize(){
         return config.pointersize();
     }
 
+
+    @Override
+    public String toString(){
+        return getTypeName();
+    }
 
 
 }

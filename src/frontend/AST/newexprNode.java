@@ -11,7 +11,7 @@ public class newexprNode extends exprNode{
     private typeNode baseType;
     private type baseTypeAfterResolve;
     private int numDims;
-    private List<exprNode> exprNodeList=new Array<newexprNode>();
+    private List<exprNode> exprNodeList=new ArrayList<exprNode>();
 
 
     public newexprNode(typeNode baseType,int numDims,List<exprNode> exprNodeList,position pos){
@@ -22,7 +22,7 @@ public class newexprNode extends exprNode{
     }
 
     public typeNode getBaseType(){
-        return baseType
+        return baseType;
     }
 
     public int getNumDims(){

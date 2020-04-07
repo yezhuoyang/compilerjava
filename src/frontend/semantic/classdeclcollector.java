@@ -2,7 +2,7 @@ package compilerjava.semantic;
 
 import compilerjava.AST.*;
 import compilerjava.Env.*;
-
+import java.util.*;
 
 
 
@@ -10,16 +10,16 @@ public class classdeclcollector implements ASTvisitor{
     private globalfield _globalfield;
 
     public classdeclcollector(globalfield _globalfield){
-            thia.globalfield=_globalfield;
+            this._globalfield=_globalfield;
     }
 
     @Override
-    public void visit(ProgramNode node){
+    public void visit(programNode node){
         node.getDeclNodeList().forEach(x->x.accept(this));
     }
 
     @Override
-    public void visit(VariabledeclNode node){
+    public void visit(vardeclNode node){
     }
 
     @Override
@@ -29,8 +29,8 @@ public class classdeclcollector implements ASTvisitor{
     @Override
     public void visit(classdeclNode node){
         classsymbol _classsymbol=new classsymbol(node.getID(),node,_globalfield);
-        _globalfield=defclass();
-        node.setClassname(_classsymbol);
+        _globalfield.defclass(_classsymbol);
+        node.setClassSymbol(_classsymbol);
     }
 
 

@@ -1,7 +1,7 @@
 package compilerjava.Env;
 
-import compilerjava.Env.position;
-import compilerjava.Env.semanticError;
+import compilerjava.util.position;
+import compilerjava.util.semanticError;
 
 
 public class Nulltype implements type{
@@ -44,6 +44,11 @@ public class Nulltype implements type{
     @Override
     public int getTypeSize(){
         return 0;
+    }
+
+    @Override
+    public String toString(){
+        return "null";
     }
 
 }

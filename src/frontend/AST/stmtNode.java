@@ -1,5 +1,5 @@
 package compilerjava.AST;
-import compilerjava.position;
+import compilerjava.util.position;
 
 
 public abstract class stmtNode extends Node{

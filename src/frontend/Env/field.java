@@ -1,7 +1,7 @@
 package  compilerjava.Env;
 
 
-import compiler.util.position;
+import compilerjava.util.position;
 
 
 
@@ -13,7 +13,7 @@ public interface field{
 
     void defvar(varsymbol symbol);
 
-    void deffunc(funceymbol symbol);
+    void deffunc(funcsymbol symbol);
 
     void defclass(classsymbol symbol);
 

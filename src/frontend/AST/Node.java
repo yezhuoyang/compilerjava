@@ -1,5 +1,5 @@
 package compilerjava.AST;
-import compilerjava.util.position
+import compilerjava.util.position;
 
 
 public abstract class Node{
@@ -14,4 +14,5 @@ public abstract class Node{
     }
 
     abstract public void accept(ASTvisitor visitor);
+
 }

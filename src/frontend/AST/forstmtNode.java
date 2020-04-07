@@ -1,8 +1,8 @@
 package compilerjava.AST;
-import compilerjava.position;
+import compilerjava.util.position;
 
 
-public class forstmtNode extends stmtNode{
+public class forstmtNode extends stmtNode implements Loop{
     private exprNode init;
     private exprNode cond;
     private exprNode step;

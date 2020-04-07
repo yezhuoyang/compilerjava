@@ -8,6 +8,7 @@ public class arraytypeNode extends typeNode{
     private typeNode baseType;
     private int dims;
 
+
     public arraytypeNode(typeNode tpnode,position pos){
           super(tpnode.gettypeID(),pos);
           if(tpnode instanceof arraytypeNode){
@@ -15,7 +16,7 @@ public class arraytypeNode extends typeNode{
               dims=((arraytypeNode)tpnode).dims+1;
           }
           else {
-              baseType = tpnode
+              baseType = tpnode;
               dims = 1;
           }
     }
@@ -24,9 +25,15 @@ public class arraytypeNode extends typeNode{
         return dims;
     }
 
+
     @Override
     public void accept(ASTvisitor visitor){
         visitor.visit(this);
     }
+
+
+
+
+
 
 }

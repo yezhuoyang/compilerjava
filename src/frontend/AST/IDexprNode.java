@@ -1,7 +1,7 @@
 package compilerjava.AST;
 
 import compilerjava.Env.symbol;
-import compilerjava.position;
+import compilerjava.util.position;
 
 
 

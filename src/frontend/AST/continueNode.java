@@ -1,10 +1,11 @@
 package compilerjava.AST;
-import compilerjava.position;
+import compilerjava.util.position;
 
 
 
 public class continueNode extends stmtNode {
 
+    private Loop currentLoop;
 
     public continueNode(position pos) {
         super(pos);
@@ -14,5 +15,18 @@ public class continueNode extends stmtNode {
     public void accept(ASTvisitor visitor) {
         visitor.visit(this);
     }
+
+
+
+    public Loop getCurrentLoop() {
+        return currentLoop;
+    }
+
+    public void setCurrentLoop(Loop currentLoop) {
+        this.currentLoop = currentLoop;
+    }
+
+
+
 
 }

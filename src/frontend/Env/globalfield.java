@@ -1,6 +1,6 @@
 package compilerjava.Env;
 
-import compilerjava.AST.Node;
+import compilerjava.AST.*;
 import compilerjava.util.position;
 import compilerjava.util.semanticError;
 
@@ -11,12 +11,12 @@ import java.util.Map;
 
 public class globalfield extends basefield{
 
-    private Map<String,type> typeMap=new LinkedHashMap;
-    private basesymbol  Intsymbol;
+    private Map<String,type> typeMap=new LinkedHashMap<>();
+    private basesymbol  intsymbol;
     private basesymbol  boolsymbol;
     private basesymbol  voidsymbol;
     private funcsymbol  arrayfunctionsymbol;
-    private classsymbol classsym;
+    private classsymbol string;
 
 
     public globalfield(String name){
@@ -48,15 +48,15 @@ public class globalfield extends basefield{
         return sym;
     }
 
+
     public type resolvetype(typeNode node){
         type tp=typeMap.get(node.gettypeID());
         if(tp==null) throw new semanticError("Unknown type ",node.getpos());
         return tp;
     }
 
-
     public symbol resolveMain(){
-        if(!symbolMap.containsKey("main"))throw semanticError("No main function!",new position(0,0));
+        if(!symbolMap.containsKey("main"))throw new semanticError("No main function!",new position(0,0));
         return symbolMap.get("main");
     }
 
@@ -70,11 +70,11 @@ public class globalfield extends basefield{
 
 
     public void setIntsymbol(basesymbol intsymbol) {
-        Intsymbol = intsymbol;
+        this.intsymbol = intsymbol;
     }
 
-    public void getIntsymbol(){
-        return Intsymbol;
+    public basesymbol getIntsymbol(){
+        return intsymbol;
     }
 
     public void setVoidsymbol(basesymbol voidsymbol) {
@@ -85,12 +85,12 @@ public class globalfield extends basefield{
         return voidsymbol;
     }
 
-    public classsymbol getClasssym() {
-        return classsym;
+    public classsymbol getString() {
+        return string;
     }
 
-    public void setClasssym(classsymbol classsym) {
-        this.classsym = classsym;
+    public void setString(classsymbol string) {
+        this.string = string;
     }
 
     public funcsymbol getArrayfunctionsymbol() {

@@ -69,9 +69,9 @@ stmt
     : block             #blockstmt
     | variableDecl      #vardeclstmt
     | expr ';'          #exprstmt
-    | conditionStmt ';' #conditionstmt
-    | loopStmt ';'      #loopstmt
-    | jumpStmt ';'      #jumpstmt
+    | conditionStatement ';' #conditionstmt
+    | loopStatement ';'      #loopstmt
+    | jumpStatement ';'      #jumpstmt
     | ';'               #blankstmt
     ;
 
@@ -79,16 +79,16 @@ block
     : '{' stmt* '}'
     ;
 
-conditionStmt
+conditionStatement
     : IF '(' expr ')' thenStmt=stmt (ELSE elseStmt=stmt)*?
     ;
 
-loopStmt
+loopStatement
     : WHILE '(' expr ')' stmt                                       #whilestmt
     | FOR '(' init=expr?  ';'  cond=expr? ';' step=expr?')' stmt    #forstmt
     ;
 
-jumpStmt
+jumpStatement
     : RETURN expr ';'   #returnstmt
     | BREAK ';'         #breakstmt
     | CONTINUE ';'      #continuestmt
@@ -181,7 +181,7 @@ ID
 
 
 WHITESPACE
-    : [\t\n\r]->skip
+    : [ \t\n\r]->skip
     ;
 
 

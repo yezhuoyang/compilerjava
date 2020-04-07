@@ -1,11 +1,12 @@
 package compilerjava.AST;
 
 
-import compilerjava.position;
+import compilerjava.util.position;
 import compilerjava.Env.type;
 import compilerjava.Env.varsymbol;
 
 
+import java.util.*;
 
 public class vardeclNode extends declNode{
     private typeNode _typeNode;
@@ -69,11 +70,9 @@ public class vardeclNode extends declNode{
         return _typeNode;
     }
 
-
     public varsymbol getvarsymbol() {
         return _varsymbol;
     }
-
 
     public void setvarsymbol(varsymbol _varsymbol) {
         this._varsymbol = _varsymbol;

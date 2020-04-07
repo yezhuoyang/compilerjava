@@ -1,4 +1,4 @@
-package compiler.util;
+package compilerjava.util;
 
 
 public class semanticError extends RuntimeException{
@@ -10,12 +10,12 @@ public class semanticError extends RuntimeException{
 
     public semanticError(String msg,position pos){
         super(msg);
-        this.position=pos;
+        this.pos=pos;
     }
 
     @Override
     public String getMessage(){
-        return "[Semantic Error]: "+super.getMessage()+" @ "+position.toString();
+        return "[Semantic Error]: "+super.getMessage()+" @ "+pos.toString();
     }
 
 

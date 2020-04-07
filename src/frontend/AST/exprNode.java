@@ -1,5 +1,5 @@
-package compilerjava.AST
-import compilerjava.position;
+package compilerjava.AST;
+import compilerjava.util.position;
 
 
 import compilerjava.Env.type;
@@ -52,11 +52,11 @@ public abstract class exprNode extends Node{
 
 
     public boolean isBooleanVar(){
-        return (cat==Category.LVALUE&&type.getTypeName().equals("bool"));
+        return (cat==Category.LVALUE&&_type.getTypeName().equals("bool"));
     }
 
     public boolean isString(){
-        return  (cat==Category.LVALUE&&type.getTypeName().equals("string"));
+        return  (cat==Category.LVALUE&&_type.getTypeName().equals("string"));
     }
 
     public boolean isInteger(){
@@ -76,12 +76,12 @@ public abstract class exprNode extends Node{
     }
 
     public boolean isAccessable(){
-        return (isValue()&&type.isClasstype());
+        return (isValue()&&_type.isClassType());
     }
 
 
     public boolean isNullable(){
-        return (cat==Category.LVALUE&&(type.isClassType()||type.isArrayType())||type.isNullable())
+        return (cat==Category.LVALUE&&(_type.isClassType()||_type.isArrayType())||_type.isNullType());
     }
 
     public boolean isValue(){
@@ -89,6 +89,10 @@ public abstract class exprNode extends Node{
     }
 
     public boolean isNull(){
-        return type.isNullType();
+        return _type.isNullType();
     }
+
+
+
+
 }

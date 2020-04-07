@@ -1,5 +1,5 @@
 package compilerjava.AST;
-import compilerjava.position;
+import compilerjava.util.position;
 import java.util.List;
 
 

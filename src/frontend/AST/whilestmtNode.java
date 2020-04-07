@@ -1,8 +1,8 @@
 package compilerjava.AST;
-import compilerjava.position;
+import compilerjava.util.position;
 
 
-public class whilestmtNode extends stmtNode{
+public class whilestmtNode extends stmtNode implements Loop{
     private exprNode expr;
     private stmtNode stmt;
     private position pos;

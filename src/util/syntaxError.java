@@ -1,4 +1,4 @@
-package compiler.util;
+package compilerjava.util;
 
 
 public class syntaxError extends RuntimeException{
@@ -10,12 +10,12 @@ public class syntaxError extends RuntimeException{
 
     public syntaxError(String msg,position pos){
         super(msg);
-        this.position=pos;
+        this.pos=pos;
     }
 
     @Override
     public String getMessage(){
-        return "[Syntax Error]: "+super.getMessage()+" @ "+position.toString();
+        return "[Syntax Error]: "+super.getMessage()+" @ "+pos.toString();
     }
 
 

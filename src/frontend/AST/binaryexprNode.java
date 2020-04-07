@@ -9,22 +9,22 @@ public class binaryexprNode extends exprNode{
     private exprNode lhs,rhs;
 
 
-    public binaryexprNode(exprNode lhs,exprNode rhs,Op op,position pos){
+    public binaryexprNode(exprNode lhs,exprNode rhs,Optype op,position pos){
             super(pos);
             this.lhs=lhs;
             this.rhs=rhs;
             this.op=op;
     }
 
-    public getrhs(){
+    public exprNode getrhs(){
+        return rhs;
+    }
+
+    public exprNode getlhs(){
         return lhs;
     }
 
-    public getlhs(){
-        return lhs;
-    }
-
-    public Op getOp(){
+    public Optype getOp(){
         return op;
     }
 

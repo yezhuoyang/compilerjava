@@ -15,13 +15,13 @@ public class blockstmtNode extends stmtNode{
 
     public blockstmtNode(stmtNode sNode,position pos){
             super(pos);
-            if(stmtNode !=null)
+            if(sNode !=null)
                 stmtList.add(sNode);
     }
 
     public blockstmtNode(List<stmtNode> stmtList,position pos){
-            this.stmtList=stmtList;
-            this.pos=pos;
+        super(pos);
+        this.stmtList=stmtList;
     }
 
     public List<stmtNode> getStmtList(){

@@ -11,7 +11,7 @@ public abstract class basefield implements field{
     private String name;
     private field outerfield;
 
-    basefield(String name,field outerfield){
+    public basefield(String name,field outerfield){
         this.name=name;
         this.outerfield=outerfield;
     }
@@ -27,15 +27,20 @@ public abstract class basefield implements field{
     }
 
     @Override
-    public void definevar(varsymbol symbol){
-        if(symbolMap.containsKey(symbol.getSymbolName()))
+    public void defvar(varsymbol symbol){
+        if(symbolMap.containsKey(symbol.getWord()))
             throw new semanticError("Duplicate ID: ",symbol.getDefNode().getpos());
-        symbolMap.put(symbol.getSymbolName(),symbol);
+        symbolMap.put(symbol.getWord(),symbol);
         symbol.setfield(this);
     }
 
-
-
+    @Override
+    public void deffunc(funcsymbol symbol){
+        if(symbolMap.containsKey(symbol.getWord()))
+            throw new semanticError("Duplicate ID: ",symbol.getDefNode().getpos());
+        symbolMap.put(symbol.getWord(),symbol);
+        symbol.setfield(this);
+    }
 
 
 

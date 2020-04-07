@@ -2,8 +2,7 @@ package compilerjava.semantic;
 
 import compilerjava.AST.*;
 import compilerjava.Env.*;
-import compilerjava.util.semanticError;
-
+import compilerjava.util.*;
 
 
 
@@ -12,7 +11,7 @@ public class classmembercollector implements ASTvisitor{
     private field  currentfield;
 
     public static type Node2Type(typeNode tpnode,globalfield _globalfield){
-        type tp=_globalfield.resolveyType(tpnode);
+        type tp=_globalfield.resolvetype(tpnode);
         if(tpnode instanceof arraytypeNode)
             return new arraytype(tp,((arraytypeNode)tpnode).getDims());
         else return tp;
@@ -20,19 +19,19 @@ public class classmembercollector implements ASTvisitor{
 
 
     public classmembercollector(globalfield _globalfield){
-        thia.globalfield=_globalfield;
+        this._globalfield=_globalfield;
     }
 
     @Override
-    public void visit(ProgramNode node){
+    public void visit(programNode node){
         node.getDeclNodeList().forEach(x->{
-            if(x instanceof classmemberNode)x.accept(this);
+            if(x instanceof classdeclNode)x.accept(this);
         });
     }
 
     @Override
-    public void visit(VariabledeclNode node){
-        type tp=Node2Type(node.gettype(),_globalfield);
+    public void visit(vardeclNode node){
+        type tp=Node2Type(node.gettypeNode(),_globalfield);
         varsymbol _varsymbol=new varsymbol(node.getID(),tp,node);
         node.setvarsymbol(_varsymbol);
         currentfield.defvar(_varsymbol);
@@ -40,23 +39,23 @@ public class classmembercollector implements ASTvisitor{
 
     @Override
     public void visit(funcdeclNode node){
-        type returntype=node.gettype()==null
+        type returntype=node.gettypeNode()==null
                 ? (classsymbol) currentfield:
-                Node2Type(node.gettype(),_globalfield);
+                Node2Type(node.gettypeNode(),_globalfield);
         funcsymbol _funcsymbol=new funcsymbol(node.getID(),returntype,node,currentfield);
         node.setfuncsymbol(_funcsymbol);
         currentfield.deffunc(_funcsymbol);
         if(currentfield instanceof classsymbol){
             if(node.getID().equals(((classsymbol)currentfield).getTypeName())){
-                if(node.gettype()==null){
+                if(node.gettypeNode()==null){
                     if(((classsymbol)currentfield).getConstructor()!=null)
                         throw new semanticError("Duplicated constructors",node.getpos());
                     ((classsymbol) currentfield).setConstructor(_funcsymbol);
                 }else throw new semanticError("Wrong type for constructor",node.getpos());
-            }else if(node.gettype()==null) throw new semanticError("Return type missing",node.getpos());
+            }else if(node.gettypeNode()==null) throw new semanticError("Return type missing",node.getpos());
         }
         currentfield=_funcsymbol;
-        node.getParameterList().forEach(x->accept(this));
+        node.getParameterList().forEach(x->x.accept(this));
     }
 
     @Override
