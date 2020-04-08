@@ -34,12 +34,10 @@ public class globalfield extends basefield{
         symbol.setfield(this);
     }
 
-
     public void defbasetype(basesymbol symbol){
         typeMap.put(symbol.getWord(),symbol);
         symbol.setfield(this);
     }
-
 
     @Override
     public symbol resolvesymbol(String ID,position pos){

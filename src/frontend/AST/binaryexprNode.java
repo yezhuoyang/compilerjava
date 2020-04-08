@@ -32,6 +32,7 @@ public class binaryexprNode extends exprNode{
         MUL,DIV,MOD,ADD,SUB,BITL,BITR,LT,GT,LEQ,GEQ,EQ,NEQ,AND,XOR,OR,BITAND,BITOR,ASSIGN
     }
 
+    @Override
     public void accept(ASTvisitor visitor){
         visitor.visit(this);
     }

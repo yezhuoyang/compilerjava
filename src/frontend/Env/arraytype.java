@@ -72,7 +72,7 @@ public class arraytype implements type{
 
     @Override
     public boolean isArrayType(){
-        return false;
+        return true;
     }
 
     @Override

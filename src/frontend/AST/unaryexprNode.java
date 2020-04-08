@@ -9,7 +9,7 @@ public class unaryexprNode extends exprNode{
     private exprNode expr;
 
     public enum Op{
-        PRE_ADD,PRE_SUB,SUF_ADD,SUF_SUB,POS,NEG,NOTL,NOT
+        PRE_ADD,PRE_SUB,SUF_ADD,SUF_SUB,POS,NEG,BITNOT,NOT
     }
 
     public unaryexprNode(exprNode expr,Op op,position pos){

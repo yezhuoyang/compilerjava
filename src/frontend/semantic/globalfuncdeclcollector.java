@@ -56,7 +56,6 @@ public class globalfuncdeclcollector implements ASTvisitor{
     }
 
 
-
     @Override
     public void visit(classdeclNode node){
     }

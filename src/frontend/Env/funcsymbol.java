@@ -36,10 +36,11 @@ public class funcsymbol extends symbol implements field{
         return outerfield;
     }
 
+
     @Override
     public void defvar(varsymbol symbol){
         if(arguments.containsKey(symbol.getWord()))
-            throw new semanticError("Duplicate name variables",symbol.getDefNode().getpos());
+            throw new semanticError(" Duplicate name variables ",symbol.getDefNode().getpos());
         else arguments.put(symbol.getWord(),symbol);
         symbol.setfield(this);
     }

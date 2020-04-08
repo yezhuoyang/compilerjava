@@ -22,7 +22,7 @@ functionDecl
 
 
 classDecl
-    :  CLASS ID '{' (functionDecl|variableDecl)* '}'
+    :  CLASS ID '{' (functionDecl|variableDecl)* '}' ';'
     ;
 
 variableDecl
@@ -69,9 +69,9 @@ stmt
     : block             #blockstmt
     | variableDecl      #vardeclstmt
     | expr ';'          #exprstmt
-    | conditionStatement ';' #conditionstmt
-    | loopStatement ';'      #loopstmt
-    | jumpStatement ';'      #jumpstmt
+    | conditionStatement     #conditionstmt
+    | loopStatement          #loopstmt
+    | jumpStatement          #jumpstmt
     | ';'               #blankstmt
     ;
 
@@ -80,7 +80,7 @@ block
     ;
 
 conditionStatement
-    : IF '(' expr ')' thenStmt=stmt (ELSE elseStmt=stmt)*?
+    : IF '(' expr ')' thenStmt=stmt (ELSE elseStmt=stmt)?
     ;
 
 loopStatement
@@ -89,7 +89,7 @@ loopStatement
     ;
 
 jumpStatement
-    : RETURN expr ';'   #returnstmt
+    : RETURN expr? ';'   #returnstmt
     | BREAK ';'         #breakstmt
     | CONTINUE ';'      #continuestmt
     ;
@@ -98,7 +98,7 @@ jumpStatement
 expr
     :   expr op=('++' | '--')                          #postcalcdecl
     |   <assoc=right> 'new' creator                    #newexpr
-    |   expr '(' params? ')'                           #functioncall
+    |   expr '(' paramList? ')'                           #functioncall
     |   array = expr '[' index = expr ']'              #subscript
     |   expr '.' ID                                    #memberaccess
     |   <assoc=right> op=('++' | '--') expr            #unaryexpr
@@ -117,11 +117,15 @@ expr
     |   src1 = expr op='||' src2 = expr                #binaryexpr
     |   <assoc=right> src1 = expr op='=' src2 = expr   #binaryexpr
     |   ID                                             #identifier
-    |   constant                                       #constantexpr
     |   THIS                                           #thisexpr
+    |   constant                                       #constantexpr
     |   '(' expr ')'                                   #subexpr
     ;
 
+
+paramList
+    : expr ( ',' expr)*
+    ;
 
 creator
     :  nonArraytype ('[' expr ']')+ ('['  ']')+('[' expr ']')+    #errorCreator
@@ -135,7 +139,7 @@ constant
     :  INTCONSTANT                                       #integerLiteral
     |  STRINGCONSTANT                                    #stringLiteral
     |  BOOLCONSTANT                                      #boolLiteral
-    |  NULL                                              #nullLiteral
+    |  NULLCONSTANT                                      #nullLiteral
     ;
 
 
@@ -143,7 +147,6 @@ constant
 INT: 'int';
 BOOL:'bool';
 STRING: 'string';
-NULL: 'null';
 VOID: 'void';
 ELSE: 'else';
 FOR:  'for';
@@ -155,9 +158,9 @@ RETURN:  'return';
 NEW:    'new';
 CLASS:  'class';
 THIS:   'this';
-TRUE:   'true';
-FALSE:   'false';
-
+fragment TRUE:   'true';
+fragment FALSE:   'false';
+fragment NULL:   'null';
 
 
 
@@ -167,8 +170,13 @@ INTCONSTANT
 
 
 STRINGCONSTANT
-     : '"' ('//n' | '\\\\' | '\\"'|.)*? ' " '
+     :  '"' ('//n' | '\\\\' | '\\"'| .)*? '"'
      ;
+
+NULLCONSTANT
+     : NULL
+     ;
+
 
 BOOLCONSTANT
      : TRUE
@@ -176,20 +184,20 @@ BOOLCONSTANT
      ;
 
 ID
-    :  [a-zA-Z]+[a-zA-Z_0-9]*
+    :  [a-zA-Z]+ [a-zA-Z_0-9]*
     ;
 
 
 WHITESPACE
-    : [ \t\n\r]->skip
+    : [ \t\n\r]+ -> skip
     ;
 
 
 LINECOMMENT
-    : '//' ~[\r\n]* ->skip
+    : '//' ~[\r\n]* -> skip
     ;
 
 
 BLOCKCOMMENT
-    : '/*' .*? '*/' ->skip
+    : '/*' .*? '*/' -> skip
     ;

@@ -109,16 +109,14 @@ public class ASTcreator extends MXBaseVisitor<Node>{
 
 	@Override
 	public Node visitArrayType(MXParser.ArrayTypeContext ctx) {
-         return  new arraytypeNode((typeNode)visit(ctx.type()),new position(ctx.getStart()));
+         return new arraytypeNode((typeNode)visit(ctx.type()),new position(ctx.getStart()));
 	}
-
 
 
 	@Override
 	public Node visitNarrayType(MXParser.NarrayTypeContext ctx) {
          return visit(ctx.nonArraytype());
 	}
-
 
 
 	@Override
@@ -279,10 +277,10 @@ public class ASTcreator extends MXBaseVisitor<Node>{
 	       	        op=unaryexprNode.Op.NEG;
 	                break;
 	        case "!":
-	        	    op=unaryexprNode.Op.NOTL;
+	        	    op=unaryexprNode.Op.NOT;
 	                break;
 	        case "~":
-	        	    op=unaryexprNode.Op.NOT;
+	        	    op=unaryexprNode.Op.BITNOT;
 	                break;
 	        default:
 	                op=null;
@@ -324,13 +322,12 @@ public class ASTcreator extends MXBaseVisitor<Node>{
 	@Override
 	public Node visitFunctioncall(MXParser.FunctioncallContext ctx) {
 	        List<exprNode> parameterList=new ArrayList<>();
-	        if(ctx.params()!=null){
-	            for(ParserRuleContext parameter:ctx.params().paramDecl())
+	        if(ctx.paramList()!=null){
+	            for(ParserRuleContext parameter:ctx.paramList().expr())
 	                parameterList.add((exprNode) visit(parameter));
 	        }
             return new funccallexprNode((exprNode)visit(ctx.expr()),parameterList,new position(ctx.getStart()));
 	}
-
 
 	@Override
 	public Node visitBinaryexpr(MXParser.BinaryexprContext ctx) {
@@ -433,12 +430,11 @@ public class ASTcreator extends MXBaseVisitor<Node>{
 	public Node visitArrayCreator(MXParser.ArrayCreatorContext ctx) {
 	       List<exprNode> exprNodeList=new ArrayList<>();
 	       for(ParserRuleContext expr:ctx.expr())
-	                exprNodeList.add((exprNode) visit(expr)  );
+	                exprNodeList.add((exprNode) visit(expr) );
 	       return new newexprNode( (typeNode)visit(ctx.nonArraytype()),
 	           (ctx.getChildCount()-ctx.expr().size()-1)/2,
 	           exprNodeList,
-	           new position(ctx.getStart())
-	           );
+	           new position(ctx.getStart()));
 	}
 
 
@@ -482,6 +478,7 @@ public class ASTcreator extends MXBaseVisitor<Node>{
 	public Node visitNullLiteral(MXParser.NullLiteralContext ctx) {
 	        return new nullliteralNode(new position(ctx.getStart()));
 	}
+
 
 
 

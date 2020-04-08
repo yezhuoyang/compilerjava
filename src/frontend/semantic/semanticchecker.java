@@ -4,6 +4,7 @@ package compilerjava.semantic;
 import compilerjava.AST.*;
 import compilerjava.Env.*;
 import compilerjava.util.*;
+
 import java.util.Iterator;
 import java.util.Map;
 
@@ -179,16 +180,15 @@ public class semanticchecker implements ASTvisitor{
         array.accept(this);
         index.accept(this);
         if(array.gettype().isArrayType()){
-            if(index.gettype().isArrayType()){
-                if(index.isInteger()){
+            if(index.isInteger()){
                     node.setCat(exprNode.Category.LVALUE);
                     node.settype(((arraytype)array.gettype()).getDims()==1
-                            ?((arraytype)array.gettype()).getBasetype()
+                            ? ((arraytype)array.gettype()).getBasetype()
                             : new arraytype( ((arraytype)array.gettype()).getBasetype(),((arraytype)array.gettype()).getDims()-1));
                 }else throw new semanticError("Subscript ought to be int ",node.getpos());
-            }else throw new semanticError("Array expression ought to be array type",node.getpos());
-        }
+        }else throw new semanticError("Array expression ought to be array type",node.getpos());
     }
+
 
     @Override
     public void visit(binaryexprNode node){
@@ -203,9 +203,9 @@ public class semanticchecker implements ASTvisitor{
             case SUB:
             case BITL:
             case BITR:
-            case AND:
+            case BITAND:
             case XOR:
-            case OR:{
+            case BITOR:{
                 if(lhs.isInteger()&&rhs.isInteger()){
                     node.setCat(exprNode.Category.RVALUE);
                     node.settype(intsymbol);
@@ -216,8 +216,7 @@ public class semanticchecker implements ASTvisitor{
                 if(lhs.isString()&&rhs.isString()){
                     node.setCat(exprNode.Category.RVALUE);
                     node.settype(stringsymbol);
-                }
-                else if(lhs.isInteger()&&rhs.isInteger()){
+                } else if(lhs.isInteger()&&rhs.isInteger()){
                     node.setCat(exprNode.Category.RVALUE);
                     node.settype(intsymbol);
                 }else throw new semanticError("Operands ought to be both integers or strings",node.getpos());
@@ -250,12 +249,14 @@ public class semanticchecker implements ASTvisitor{
                     throw new semanticError("Operands ought to be both integers or strings",node.getpos());
                 break;
             }
-            case BITAND:
-            case BITOR:{
+            case AND:
+            case OR:{
                 if(lhs.isBoolean()&&rhs.isBoolean()){
                     node.setCat(exprNode.Category.RVALUE);
                     node.settype(boolsymbol);
                 }else throw new semanticError("Operands ought to be both booleans",node.getpos());
+
+                break;
             }
             case ASSIGN:{
                 if(lhs.isAssignable()&&rhs.isValue()){
@@ -397,18 +398,18 @@ public class semanticchecker implements ASTvisitor{
             }
             case POS:
             case NEG:
-            case NOT:{
+            case BITNOT:{
                 if(node.getExpr().isInteger()){
                     node.setCat(exprNode.Category.RVALUE);
                     node.settype(intsymbol);
                 }else throw new semanticError("Non_int expression",node.getpos());
                 break;
             }
-            case NOTL:{
+            case NOT:{
                  if(node.getExpr().isBoolean()){
                      node.setCat(exprNode.Category.RVALUE);
                      node.settype(boolsymbol);
-                 }
+                 }else throw new semanticError("Non_bool expression",node.getpos());
                  break;
             }
             default:

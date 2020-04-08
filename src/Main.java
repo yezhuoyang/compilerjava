@@ -16,13 +16,17 @@ public class Main{
 
 
     private static programNode buildAST(InputStream in)throws Exception{
-        MXParser parser=new  MXParser(new CommonTokenStream(new MXLexer(CharStreams.fromStream(in))));
+        MXLexer lexer = new MXLexer(CharStreams.fromStream(in));
+        lexer.removeErrorListeners();
+        lexer.addErrorListener( new MXErrorListener() );
+        MXParser parser=new  MXParser(new CommonTokenStream(lexer));
         parser.removeErrorListeners();
         parser.addErrorListener(new MXErrorListener());
         ParseTree tree=parser.program();
         ASTcreator astcreator=new ASTcreator();
         return (programNode)astcreator.visit(tree);
     }
+
 
 
     public static void main(String... args)throws Exception{

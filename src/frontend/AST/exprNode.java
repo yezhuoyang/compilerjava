@@ -56,7 +56,7 @@ public abstract class exprNode extends Node{
     }
 
     public boolean isString(){
-        return  (cat==Category.LVALUE&&_type.getTypeName().equals("string"));
+        return  ((cat==Category.LVALUE||cat==Category.RVALUE)&&_type.getTypeName().equals("string"));
     }
 
     public boolean isInteger(){
@@ -91,7 +91,6 @@ public abstract class exprNode extends Node{
     public boolean isNull(){
         return _type.isNullType();
     }
-
 
 
 

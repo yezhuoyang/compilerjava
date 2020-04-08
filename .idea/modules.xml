@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/src/frontend/AST/AST.iml" filepath="$PROJECT_DIR$/src/frontend/AST/AST.iml" />
-      <module fileurl="file://$PROJECT_DIR$/src/frontend/Env/Env.iml" filepath="$PROJECT_DIR$/src/frontend/Env/Env.iml" />
       <module fileurl="file://$PROJECT_DIR$/compilerjava.iml" filepath="$PROJECT_DIR$/compilerjava.iml" />
     </modules>
   </component>
