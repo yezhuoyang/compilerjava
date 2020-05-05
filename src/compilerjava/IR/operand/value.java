@@ -1,14 +1,12 @@
 package compilerjava.IR.operand;
 
-import compilerjava.IR.IRvisitor;
 
+public abstract class value extends virtualregister{
+    public value(){
+    }
 
-public class value {
-
-
-
-
-
-
+    public value(String name){
+        super(name);
+    }
 
 }

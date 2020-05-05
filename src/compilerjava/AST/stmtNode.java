@@ -6,7 +6,7 @@ public abstract class stmtNode extends Node{
 
 
     public stmtNode(position pos){
-                            super(pos);
+        super(pos);
     }
 
 

@@ -2,7 +2,7 @@ package compilerjava.Env;
 
 
 import compilerjava.AST.funcdeclNode;
-
+import compilerjava.IR.function;
 import compilerjava.util.position;
 
 import compilerjava.util.semanticError;
@@ -12,8 +12,10 @@ import java.util.Map;
 
 public class funcsymbol extends symbol implements field{
     private field outerfield;
+    private function func;
     private Map<String,varsymbol> arguments=new LinkedHashMap<>();
 
+    public boolean hasSideEffect=false;
 
     private boolean isMemberFunc=false;
 
@@ -21,6 +23,13 @@ public class funcsymbol extends symbol implements field{
         super(name,tp,node);
         this.outerfield=outerfield;
     }
+
+    public funcsymbol(String name,type tp, funcdeclNode node,field outerfield, boolean hasSideEffect){
+        super(name,tp,node);
+        this.outerfield=outerfield;
+        this.hasSideEffect=hasSideEffect;
+    }
+
 
     public Map<String, varsymbol> getArguments() {
         return arguments;
@@ -73,5 +82,14 @@ public class funcsymbol extends symbol implements field{
 
     public void setMemberFunc() {
         isMemberFunc=true;
+    }
+
+    public function getFunc() {
+        return func;
+    }
+
+
+    public void setFunc(function func) {
+        this.func = func;
     }
 }

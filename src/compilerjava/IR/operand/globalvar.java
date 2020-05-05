@@ -1,4 +1,9 @@
 package compilerjava.IR.operand;
 
-public class globalvar {
+
+
+
+public interface globalvar {
+
+
 }

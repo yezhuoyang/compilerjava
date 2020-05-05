@@ -28,6 +28,10 @@ public class binaryexprNode extends exprNode{
         return op;
     }
 
+    public void setOp(Optype op) {
+        this.op = op;
+    }
+
     public enum Optype{
         MUL,DIV,MOD,ADD,SUB,BITL,BITR,LT,GT,LEQ,GEQ,EQ,NEQ,AND,XOR,OR,BITAND,BITOR,ASSIGN
     }

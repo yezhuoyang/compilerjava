@@ -2,11 +2,12 @@ package compilerjava.AST;
 import compilerjava.util.position;
 
 
+import compilerjava.IR.basicblock;
+import compilerjava.IR.operand.operand;
+
 import compilerjava.Env.type;
 import compilerjava.Env.funcsymbol;
 import compilerjava.util.position;
-
-
 
 
 public abstract class exprNode extends Node{
@@ -17,6 +18,11 @@ public abstract class exprNode extends Node{
     private type _type;
     private funcsymbol _funcsymbol;
     private Category cat;
+
+
+    private basicblock thenBB, elseBB;
+    private operand resultop;
+
 
     public exprNode(position pos){
         super(pos);
@@ -40,6 +46,14 @@ public abstract class exprNode extends Node{
 
     public void settype(type _type) {
         this._type = _type;
+    }
+
+    public operand getResultop(){
+        return  resultop;
+    }
+
+    public void setResultop(operand resultop) {
+        this.resultop = resultop;
     }
 
     public funcsymbol getfuncsymbol() {
@@ -93,5 +107,19 @@ public abstract class exprNode extends Node{
     }
 
 
+    public basicblock getElseBB() {
+        return elseBB;
+    }
 
+    public basicblock getThenBB() {
+        return thenBB;
+    }
+
+    public void setElseBB(basicblock elseBB) {
+        this.elseBB = elseBB;
+    }
+
+    public void setThenBB(basicblock thenBB) {
+        this.thenBB = thenBB;
+    }
 }

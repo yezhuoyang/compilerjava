@@ -1,4 +1,16 @@
 package compilerjava.IR.operand;
 
-public class storage {
+
+
+
+
+public abstract class storage extends operand{
+
+    public storage(){
+    }
+
+    public storage(String name){
+        super(name);
+    }
+
 }

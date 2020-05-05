@@ -1,5 +1,7 @@
 package compilerjava.AST;
 import compilerjava.util.position;
+import compilerjava.IR.basicblock;
+
 
 
 public class whilestmtNode extends stmtNode implements Loop{
@@ -7,6 +9,8 @@ public class whilestmtNode extends stmtNode implements Loop{
     private stmtNode stmt;
     private position pos;
 
+    private basicblock stepBB;
+    private basicblock mergeBB;
 
     public whilestmtNode(exprNode expr,stmtNode stmt,position pos){
         super(pos);
@@ -27,4 +31,21 @@ public class whilestmtNode extends stmtNode implements Loop{
         visitor.visit(this);
     }
 
+    @Override
+    public basicblock getStepBB() {
+        return stepBB;
+    }
+
+    public void setStepBB(basicblock stepBB) {
+        this.stepBB = stepBB;
+    }
+
+    @Override
+    public basicblock getMergeBB() {
+        return mergeBB;
+    }
+
+    public void setMergeBB(basicblock mergeBB) {
+        this.mergeBB = mergeBB;
+    }
 }
