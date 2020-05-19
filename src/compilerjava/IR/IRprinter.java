@@ -22,6 +22,14 @@ public class IRprinter implements IRvisitor{
     private boolean printColor=false;
     private boolean printDefUse=false;
 
+    public void printColor(){
+        printColor=true;
+    }
+
+    public void noColor(){
+        printColor=false;
+    }
+
     public IRprinter(PrintStream out){
         this.out=out;
     }
@@ -50,6 +58,12 @@ public class IRprinter implements IRvisitor{
     public void visit(function func){
         boolean isVoid=func.getReturnInstList().get(0).getReturnValue()==null;
         out.print("define "+(isVoid?"void ":"i64 ")+"@"+func.getName()+" ");
+        if(func.getReferenceForClassMethod()!=null)func.getReferenceForClassMethod().accept(this);
+        out.print(" ");
+        func.getParameterList().forEach(x->{
+            x.accept(this);
+            out.print(" ");
+        });
         out.println("{");
         func.getReversePostOrderDFSBBList().forEach(this::visit);
         out.println("}");
@@ -78,13 +92,13 @@ public class IRprinter implements IRvisitor{
                 out.println();
             }
         }
-        out.println();
+        //out.println();
     }
 
     @Override
     public void visit(alloc inst){
         inst.getPointer().accept(this);
-        out.print(" =alloc");
+        out.print(" = alloc ");
         inst.getSize().accept(this);
         out.println();
     }
@@ -125,7 +139,7 @@ public class IRprinter implements IRvisitor{
                 break;
         }
         inst.getDst().accept(this);
-        out.printf(" =%s ",op);
+        out.printf(" = %s ",op);
         inst.getSrc1().accept(this);
         out.print(" ");
         inst.getSrc2().accept(this);
@@ -171,7 +185,7 @@ public class IRprinter implements IRvisitor{
     public void visit(call inst){
         if(inst.getResult()!=null){
             inst.getResult().accept(this);
-            out.print(" =call ");
+            out.print(" = call ");
         }else out.print("call ");
         out.print(inst.getCallee().getName()+" ");
         if(inst.getObjectPointer()!=null){
@@ -187,7 +201,41 @@ public class IRprinter implements IRvisitor{
 
     @Override
     public void visit(cmp inst){
-
+        if(inst.getDst()==null){
+            out.print("cmp ");
+            inst.getSrc1().accept(this);
+            out.print(" ");
+            inst.getSrc2().accept(this);
+            out.println();
+        }else{
+            String op=null;
+            switch (inst.getOp()){
+                case LT:
+                       op="slt";
+                       break;
+                case LEQ:
+                       op="sle";
+                       break;
+                case EQ:
+                       op="seq";
+                       break;
+                case GEQ:
+                       op="sge";
+                       break;
+                case GT:
+                       op="sgt";
+                       break;
+                case NEQ:
+                       op="sne";
+                       break;
+            }
+            inst.getDst().accept(this);
+            out.print(" = "+op+' ');
+            inst.getSrc1().accept(this);
+            out.print(" ");
+            inst.getSrc2().accept(this);
+            out.println();
+        }
     }
 
     @Override
@@ -198,7 +246,7 @@ public class IRprinter implements IRvisitor{
     @Override
     public void visit(load inst){
         inst.getDst().accept(this);
-        out.print(" = load");
+        out.print(" = load ");
         inst.getSrc().accept(this);
         out.println();
     }
@@ -206,14 +254,14 @@ public class IRprinter implements IRvisitor{
     @Override
     public void visit(move inst){
         inst.getDst().accept(this);
-        out.print(" =move");
+        out.print(" = move ");
         inst.getSrc().accept(this);
         out.println();
     }
 
     @Override
     public void visit(back inst){
-         out.print("ret");
+         out.print("ret ");
          if(inst.getReturnValue()!=null)inst.getReturnValue().accept(this);
          out.println();
     }
@@ -273,9 +321,10 @@ public class IRprinter implements IRvisitor{
 
     @Override
     public void visit(lea inst){
-
-
-
+        inst.getDst().accept(this);
+        out.print(" = lea");
+        inst.getSrc().accept(this);
+        out.println();
     }
 
     @Override
@@ -305,8 +354,8 @@ public class IRprinter implements IRvisitor{
             out.print(" ");
             if(((memory)stor).getIndex()!=null){
                 visit(((memory)stor).getIndex());
-                out.print(" ");
-                visit(((memory)stor).getScale());
+                //out.print(" ");
+                //visit(((memory)stor).getScale());
             }else{
                 out.print("null 0");
             }
@@ -318,10 +367,8 @@ public class IRprinter implements IRvisitor{
 
     @Override
     public void visit(immediate imme){
-        out.println(imme.getImmediate());
+        out.print(imme.getImmediate());
     }
-
-
 
 
     private String createName(storage _storage,String name){
@@ -335,7 +382,7 @@ public class IRprinter implements IRvisitor{
 
     public String getName(storage _storage){
         if(_storage instanceof virtualregister){
-            if(printColor&&!(_storage instanceof globalvar)){
+            if( ((virtualregister)_storage).color!=null&&printColor&&!(_storage instanceof globalvar)){
                 return ((virtualregister)_storage).color.getName();
             }else{
                 String name=storageStringMap.get(_storage);

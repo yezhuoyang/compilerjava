@@ -14,7 +14,6 @@ public class forstmtNode extends stmtNode implements Loop{
     private basicblock stepBB;
     private basicblock mergeBB;
 
-
     public forstmtNode(exprNode init,exprNode cond,exprNode step,stmtNode stmt,position pos){
         super(pos);
         this.init=init;

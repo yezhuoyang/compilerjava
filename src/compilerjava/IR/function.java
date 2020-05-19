@@ -19,7 +19,6 @@ public class function {
     public int argumentLimit;
     public int temporaryCnt=0;
 
-
     private basicblock entryBB=new basicblock(this,"entry");
     private basicblock exitBB=new basicblock(this,"exit");
     private List<back> returnInstList=new ArrayList<>();
@@ -119,17 +118,22 @@ public class function {
     }
 
     public void calcReversePostOrderDFSBBList(){
-
-
+        reversePostOrderDFSBBList=new ArrayList<>();
+        visit=new HashSet<>();
+        postOrderDFS(entryBB);
+        for(int i=0;i<reversePostOrderDFSBBList.size();i++){
+            reversePostOrderDFSBBList.get(i).postOrderNumber=i;
+        }
+        Collections.reverse(reversePostOrderDFSBBList);
     }
-
+    
     public List<basicblock> getPostOrderDFSBBList(){
        if(postOrderDFSBBList==null){
            postOrderDFSBBList=new ArrayList<>();
            postOrderDFSBBList.addAll(reversePostOrderDFSBBList);
            Collections.reverse(postOrderDFSBBList);
        }
-        return postOrderDFSBBList;
+       return postOrderDFSBBList;
     }
 
     private void postOrderDFS(basicblock nowBB){
@@ -159,8 +163,8 @@ public class function {
 
     public void updateCalleeSet(){
         calleeset.clear();
-        getReversePostOrderDFSBBList().forEach(basicblock -> {
-           for(IRinst irinst=basicblock.head;irinst!=null;irinst=irinst.getNextInstruction())
+        getReversePostOrderDFSBBList().forEach(BB -> {
+           for(IRinst irinst=BB.head;irinst!=null;irinst=irinst.getNextInstruction())
                if(irinst instanceof call) calleeset.add(((call)irinst).getCallee());
         });
     }
@@ -176,6 +180,5 @@ public class function {
         public Set<globalvar> recursiveDefglobalvar=new HashSet<>();
         public Map<globalvar,virtualregister> globaltemporal=new HashMap<>();
     }
-
 
 }

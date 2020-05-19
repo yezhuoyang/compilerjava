@@ -5,8 +5,8 @@ import compilerjava.IR.IRvisitor;
 
 public class dynamicdata extends memory{
 
-    public dynamicdata(register base,register index,immediate scale,immediate offset){
-        super(base,index,scale,offset);
+    public dynamicdata(register base,register index,immediate offset){
+        super(base,index,offset);
     }
 
     @Override

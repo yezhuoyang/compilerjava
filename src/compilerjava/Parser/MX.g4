@@ -57,7 +57,6 @@ typeForfunc
     | VOID
     ;
 
-
 nonArraytype
     : INT           #narrayTypeInt
     | BOOL          #narrayTypeBool
@@ -94,7 +93,6 @@ jumpStatement
     | CONTINUE ';'      #continuestmt
     ;
 
-
 expr
     :   expr op=('++' | '--')                          #postcalcdecl
     |   <assoc=right> 'new' creator                    #newexpr
@@ -115,6 +113,7 @@ expr
     |   src1 = expr op='|' src2 = expr                 #binaryexpr
     |   src1 = expr op='&&' src2 = expr                #binaryexpr
     |   src1 = expr op='||' src2 = expr                #binaryexpr
+    |   <assoc=right> src1 = expr op='=' src2 = expr   #binaryexpr
     |   <assoc=right> src1 = expr op='=' src2 = expr   #binaryexpr
     |   ID                                             #identifier
     |   THIS                                           #thisexpr

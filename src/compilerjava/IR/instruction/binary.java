@@ -114,6 +114,7 @@ public class binary extends IRinst {
         if(src2==oldVR) src2=newVR;
     }
 
+
     @Override
     public void replaceDef(virtualregister oldVR,virtualregister newVR){
         if(dst==oldVR) dst=newVR;

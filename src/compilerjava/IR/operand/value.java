@@ -2,6 +2,8 @@ package compilerjava.IR.operand;
 
 
 public abstract class value extends virtualregister{
+
+
     public value(){
     }
 

@@ -5,7 +5,7 @@ import compilerjava.IR.IRvisitor;
 
 public class I64Value extends value{
 
-    public I64Value(){
+    public I64Value() {
     }
 
     public I64Value(String name){

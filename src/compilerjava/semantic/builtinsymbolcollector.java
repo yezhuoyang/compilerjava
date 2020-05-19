@@ -63,10 +63,8 @@ public class builtinsymbolcollector{
                          defvar(new varsymbol("i",intsymbol,null));
             }});
 
-
-
             _globalfield.setArrayfunctionsymbol(new funcsymbol("array.size",intsymbol,null,_globalfield));
-
+            initFuncinit(ast);
     }
 
 
@@ -75,6 +73,18 @@ public class builtinsymbolcollector{
     }
 
 
-
+    private void initFuncinit(programNode ast){
+        List<stmtNode> stmtNodeList=new ArrayList<>();
+        ast.getDeclNodeList().forEach(x->{
+            if(x instanceof vardeclNode){
+                if(((vardeclNode)x).getExpr()!=null)
+                    stmtNodeList.add(new exprstmtNode(new binaryexprNode(new IDexprNode(((vardeclNode)x).getID(),x.getpos()),((vardeclNode)x).getExpr(),binaryexprNode.Optype.ASSIGN,x.getpos()),x.getpos()));
+            }
+        });
+        stmtNodeList.add(new returnNode(new funccallexprNode(new IDexprNode("main",null),new ArrayList<>(),null),null));
+        blockstmtNode _blockstmtNode=new blockstmtNode(stmtNodeList,null);
+        funcdeclNode initfunc=new funcdeclNode(new inttpNode(null),"__init",new ArrayList<>(),_blockstmtNode,null);
+        ast.getDeclNodeList().add(initfunc);
+    }
 
 }

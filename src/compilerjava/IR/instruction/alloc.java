@@ -52,8 +52,8 @@ public class alloc extends IRinst{
 
     @Override
     public void updateUseRegs() {
-        usereg.clear();
-        if(size instanceof register) usereg.add((register) size);
+        useregs.clear();
+        if(size instanceof register) useregs.add((register) size);
     }
 
 

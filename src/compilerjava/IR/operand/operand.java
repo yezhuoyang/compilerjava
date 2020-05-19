@@ -6,8 +6,8 @@ import compilerjava.IR.IRvisitor;
 public abstract class operand {
     String name;
 
-    public operand(){
 
+    public operand(){
     }
 
     public operand(String name){
@@ -17,6 +17,7 @@ public abstract class operand {
     public String getName() {
         return name;
     }
+
 
     public abstract void accept(IRvisitor irvisitor);
 

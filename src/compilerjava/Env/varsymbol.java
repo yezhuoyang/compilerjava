@@ -9,7 +9,6 @@ public class varsymbol extends symbol{
     private storage varstorage;
     private int offset;
 
-
     public varsymbol(String name,type tp,vardeclNode node){
             super(name,tp,node);
     }

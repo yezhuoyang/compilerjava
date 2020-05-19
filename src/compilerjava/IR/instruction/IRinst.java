@@ -10,8 +10,6 @@ import compilerjava.IR.operand.virtualregister;
 
 
 
-
-
 import java.util.*;
 
 
@@ -99,7 +97,6 @@ public abstract class IRinst {
 
     public abstract register getDefReg();
 
-
     public abstract void setDefReg(register newReg);
 
     public List<register> getUseregs(){
@@ -130,9 +127,7 @@ public abstract class IRinst {
     public abstract void replaceUse(virtualregister oldVR,virtualregister newVR);
 
 
-
     public abstract void replaceDef(virtualregister oldVR,virtualregister newVR);
-
 
     public Set<virtualregister> getUse(){
         return use;

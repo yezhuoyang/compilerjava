@@ -1,4 +1,4 @@
 package compilerjava.optimizer;
 
-public class DeadCodeElim {
+public class irreleventcodeelim {
 }

@@ -6,8 +6,8 @@ import compilerjava.util.position;
 
 
 
-public class localfield extends basefield{
-    public localfield(String name,field outerfield){
+public class tempfield extends basefield{
+    public tempfield(String name,field outerfield){
         super(name,outerfield);
     }
 

@@ -1,13 +1,12 @@
 package compilerjava.optimizer;
 
+public class elimsideeffect {
 
 
 
 
 
 
-
-public class ConstAndCopyProp {
 
 
 

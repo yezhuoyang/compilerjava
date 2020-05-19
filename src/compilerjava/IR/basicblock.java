@@ -5,7 +5,7 @@ import compilerjava.IR.operand.virtualregister;
 
 import java.util.HashSet;
 import java.util.Set;
-
+import java.io.*;
 
 
 public class basicblock {
@@ -45,13 +45,12 @@ public class basicblock {
     }
 
     public Set<basicblock> getPredecessors(){
-        return successors;
+        return predecessors;
     }
 
     public Set<basicblock> getSuccessors(){
         return successors;
     }
-
 
     public boolean isFinished() {
         return finished;
@@ -103,7 +102,6 @@ public class basicblock {
         }
     }
 
-
     public void removeInst(){
         finished=false;
         if(tail==null){
@@ -123,7 +121,6 @@ public class basicblock {
         }
     }
 
-
     private void addBB(basicblock BB){
         if(BB==null) return;
         this.addSuccessor(BB);
@@ -142,7 +139,6 @@ public class basicblock {
         }
         finished=true;
     }
-
 
     public void deleteSelf(){
         getSuccessors().forEach(successor->{
@@ -165,7 +161,7 @@ public class basicblock {
                 if(!irinst.hasNextInstruction()) break;
             }
         });
-        getSuccessors().forEach(successor->successor.removePredecessor(this));
+        getSuccessors().forEach(successor->successor.replacePredecessor(this,newBB));
         newBB.removeInst();
         newBB.addInst(this.head);
         newBB.tail=this.tail;

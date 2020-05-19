@@ -58,7 +58,7 @@ public class back extends IRinst{
     }
 
     @Override
-    public void renameUseRegForSSA() {
+    public void renameUseRegForSSA(){
         if(returnValue instanceof virtualregister && !(returnValue instanceof globalvar))
             returnValue=((virtualregister)returnValue).getSSARenameReg(((virtualregister)returnValue).info.stack.peek());
         updateUseRegs();

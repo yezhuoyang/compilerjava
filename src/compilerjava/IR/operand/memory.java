@@ -9,7 +9,6 @@ import java.util.List;
 public abstract class memory extends storage{
     private register base=null;
     private register index=null;
-    private immediate scale=new immediate(0);
     private immediate offset=new immediate(0);
     private List<virtualregister> useregs=new ArrayList<>();
 
@@ -18,10 +17,9 @@ public abstract class memory extends storage{
         this.base=base;
     }
 
-    public memory(register base,register index,immediate scale,immediate offset){
+    public memory(register base,register index,immediate offset){
         this.base=base;
         this.index=index;
-        this.scale=scale;
         this.offset=offset;
     }
 
@@ -43,14 +41,6 @@ public abstract class memory extends storage{
 
     public void setIndex(register index){
         this.index=index;
-    }
-
-    public immediate getScale(){
-        return scale;
-    }
-
-    public void setScale(immediate scale){
-        this.scale=scale;
     }
 
     public immediate getOffset(){

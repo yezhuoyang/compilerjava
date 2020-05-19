@@ -5,11 +5,9 @@ import compilerjava.util.position;
 
 
 
-
 public class programNode extends Node{
         private List<declNode> declNodeList;
         public boolean hasClassDeclNode=false;
-
 
 
         public programNode(List<declNode> declNodeList,position pos,boolean hasClassDeclNode){

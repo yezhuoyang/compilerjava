@@ -106,11 +106,11 @@ public class symbolcollector implements ASTvisitor{
 
     @Override
     public void visit(blockstmtNode node){
-        localfield _localfield=new localfield("block local field",currentfield);
-        currentfield=_localfield;
+        tempfield _tempfield=new tempfield("block local field",currentfield);
+        currentfield=_tempfield;
         node.getStmtList().forEach(x->{
             x.accept(this);
-            currentfield=_localfield;
+            currentfield=_tempfield;
         });
     }
 

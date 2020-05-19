@@ -19,6 +19,14 @@ public class lea extends IRinst{
     }
 
 
+    public operand getDst() {
+        return dst;
+    }
+
+    public memory getSrc() {
+        return src;
+    }
+
     @Override
     public IRinst getFakeInst(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap) {
         return null;
@@ -81,6 +89,9 @@ public class lea extends IRinst{
     public void replaceDef(virtualregister oldVR,virtualregister newVR){
         if(dst==oldVR)dst=newVR;
     }
+
+
+
 
 
 }

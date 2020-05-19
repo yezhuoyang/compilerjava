@@ -13,6 +13,8 @@ import org.apache.commons.text.StringEscapeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.*;
+
 
 public class IRcreator implements ASTvisitor {
     private globalfield     _globalfield;
@@ -60,9 +62,11 @@ public class IRcreator implements ASTvisitor {
             if(currentfunction!=null&&node.isParameterVariable())
                   currentfunction.addParameterList(_vregister);
             _varsymbol.setVarstorage(_vregister);
-            if(node.getExpr()!=null)assign(_vregister,node.getExpr());
+            if(node.getExpr()!=null)
+                assign(_vregister,node.getExpr());
         }
     }
+
 
     @Override
     public void visit(funcdeclNode node){
@@ -89,7 +93,7 @@ public class IRcreator implements ASTvisitor {
                 ret.getCurrentBB().finish(new jump(ret.getCurrentBB(),exitBB));
             });
             exitBB.finish(new back(exitBB,returnop));
-        }else currentfunction.setEntryBB(currentfunction.getReturnInstList().get(0).getCurrentBB());
+        }else currentfunction.setExitBB(currentfunction.getReturnInstList().get(0).getCurrentBB());
         currentfunction=null;
     }
 
@@ -107,17 +111,14 @@ public class IRcreator implements ASTvisitor {
 
     @Override
     public void visit(classtpNode node){
-
     }
 
     @Override
     public void visit(booltpNode node){
-
     }
 
     @Override
     public void visit(inttpNode node){
-
     }
 
     @Override
@@ -127,14 +128,15 @@ public class IRcreator implements ASTvisitor {
 
     @Override
     public void visit(stringtpNode node){
-
     }
+
 
     @Override
     public void visit(blockstmtNode node){
         for(stmtNode _stmtNode:node.getStmtList()){
             _stmtNode.accept(this);
-            if(currentBB.isFinished())break;
+            if(currentBB.isFinished())
+                break;
         }
     }
 
@@ -194,33 +196,33 @@ public class IRcreator implements ASTvisitor {
 
     @Override
     public void visit(forstmtNode node){
-        basicblock bodyBB=new basicblock(currentfunction,"for_body");
-        basicblock condBB=node.getCond()==null?bodyBB  :new basicblock(currentfunction,"for_cond");
-        basicblock stepBB=node.getStepBB()==null?condBB:new basicblock(currentfunction,"for_step");
-        basicblock mergeBB=new basicblock(currentfunction,"for_merge");
+        basicblock bodyBB = new basicblock(currentfunction, "for_body");
+        basicblock condBB = node.getCond() == null ? bodyBB : new basicblock(currentfunction, "for_cond");
+        basicblock stepBB = node.getStep() == null ? condBB : new basicblock(currentfunction, "for_step");
+        basicblock mergeBB = new basicblock(currentfunction, "for_merge");
         node.setStepBB(stepBB);
         node.setMergeBB(mergeBB);
-
-        if(node.getInit()!=null)node.getInit().accept(this);
-        currentBB.finish(new jump(currentBB,condBB));
-
-        if(node.getCond()!=null){
-            currentBB=condBB;
+        //generate init
+        if (node.getInit() != null) node.getInit().accept(this);
+        currentBB.finish(new jump(currentBB, condBB));
+        //generate cond
+        if (node.getCond() != null) {
+            currentBB = condBB;
             node.getCond().setThenBB(bodyBB);
             node.getCond().setElseBB(mergeBB);
             node.getCond().accept(this);
         }
-
-        currentBB=bodyBB;
+        //generate body
+        currentBB = bodyBB;
         node.getStmt().accept(this);
-        if(!currentBB.isFinished())currentBB.finish(new jump(currentBB,stepBB));
-
-        if(node.getStep()!=null){
-            currentBB=stepBB;
+        if (!currentBB.isFinished()) currentBB.finish(new jump(currentBB, stepBB));
+        //generate step
+        if (node.getStep() != null) {
+            currentBB = stepBB;
             node.getStep().accept(this);
-            if(!currentBB.isFinished())currentBB.finish(new jump(currentBB,condBB));
+            if (!currentBB.isFinished()) currentBB.finish(new jump(currentBB, condBB));
         }
-        currentBB=mergeBB;
+        currentBB = mergeBB;
     }
 
 
@@ -255,10 +257,9 @@ public class IRcreator implements ASTvisitor {
         node.setResultop(new I64Pointer());
         I64Value offset=new I64Value();
         I64Value offset_2=new I64Value();
-        currentBB.addInst(new binary(currentBB,binary.Op.MUL,indexValue,new immediate(_arraytype.getDims()>1?config.pointersize():_arraytype.getBasetype().getTypeSize()),offset));
-        currentBB.addInst(new binary(currentBB,binary.Op.ADD,offset,new immediate(config.registersize),offset_2));
+        currentBB.addInst(new binary(currentBB,binary.Op.MUL,indexValue,new immediate(_arraytype.getDims()>1?config.pointersize():_arraytype.getBasetype().getTypeSize(),config.intsize),offset));
+        currentBB.addInst(new binary(currentBB,binary.Op.ADD,offset,new immediate(config.registersize,config.intsize),offset_2));
         currentBB.addInst(new binary(currentBB,binary.Op.ADD,baseAddress,offset_2,node.getResultop()));
-
         if(node.getThenBB()!=null){
             I64Value tmp=new I64Value();
             currentBB.finish(new load(currentBB,node.getResultop(),tmp));
@@ -450,6 +451,7 @@ public class IRcreator implements ASTvisitor {
     }
 
 
+
     @Override
     public void visit(classmemberNode node){
         node.getExpr().accept(this);
@@ -461,7 +463,7 @@ public class IRcreator implements ASTvisitor {
                 //class variable
                 I64Pointer memberPointer=new I64Pointer();
                 //Offset and set result
-                currentBB.addInst(new binary(currentBB,binary.Op.ADD,base,new immediate(((varsymbol)membersymbol).getOffset()),memberPointer));
+                currentBB.addInst(new binary(currentBB,binary.Op.ADD,base,new immediate(((varsymbol)membersymbol).getOffset(),config.intsize),memberPointer));
                 node.setResultop(memberPointer);
                 //Short-circuit evaluation
                 if(node.getThenBB()!=null){
@@ -504,7 +506,7 @@ public class IRcreator implements ASTvisitor {
     @Override
     public void visit(IDexprNode node) {
         symbol _symbol = node.getsymbol();
-        if (_symbol.getfield() == currentclasssymbol) {
+        if (_symbol.getfield() == currentclasssymbol){
             if (_symbol instanceof varsymbol) {
                 I64Pointer memberPointer = new I64Pointer();
                 currentBB.addInst(new binary(currentBB, binary.Op.ADD, currentfunction.getReferenceForClassMethod(), new immediate(((varsymbol) _symbol).getOffset()), memberPointer));
@@ -529,7 +531,20 @@ public class IRcreator implements ASTvisitor {
 
     @Override
     public void visit(newexprNode node){
-
+        type tp=node.getBaseTypeAfterResolve();
+        node.setResultop(new I64Value());
+        if(node.getNumDims()==0){
+            currentBB.addInst(new alloc(currentBB,new immediate(((classsymbol)tp).getObjectSize()),node.getResultop()));
+            classsymbol _classsymbol=(classsymbol) tp;
+            if(_classsymbol.getConstructor()!=null){
+                call _call=new call(currentBB,_classsymbol.getConstructor().getFunc(),null);
+                _classsymbol.getConstructor().getFunc().callerInstList.add(_call);
+                _call.setObjectPointer(node.getResultop());
+                currentBB.addInst(_call);
+            }
+        }else{
+            arrayAlloc(node,node.getResultop(),0);
+        }
     }
 
     @Override
@@ -539,7 +554,93 @@ public class IRcreator implements ASTvisitor {
 
     @Override
     public void visit(unaryexprNode node){
-
+        exprNode exprNode = node.getExpr();
+        unary.Op op = unary.Op.NOT;
+        switch (node.getOp()) {
+            case PRE_ADD:
+            case SUF_ADD:
+                op = unary.Op.SUF_ADD;
+                break;
+            case PRE_SUB:
+            case SUF_SUB:
+                op = unary.Op.SUF_SUB;
+                break;
+            case POS:
+                op = unary.Op.POS;
+                break;
+            case NEG:
+                op = unary.Op.NEG;
+                break;
+            case BITNOT:
+                op = unary.Op.BITNOT;
+                break;
+            default:
+                break;
+        }
+        switch (node.getOp()) {
+            case PRE_ADD:
+            case PRE_SUB: {
+                exprNode.accept(this);
+                operand _operand = exprNode.getResultop();
+                operand _value = getOperandForValueUse(currentBB, _operand);
+                if (_operand instanceof pointer) {
+                    I64Value tmp = new I64Value();
+                    currentBB.addInst(new binary(currentBB, node.getOp() == unaryexprNode.Op.PRE_ADD ? binary.Op.ADD : binary.Op.SUB, _value, new immediate(1), tmp));
+                    currentBB.addInst(new store(currentBB, tmp, _operand));
+                    node.setResultop(_operand);
+                } else if (_operand instanceof value) {
+                    currentBB.addInst(new binary(currentBB, node.getOp() == unaryexprNode.Op.PRE_ADD ? binary.Op.ADD : binary.Op.SUB, _value, new immediate(1), _value));
+                    node.setResultop(_operand);
+                }
+                break;
+            }
+            case SUF_ADD:
+            case SUF_SUB: {
+                exprNode.accept(this);
+                operand _operand = exprNode.getResultop();
+                operand _value = getOperandForValueUse(currentBB, _operand);
+                if (_operand instanceof pointer) {
+                    I64Value tmp = new I64Value();
+                    currentBB.addInst(new binary(currentBB, node.getOp() == unaryexprNode.Op.SUF_ADD ? binary.Op.ADD : binary.Op.SUB, _value, new immediate(1), tmp));
+                    currentBB.addInst(new store(currentBB, tmp, _operand));
+                    node.setResultop(_value);
+                } else if (_operand instanceof value) {
+                    I64Value tmp = new I64Value();
+                    currentBB.addInst(new move(currentBB, _value, tmp));
+                    currentBB.addInst(new binary(currentBB, node.getOp() == unaryexprNode.Op.SUF_ADD ? binary.Op.ADD : binary.Op.SUB, _value, new immediate(1), _value));
+                    node.setResultop(tmp);
+                }
+                break;
+            }
+            case POS: {
+                exprNode.accept(this);
+                operand value = getOperandForValueUse(currentBB, exprNode.getResultop());
+                node.setResultop(value);
+                break;
+            }
+            case NEG:
+            case BITNOT: {
+                exprNode.accept(this);
+                operand value = getOperandForValueUse(currentBB, exprNode.getResultop());
+                node.setResultop(new I64Value());
+                currentBB.addInst(new unary(currentBB, op, value, node.getResultop()));
+                break;
+            }
+            case NOT: {
+                if (node.getThenBB() != null) {
+                    //short-circuit evaluation
+                    exprNode.setThenBB(node.getElseBB());
+                    exprNode.setElseBB(node.getThenBB());
+                    exprNode.accept(this);
+                    break;
+                } else {
+                    node.setResultop(new I64Value());
+                    assign(node.getResultop(), node);
+                }
+            }
+            default:
+                break;
+        }
     }
 
     @Override
@@ -569,7 +670,9 @@ public class IRcreator implements ASTvisitor {
     }
 
     private void assign(operand lhs,exprNode rhsexpr){
-        if(rhsexpr.isBoolean()&&!trivialboolExtractor.trivialNodeMap.get(rhsexpr)){
+        //System.out.println(lhs.getName()+" "+rhsexpr.gettype().getTypeName());
+        //&&!trivialboolExtractor.trivialNodeMap.get(rhsexpr)
+        if(rhsexpr.isBoolean()){
             basicblock thenBB=new basicblock(currentfunction,"thenBB");
             basicblock elseBB=new basicblock(currentfunction,"elseBB");
             basicblock mergeBB=new basicblock(currentfunction,"mergeBB");
@@ -595,12 +698,14 @@ public class IRcreator implements ASTvisitor {
                 else currentBB.addInst(new move(currentBB,tmp_value,lhs));
             }else{
                 if(lhs instanceof pointer) currentBB.addInst(new store(currentBB,rhsexpr.getResultop(),lhs));
-                else currentBB.addInst(new move(currentBB,rhsexpr.getResultop(),lhs));
+                else {
+                    //System.out.println(lhs.getName()+" "+rhsexpr.getfuncsymbol().getWord());
+                    currentBB.addInst(new move(currentBB,rhsexpr.getResultop(),lhs));
+                }
             }
         }
     }
-
-
+    
     private void arrayAlloc(newexprNode node,operand result,int depth){
         if(depth==node.getExprNodeList().size())return;
         exprNode indexExprNode=node.getExprNodeList().get(depth);
@@ -608,6 +713,7 @@ public class IRcreator implements ASTvisitor {
         operand indexValue=getOperandForValueUse(currentBB,indexExprNode.getResultop());
         I64Value allocateSize=new I64Value();
         if(depth==node.getExprNodeList().size()-1){
+            //Final dimension
             currentBB.addInst(new binary(currentBB,binary.Op.MUL,indexValue,new immediate(depth==node.getNumDims()-1? node.gettype().getTypeSize():config.pointersize()),allocateSize));
             currentBB.addInst(new binary(currentBB,binary.Op.ADD,allocateSize,new immediate(config.registersize),allocateSize));
             if(result instanceof pointer){
@@ -627,7 +733,7 @@ public class IRcreator implements ASTvisitor {
                 currentBB.addInst(new alloc(currentBB,allocateSize,tmp));
                 currentBB.addInst(new store(currentBB,indexValue,tmp));
                 currentBB.addInst(new store(currentBB,tmp,result));
-            }else{
+            }else {
                 currentBB.addInst(new alloc(currentBB,allocateSize,result));
                 currentBB.addInst(new store(currentBB,indexValue,result));
             }
@@ -675,14 +781,14 @@ public class IRcreator implements ASTvisitor {
 
     private void builtinFunctionSymbolInitialization(){
         ((funcsymbol)_globalfield.getString().resolvesymbol("length",null)).setFunc(irRoot.builtinStringLength);
-        ((funcsymbol)_globalfield.getString().resolvesymbol("length",null)).setFunc(irRoot.builtinSubstring);
-        ((funcsymbol)_globalfield.getString().resolvesymbol("length",null)).setFunc(irRoot.builtinParseInt);
-        ((funcsymbol)_globalfield.getString().resolvesymbol("length",null)).setFunc(irRoot.builtinStringLength);
-        ((funcsymbol)_globalfield.getString().resolvesymbol("length",null)).setFunc(irRoot.builtinStringLength);
-        ((funcsymbol)_globalfield.getString().resolvesymbol("length",null)).setFunc(irRoot.builtinStringLength);
-        ((funcsymbol)_globalfield.getString().resolvesymbol("length",null)).setFunc(irRoot.builtinStringLength);
-        ((funcsymbol)_globalfield.getString().resolvesymbol("length",null)).setFunc(irRoot.builtinStringLength);
-        ((funcsymbol)_globalfield.getString().resolvesymbol("length",null)).setFunc(irRoot.builtinStringLength);
+        ((funcsymbol)_globalfield.getString().resolvesymbol("substring",null)).setFunc(irRoot.builtinSubstring);
+        ((funcsymbol)_globalfield.getString().resolvesymbol("parseInt",null)).setFunc(irRoot.builtinParseInt);
+        ((funcsymbol)_globalfield.getString().resolvesymbol("ord",null)).setFunc(irRoot.builtinStringLength);
+        ((funcsymbol)_globalfield.getString().resolvesymbol("print",null)).setFunc(irRoot.builtinStringLength);
+        ((funcsymbol)_globalfield.getString().resolvesymbol("println",null)).setFunc(irRoot.builtinStringLength);
+        ((funcsymbol)_globalfield.getString().resolvesymbol("getString",null)).setFunc(irRoot.builtinStringLength);
+        ((funcsymbol)_globalfield.getString().resolvesymbol("getInt",null)).setFunc(irRoot.builtinStringLength);
+        ((funcsymbol)_globalfield.getString().resolvesymbol("toString",null)).setFunc(irRoot.builtinStringLength);
     }
 
     private boolean isArraySizeCall(funccallexprNode node){
@@ -696,6 +802,7 @@ public class IRcreator implements ASTvisitor {
             return true;
         }else return false;
     }
+
 
 
 

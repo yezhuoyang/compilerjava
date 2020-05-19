@@ -1,121 +1,175 @@
 package compilerjava.IR.operand;
 
 import compilerjava.IR.IRvisitor;
+import compilerjava.config;
+import sun.nio.cs.ext.IBM865;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
+public class realregister extends register {
+    public static final realregister zero = new realregister("zero", false);
+    public static final realregister ra   = new realregister("ra", true);
+    public static final realregister sp   = new realregister("sp", false);
+    public static final realregister gp   = new realregister("gp", false);
+    public static final realregister tp   = new realregister("tp", false);
+    public static final realregister t0   = new realregister("t0", true);
+    public static final realregister t1   = new realregister("t1", true);
+    public static final realregister t2   = new realregister("t2",  true);
+    public static final realregister s0   = new realregister("s0",   false);
+    public static final realregister s1   = new realregister("s1", false);
+    public static final realregister a0   = new realregister("a0", true);
+    public static final realregister a1   = new realregister("a1",  true);
+    public static final realregister a2   = new realregister("a2", true);
+    public static final realregister a3   = new realregister("a3", true);
+    public static final realregister a4   = new realregister("a4", true);
+    public static final realregister a5   = new realregister("a5", true);
+    public static final realregister a6   = new realregister("a6", true);
+    public static final realregister a7   = new realregister("a7", true);
 
-public class realregister extends register{
-    public static final realregister rax=new realregister("rax","al",true);
-    public static final realregister rcx=new realregister("rcx","cl",true);
-    public static final realregister rdx=new realregister("rdx","dl",true);
-    public static final realregister rbx=new realregister("rbx","bl",false);
-    public static final realregister rsi=new realregister("rsi","sil",true);
-    public static final realregister rdi=new realregister("rdi","dil",true);
-    public static final realregister rsp=new realregister("rsp","spl",true);
-    public static final realregister rbp=new realregister("rbp","bpl",false);
-    public static final realregister r8=new realregister("r8","r8b",true);
-    public static final realregister r9=new realregister("r9","r9b",true);
-    public static final realregister r10=new realregister("r10","r10b",true);
-    public static final realregister r11=new realregister("r11","r11b",true);
-    public static final realregister r12=new realregister("r12","r12b",false);
-    public static final realregister r13=new realregister("r13","r13b",false);
-    public static final realregister r14=new realregister("r14","r14b",false);
-    public static final realregister r15=new realregister("r15","r15b",false);
+    public static final realregister s2   = new realregister("s2", false);
+    public static final realregister s3   = new realregister("s3",  false);
+    public static final realregister s4   = new realregister("s4", false);
+    public static final realregister s5   = new realregister("s5",  false);
+    public static final realregister s6   = new realregister("s6",  false);
+    public static final realregister s7   = new realregister("s7",  false);
+    public static final realregister s8   = new realregister("s8",  false);
+    public static final realregister s9   = new realregister("s9", false);
+    public static final realregister s10  = new realregister("s10", false);
+    public static final realregister s11  = new realregister("s11", false);
 
-    public static final Set<realregister> callerSaveRegisters=new HashSet<>();
-    public static final Set<realregister> calleeSaveRegisters=new HashSet<>();
-    public static final LinkedList<realregister> argumentPassRegisters=new LinkedList<>();
-    public static final LinkedList<realregister> allRegisters=new LinkedList<>();
+    public static final realregister t3   = new realregister("t3", true);
+    public static final realregister t4   = new realregister("t4", true);
+    public static final realregister t5  = new realregister("t5", true);
+    public static final realregister t6  = new realregister("t6", true);
 
-    public static final virtualregister vrax=new I64Value("vrax",rax);
-    public static final virtualregister vrcx=new I64Value("vrcx",rcx);
-    public static final virtualregister vrdx=new I64Value("vrdx",rdx);
-    public static final virtualregister vrbx=new I64Value("vrbx",rbx);
-    public static final virtualregister vrsi=new I64Value("vrsi",rsi);
-    public static final virtualregister vrdi=new I64Value("vrdi",rdi);
-    public static final virtualregister vrsp=new I64Value("vrsp",rsp);
-    public static final virtualregister vrbp=new I64Value("vrbp",rbp);
-    public static final virtualregister vr8=new I64Value("vr8",r8);
-    public static final virtualregister vr9=new I64Value("vr9",r9);
-    public static final virtualregister vr10=new I64Value("vr10",r10);
-    public static final virtualregister vr11=new I64Value("vr11",r11);
-    public static final virtualregister vr12=new I64Value("vr12",r12);
-    public static final virtualregister vr13=new I64Value("vr13",r13);
-    public static final virtualregister vr14=new I64Value("vr14",r14);
-    public static final virtualregister vr15=new I64Value("vr15",r15);
+    public static final Set<realregister> callerSaveRegisters = new HashSet<>();
+    public static final Set<realregister> calleeSaveRegisters = new HashSet<>();
+    public static final LinkedList<realregister> argumentPassRegisters = new LinkedList<>();
+    public static final LinkedList<realregister> allRegisters = new LinkedList<>();
 
-    public static final Set<virtualregister> callerSaveVRegisters=new HashSet<>();
-    public static final Set<virtualregister> calleeSaveVRegisters=new HashSet<>();
-    public static final LinkedList<virtualregister> argumentPassVRegisters=new LinkedList<>();
-    public static final LinkedList<virtualregister> allVRegisters=new LinkedList<>();
+    public static final virtualregister vzero = new I64Value("vzero", zero);
+    public static final virtualregister vra   = new I64Value("vra", ra);
+    public static final virtualregister vsp   = new I64Value("vsp", sp);
+    public static final virtualregister vgp   = new I64Value("vgp", gp);
+    public static final virtualregister vtp   = new I64Value("vtp", tp);
+    public static final virtualregister vt0   = new I64Value("vt0", t0);
+    public static final virtualregister vt1   = new I64Value("vt1", t1);
+    public static final virtualregister vt2   = new I64Value("vt2",  t2);
+    public static final virtualregister vs0   = new I64Value("vs0",   s0);
+    public static final virtualregister vs1   = new I64Value("vs1", s1);
+    public static final virtualregister va0   = new I64Value("va0", a0);
+    public static final virtualregister va1   = new I64Value("va1",  a1);
+    public static final virtualregister va2   = new I64Value("va2", a2);
+    public static final virtualregister va3   = new I64Value("va3", a3);
+    public static final virtualregister va4   = new I64Value("va4", a4);
+    public static final virtualregister va5   = new I64Value("va5", a5);
+    public static final virtualregister va6   = new I64Value("va6", a5);
+    public static final virtualregister va7   = new I64Value("va7", a7);
+
+    public static final virtualregister vs2   = new I64Value("vs2", s2);
+    public static final virtualregister vs3   = new I64Value("vs3",  s3);
+    public static final virtualregister vs4   = new I64Value("vs4", s4);
+    public static final virtualregister vs5   = new I64Value("vs5",  s5);
+    public static final virtualregister vs6   = new I64Value("vs6",  s6);
+    public static final virtualregister vs7   = new I64Value("vs7",  s7);
+    public static final virtualregister vs8   = new I64Value("vs8",  s8);
+    public static final virtualregister vs9   = new I64Value("vs9", s9);
+    public static final virtualregister vs10  = new I64Value("vs10", s10);
+    public static final virtualregister vs11  = new I64Value("vs11", s11);
+
+    public static final virtualregister vt3   = new I64Value("vt3", t3);
+    public static final virtualregister vt4   = new I64Value("vt4", t4);
+    public static final virtualregister vt5  = new I64Value("vt5", t5);
+    public static final virtualregister vt6  = new I64Value("vt6", t6);
+
+    public static final Set<virtualregister> callerSaveVRegisters = new HashSet<>();
+    public static final Set<virtualregister> calleeSaveVRegisters = new HashSet<>();
+    public static final LinkedList<virtualregister> argumentPassVRegisters = new LinkedList<>();
+    public static final LinkedList<virtualregister> allVRegisters = new LinkedList<>();
 
 
-    static{
-        argumentPassVRegisters.add(vrdi);
-        argumentPassVRegisters.add(vrsi);
-        argumentPassVRegisters.add(vrdx);
-        argumentPassVRegisters.add(vrcx);
-        argumentPassVRegisters.add(vr8);
-        argumentPassVRegisters.add(vr9);
-        for(virtualregister vregister:argumentPassVRegisters)
-            argumentPassRegisters.add(vregister.color);
-        allVRegisters.add(vrax);
-        allVRegisters.add(vrcx);
-        allVRegisters.add(vrdx);
-        allVRegisters.add(vrbx);
-        allVRegisters.add(vrsi);
-        allVRegisters.add(vrdi);
-        allVRegisters.add(vrsp);
-        allVRegisters.add(vrbp);
-        allVRegisters.add(vr8);
-        allVRegisters.add(vr9);
-        allVRegisters.add(vr10);
-        allVRegisters.add(vr11);
-        allVRegisters.add(vr12);
-        allVRegisters.add(vr13);
-        allVRegisters.add(vr14);
-        allVRegisters.add(vr15);
-        for(virtualregister vreg: allVRegisters){
-            allRegisters.add(vreg.color);
-            if(vreg.color.isCallerSave){
-                callerSaveVRegisters.add(vreg);
-                callerSaveRegisters.add(vreg.color);
-            }else{
-                calleeSaveVRegisters.add(vreg);
-                calleeSaveRegisters.add(vreg.color);
+    static {
+        argumentPassVRegisters.add(va0);
+        argumentPassVRegisters.add(va1);
+        argumentPassVRegisters.add(va2);
+        argumentPassVRegisters.add(va3);
+        argumentPassVRegisters.add(va4);
+        argumentPassVRegisters.add(va5);
+        argumentPassVRegisters.add(va6);
+        argumentPassVRegisters.add(va7);
+
+        for (virtualregister virtualregister : argumentPassVRegisters)
+            argumentPassRegisters.add(virtualregister.color);
+
+        allVRegisters.add(vzero);
+        allVRegisters.add(vra);
+        allVRegisters.add(vsp);
+        allVRegisters.add(vgp);
+        allVRegisters.add(vtp);
+        allVRegisters.add(vt0);
+        allVRegisters.add(vt1);
+        allVRegisters.add(vt2);
+        allVRegisters.add(vs0);
+        allVRegisters.add(vs1);
+        allVRegisters.add(va0);
+        allVRegisters.add(va1);
+        allVRegisters.add(va2);
+        allVRegisters.add(va3);
+        allVRegisters.add(va4);
+        allVRegisters.add(va5);
+        allVRegisters.add(va6);
+        allVRegisters.add(va7);
+
+        allVRegisters.add(vs2);
+        allVRegisters.add(vs3);
+        allVRegisters.add(vs4);
+        allVRegisters.add(vs5);
+        allVRegisters.add(vs6);
+        allVRegisters.add(vs7);
+        allVRegisters.add(vs8);
+        allVRegisters.add(vs9);
+        allVRegisters.add(vs10);
+        allVRegisters.add(vs11);
+
+        allVRegisters.add(vt3);
+        allVRegisters.add(vt4);
+        allVRegisters.add(vt5);
+        allVRegisters.add(vt6);
+
+        for (virtualregister vRegister : allVRegisters) {
+            allRegisters.add(vRegister.color);
+            if (vRegister.color.isCallerSave) {
+                callerSaveVRegisters.add(vRegister);
+                callerSaveRegisters.add(vRegister.color);
+            } else {
+                calleeSaveVRegisters.add(vRegister);
+                calleeSaveRegisters.add(vRegister.color);
             }
         }
     }
 
     boolean isCallerSave;
     boolean isCalleeSave;
-    public String lowByteName;
 
-    private realregister(String name,String lowByteName,boolean callerSave){
+    private realregister(String name, boolean callerSave) {
         super(name);
-        this.lowByteName=lowByteName;
-        this.isCallerSave=callerSave;
-        this.isCalleeSave=!callerSave;
+        this.isCallerSave = callerSave;
+        this.isCalleeSave = !callerSave;
     }
 
     @Override
-    public void accept(IRvisitor irvisitor){
-        irvisitor.visit(this);
+    public void accept(IRvisitor irVisitor) {
+        irVisitor.visit(this);
     }
 
-    public boolean isCalleeSave(){
+    public boolean isCalleeSave() {
         return isCalleeSave;
     }
 
-    public boolean isCallerSave(){
+    public boolean isCallerSave() {
         return isCallerSave;
-    }
-
-    public String getLowByteName(){
-        return lowByteName;
     }
 
 

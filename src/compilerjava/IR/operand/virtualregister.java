@@ -4,6 +4,7 @@ package compilerjava.IR.operand;
 import compilerjava.IR.basicblock;
 import compilerjava.IR.IRvisitor;
 import compilerjava.IR.instruction.move;
+import compilerjava.config;
 
 import java.util.*;
 

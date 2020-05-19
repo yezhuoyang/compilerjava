@@ -1,0 +1,51 @@
+define i64 @main  {
+main_entry_1:
+   %rdi = mul 10 8
+   %rdi = add %rdi 8
+   %rax = alloc %rdi
+   %rdx = move %rax
+   store 10 %rdx
+   %r10 = add %rdx 8
+   %r8 = add %rdx %rdi
+   jump main_for_cond_1
+main_for_cond_1:
+   %r13 = slt %r10 %r8
+   br %r13 main_for_body_1 main_for_merge_1
+main_for_body_1:
+   %rdi = mul 10 8
+   %rdi = add %rdi 8
+   %rax = alloc %rdi
+   store 10 %rax
+   store %rax %r10
+   %rsi = add %rax 8
+   %r11 = add %rax %rdi
+   jump main_for_cond_2
+main_for_cond_2:
+   %r13 = slt %rsi %r11
+   br %r13 main_for_body_2 main_for_merge_2
+main_for_body_2:
+   %rdi = mul 10 8
+   %rdi = add %rdi 8
+   %rax = alloc %rdi
+   store 10 %rax
+   store %rax %rsi
+   jump main_for_step_1
+main_for_step_1:
+   %rsi = add %rsi 8
+   jump main_for_cond_2
+main_for_merge_2:
+   jump main_for_step_2
+main_for_step_2:
+   %r10 = add %r10 8
+   jump main_for_cond_1
+main_for_merge_1:
+   %rax = move 0
+   ret %rax
+}
+
+define i64 @__init  {
+__init_entry_1:
+   %rax = call main 
+   ret %rax
+}
+

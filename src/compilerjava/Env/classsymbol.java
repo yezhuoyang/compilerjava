@@ -53,6 +53,9 @@ public class classsymbol extends symbol implements field, type{
         if(varsymbolMap.containsKey(symbol.getWord())||funcsymbolMap.containsKey(symbol.getWord()))
             throw new semanticError("Duplicate ID",symbol.getDefNode().getpos());
         varsymbolMap.put(symbol.getWord(),symbol);
+        symbol.setOffset(size);
+        symbol.setfield(this);
+        size+=symbol.gettype().getTypeSize();
         symbol.setfield(this);
     }
 
@@ -69,8 +72,6 @@ public class classsymbol extends symbol implements field, type{
     public void defclass(classsymbol symbol){
 
     }
-
-
 
     @Override
     public symbol resolvesymbol(String ID,position pos){

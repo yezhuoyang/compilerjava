@@ -11,6 +11,7 @@ public class global64Value extends value implements globalvar{
         super(name);
     }
 
+
     public global64Value(String name,boolean isString){
         super(name);
         this.isString=isString;

@@ -51,6 +51,8 @@ public class basesymbol extends symbol implements type{
 
     @Override
     public int getTypeSize(){
+        if(getTypeName()=="bool")
+            return config.boolsize;
         return config.basetypesize();
     }
 
