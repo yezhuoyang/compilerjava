@@ -101,8 +101,7 @@ public class alloc extends IRinst{
         if(pointer instanceof virtualregister && !(pointer instanceof globalvar))
             def.add((virtualregister)pointer);
         def.addAll(calleeSaveVRegisters);
-        def.remove(vrsp);
-        def.remove(vrbp);
+        def.remove(vsp);
     }
 
     @Override

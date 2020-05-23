@@ -10,9 +10,10 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import compilerjava.optimizer.*;
+
+
 import java.io.*;
-
-
 
 
 public class Main{
@@ -49,8 +50,38 @@ public class Main{
 
             IRcreator ircreator=new IRcreator(_globalfield);
             ircreator.visit(ast);
+
             IRroot irroot=ircreator.getIrRoot();
 
+
+            globalvarresolver _globalvarresolver=new globalvarresolver(irroot);
+            _globalvarresolver.run();
+
+
+            InstructionAdjust _instructionAdjust=new InstructionAdjust(irroot);
+            _instructionAdjust.run();
+
+
+            AdjustToEmmit adjustToEmmit=new AdjustToEmmit(irroot);
+            adjustToEmmit.run();
+
+
+            new regAllocator(irroot).run();
+
+
+            IRprinter irprinter=new IRprinter(out);
+            irprinter.visit(irroot);
+
+
+
+            PrintStream out2 = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/src/compilerjava/outcode.txt");
+            ASMgenerator codegen=new ASMgenerator(irroot,out2);
+            codegen.run();
+
+
+
+            /*
+            IRroot irroot=ircreator.getIrRoot();
 
             new riscvconstraintResolver(irroot).run();
 
@@ -62,6 +93,8 @@ public class Main{
 
             PrintStream out2 = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/src/compilerjava/outcode.txt");
             new riscvcodeEmitter(irroot,out2).run();
+            */
+
             /*
             IRprinter irprinter=new IRprinter(out);
             irprinter.visit(irroot);

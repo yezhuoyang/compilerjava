@@ -5,7 +5,6 @@ import compilerjava.Env.*;
 import java.util.*;
 
 
-
 public class classdeclcollector implements ASTvisitor{
     private globalfield _globalfield;
 

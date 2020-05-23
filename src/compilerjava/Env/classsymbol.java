@@ -111,7 +111,6 @@ public class classsymbol extends symbol implements field, type{
     }
 
 
-
     @Override
     public boolean isBaseType(){
         return false;
@@ -141,6 +140,8 @@ public class classsymbol extends symbol implements field, type{
 
     @Override
     public int getTypeSize(){
+        if(getTypeName().equals("string"))
+                return config.charsize;
         return config.pointersize();
     }
 

@@ -5,12 +5,14 @@ import compilerjava.IR.IRvisitor;
 
 public abstract class operand {
     String name;
+    int Size;
 
-
-    public operand(){
+    public operand(int Size){
+        this.Size=Size;
     }
 
-    public operand(String name){
+    public operand(String name,int Size){
+        this.Size=Size;
         this.name=name;
     }
 
@@ -18,6 +20,9 @@ public abstract class operand {
         return name;
     }
 
+    public int getSize() {
+        return Size;
+    }
 
     public abstract void accept(IRvisitor irvisitor);
 

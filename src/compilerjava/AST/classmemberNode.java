@@ -7,7 +7,7 @@ public class classmemberNode extends exprNode{
     private exprNode expr;
     private String ID;
     private symbol sym;
-
+    
     public classmemberNode(exprNode expr,String ID,position pos){
         super(pos);
         this.expr=expr;
@@ -34,6 +34,4 @@ public class classmemberNode extends exprNode{
     public void accept(ASTvisitor visitor){
         visitor.visit(this);
     }
-
-
 }

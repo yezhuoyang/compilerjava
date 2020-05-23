@@ -7,6 +7,7 @@ import compilerjava.IR.instruction.back;
 import compilerjava.IR.operand.globalvar;
 import compilerjava.IR.operand.register;
 import compilerjava.IR.operand.virtualregister;
+import compilerjava.config;
 
 import java.util.*;
 
@@ -18,6 +19,10 @@ public class function {
     public LinkedList<call> callerInstList=new LinkedList<>();
     public int argumentLimit;
     public int temporaryCnt=0;
+    public int stackframsize=0;
+
+    public int stackSize;
+
 
     private basicblock entryBB=new basicblock(this,"entry");
     private basicblock exitBB=new basicblock(this,"exit");
@@ -37,12 +42,27 @@ public class function {
     public function(String name){
         this.name=name;
         this.funcinfo=new functioninfo();
+        this.stackSize=0;
     }
+
 
     public function(String name,String builtinname){
         this.name=name;
         this.builtinFunctionName=builtinname;
         this.funcinfo=new functioninfo();
+        this.stackSize=0;
+    }
+
+    public int getStackSize(){
+        return stackSize*4+(16-stackSize*4%16);
+    }
+
+    public void calcStackFrame(){
+        stackframsize=(Math.max(argumentLimit-8,0)+temporaryCnt)* config.registersize;
+    }
+
+    public int getStackframsize() {
+        return stackframsize;
     }
 
     public String getName() {
@@ -126,7 +146,7 @@ public class function {
         }
         Collections.reverse(reversePostOrderDFSBBList);
     }
-    
+
     public List<basicblock> getPostOrderDFSBBList(){
        if(postOrderDFSBBList==null){
            postOrderDFSBBList=new ArrayList<>();

@@ -96,7 +96,7 @@ public class basicblock {
             head=tail=irinst;
         }
         else{
-            irinst.setNextInstruction(irinst);
+            irinst.setNextInstruction(head);
             head.setprevInstruction(irinst);
             head=irinst;
         }

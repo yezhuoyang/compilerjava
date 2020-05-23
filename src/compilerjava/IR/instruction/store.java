@@ -11,21 +11,33 @@ public class store extends IRinst{
     private operand src;
     private operand dst;
     private boolean isInsertedForglobalvar;
+    private int size;
 
-    public store(basicblock currentBB,operand src,operand dst){
+
+    public store(int S,basicblock currentBB,operand src,operand dst){
         super(currentBB);
         this.src=src;
         this.dst=dst;
         this.isInsertedForglobalvar=false;
+        this.size=S;
         updateUseRegs();
     }
 
-    public store(basicblock currentBB,operand src,operand dst,boolean isInsertedForglobalvar){
+    public store(int S,basicblock currentBB,operand src,operand dst,boolean isInsertedForglobalvar){
         super(currentBB);
         this.src=src;
         this.dst=dst;
         this.isInsertedForglobalvar=isInsertedForglobalvar;
+        this.size=S;
         updateUseRegs();
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
     }
 
     public operand getSrc(){
@@ -43,7 +55,7 @@ public class store extends IRinst{
 
     @Override
     public IRinst getFakeInst(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap) {
-        return new store(fakeBBMap.getOrDefault(currentBB,currentBB),fakeRegMap.getOrDefault(src,src),fakeRegMap.getOrDefault(dst,dst));
+        return new store(-1,fakeBBMap.getOrDefault(currentBB,currentBB),fakeRegMap.getOrDefault(src,src),fakeRegMap.getOrDefault(dst,dst));
     }
 
     @Override

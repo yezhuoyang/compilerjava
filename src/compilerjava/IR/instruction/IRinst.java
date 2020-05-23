@@ -45,7 +45,7 @@ public abstract class IRinst {
     }
 
     public boolean hasNextInstruction(){
-        return prevInstruction!=null;
+        return nextInstruction!=null;
     }
 
     public IRinst getNextInstruction(){

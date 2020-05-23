@@ -81,10 +81,13 @@ public class builtinsymbolcollector{
                     stmtNodeList.add(new exprstmtNode(new binaryexprNode(new IDexprNode(((vardeclNode)x).getID(),x.getpos()),((vardeclNode)x).getExpr(),binaryexprNode.Optype.ASSIGN,x.getpos()),x.getpos()));
             }
         });
+
         stmtNodeList.add(new returnNode(new funccallexprNode(new IDexprNode("main",null),new ArrayList<>(),null),null));
         blockstmtNode _blockstmtNode=new blockstmtNode(stmtNodeList,null);
+
         funcdeclNode initfunc=new funcdeclNode(new inttpNode(null),"__init",new ArrayList<>(),_blockstmtNode,null);
         ast.getDeclNodeList().add(initfunc);
+
     }
 
 }

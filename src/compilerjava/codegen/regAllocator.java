@@ -59,6 +59,7 @@ public class regAllocator {
         colors.remove(gp);
         colors.remove(tp);
         colors.remove(zero);
+        colors.remove(s0);
         try {
             debug_out = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/src/compilerjava/ir_debug.ll");
             _IRprinter = new IRprinter(debug_out, false, false);
@@ -523,7 +524,7 @@ public class regAllocator {
 
     private void rewriteProgram(function function) {
         for (virtualregister virtualregister : spilledNodes)
-            virtualregister.spillAddr = new stackdata(sp, null, new immediate(-(++function.temporaryCnt) * config.intsize));
+            virtualregister.spillAddr = new stackdata(function);
         for (virtualregister virtualregister : coalescedNodes)
             getAlias(virtualregister);
         function.getReversePostOrderDFSBBList().forEach(basicblock -> {
@@ -531,20 +532,20 @@ public class regAllocator {
                 for (virtualregister use : IRinst.getUse())
                     if (use.spillAddr != null) {
                         if (IRinst.getDef().contains(use)) {
-                            I64Value tmp = new I64Value("spill_tmp");
+                            I64Value tmp = new I64Value("spill_tmp",use.getSize());
                             tmp.addForSpill = true;
-                            IRinst.prependInstruction(new load(basicblock, use.spillAddr, tmp));
-                            IRinst.postpendInstruction(new store(basicblock, tmp, use.spillAddr));
+                            IRinst.prependInstruction(new load(use.getSize(),basicblock, use.spillAddr, tmp));
+                            IRinst.postpendInstruction(new store(use.getSize(),basicblock, tmp, use.spillAddr));
                             IRinst.replaceUse(use, tmp);
                             IRinst.replaceDef(use, tmp);
                         } else {
                             //TODO : peephole optimization for move, Binary(add, sub, mul, and, or, xor)
                             if (IRinst instanceof move && ((move) IRinst).getSrc() == use && ((virtualregister) ((move) IRinst).getDst()).spillAddr == null)
-                                IRinst.replaceInstruction(new load(basicblock, use.spillAddr, ((move) IRinst).getDst()));
+                                IRinst.replaceInstruction(new load(use.getSize(),basicblock, use.spillAddr, ((move) IRinst).getDst()));
                             else {
-                                I64Value tmp = new I64Value("spill_tmp");
+                                I64Value tmp = new I64Value("spill_tmp",use.getSize());
                                 tmp.addForSpill = true;
-                                IRinst.prependInstruction(new load(basicblock, use.spillAddr, tmp));
+                                IRinst.prependInstruction(new load(use.getSize(),basicblock, use.spillAddr, tmp));
                                 IRinst.replaceUse(use,tmp);
                             }
                         }
@@ -553,11 +554,11 @@ public class regAllocator {
                     if (def.spillAddr != null) {
                         if (!IRinst.getUse().contains(def)) {
                             if (IRinst instanceof move && ((move) IRinst).getSrc() instanceof virtualregister && ((virtualregister) ((move) IRinst).getSrc()).spillAddr == null)
-                                IRinst.replaceInstruction(new store(basicblock, ((move) IRinst).getSrc(), def.spillAddr));
+                                IRinst.replaceInstruction(new store(def.getSize(),basicblock, ((move) IRinst).getSrc(), def.spillAddr));
                             else {
-                                I64Value tmp = new I64Value("spill_tmp");
+                                I64Value tmp = new I64Value("spill_tmp",def.getSize());
                                 tmp.addForSpill = true;
-                                IRinst.postpendInstruction(new store(basicblock, tmp, def.spillAddr));
+                                IRinst.postpendInstruction(new store(def.getSize(),basicblock, tmp, def.spillAddr));
                                 IRinst.replaceDef(def, tmp);
                             }
                         }

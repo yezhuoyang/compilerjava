@@ -24,16 +24,16 @@ public abstract class virtualregister extends register{
     public boolean addForSpill=false;
     public int spillPriority=0;
 
-    public virtualregister(){
-
+    public virtualregister(int Size){
+        super(Size);
     }
 
-    public virtualregister(String name){
-        super(name);
+    public virtualregister(String name,int Size){
+        super(name,Size);
     }
 
-    public virtualregister(int SSAID,virtualregister origin){
-        super(origin.name);
+    public virtualregister(int SSAID,virtualregister origin,int Size){
+        super(origin.name,Size);
         this.origin=origin;
         this.SSAID=SSAID;
     }
@@ -50,7 +50,7 @@ public abstract class virtualregister extends register{
         if(aliases==null) aliases=new HashMap<>();
         virtualregister alias=aliases.get(id);
         if(alias==null){
-            alias=new virtualregister(id,this){
+            alias=new virtualregister(id,this,this.Size){
                 @Override
                 public void accept(IRvisitor irvisitor){
                        irvisitor.visit(this);

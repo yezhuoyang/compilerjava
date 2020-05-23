@@ -22,7 +22,7 @@ public abstract class exprNode extends Node{
 
     private basicblock thenBB, elseBB;
     private operand resultop;
-
+    int size;
 
     public exprNode(position pos){
         super(pos);
@@ -46,6 +46,7 @@ public abstract class exprNode extends Node{
 
     public void settype(type _type) {
         this._type = _type;
+        size=_type.getTypeSize();
     }
 
     public operand getResultop(){
@@ -106,6 +107,9 @@ public abstract class exprNode extends Node{
         return _type.isNullType();
     }
 
+    public int getSize() {
+        return size;
+    }
 
     public basicblock getElseBB() {
         return elseBB;

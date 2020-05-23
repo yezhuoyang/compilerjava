@@ -97,5 +97,6 @@ public class globalfield extends basefield{
 
     public void setArrayfunctionsymbol(funcsymbol arrayfunctionsymbol) {
         this.arrayfunctionsymbol = arrayfunctionsymbol;
+        arrayfunctionsymbol.setMemberFunc();
     }
 }

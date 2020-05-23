@@ -11,20 +11,24 @@ public class load extends IRinst {
     private operand src;
     private operand dst;
     private boolean isInsertedForGlobalVar;
+    private int size;
 
-    public load(basicblock currentBB,operand src,operand dst){
+
+    public load(int S,basicblock currentBB,operand src,operand dst){
         super(currentBB);
         this.src=src;
         this.dst=dst;
         this.isInsertedForGlobalVar=false;
+        this.size=S;
         updateUseRegs();
     }
 
-    public load(basicblock currentBB,operand src,operand dst,boolean isInsertedForGlobalVar){
+    public load(int S,basicblock currentBB,operand src,operand dst,boolean isInsertedForGlobalVar){
         super(currentBB);
         this.src=src;
         this.dst=dst;
         this.isInsertedForGlobalVar=isInsertedForGlobalVar;
+        this.size=S;
         updateUseRegs();
     }
 
@@ -91,7 +95,7 @@ public class load extends IRinst {
 
     @Override
     public IRinst getFakeInst(Map<basicblock,basicblock>fakeBBMap,Map<operand,operand>fakeRegMap){
-        return new load(fakeBBMap.getOrDefault(currentBB,currentBB),fakeRegMap.getOrDefault(src,src),fakeRegMap.getOrDefault(dst,dst));
+        return new load(-1,fakeBBMap.getOrDefault(currentBB,currentBB),fakeRegMap.getOrDefault(src,src),fakeRegMap.getOrDefault(dst,dst));
     }
 
     @Override

@@ -2,6 +2,23 @@
 
 
 
+
+int func(int a,int b){
+
+    return a+b;
+
+}
+
+
+
+
+
 int main(){
-    int[][][] a=new int[10][10][10];
+
+    int b=3;
+    int c=4;
+    return func(b,c);
+
+
+
 }

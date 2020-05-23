@@ -1,5 +1,5 @@
 package compilerjava.IR.operand;
-
+import compilerjava.config;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,15 +9,16 @@ import java.util.List;
 public abstract class memory extends storage{
     private register base=null;
     private register index=null;
-    private immediate offset=new immediate(0);
+    private immediate offset=new immediate(0,config.pointersize());
     private List<virtualregister> useregs=new ArrayList<>();
 
-    public memory(virtualregister base){
-        super(base.getName());
+    public memory(virtualregister base,int Size){
+        super(base.getName(),Size);
         this.base=base;
     }
 
-    public memory(register base,register index,immediate offset){
+    public memory(register base,register index,immediate offset,int Size){
+        super(Size);
         this.base=base;
         this.index=index;
         this.offset=offset;

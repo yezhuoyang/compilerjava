@@ -8,7 +8,8 @@ public class immediate extends operand{
 
     private int immediate;
 
-    public immediate(int immediate){
+    public immediate(int immediate,int Size){
+        super(Size);
         this.immediate=immediate;
     }
 

@@ -131,6 +131,7 @@ public class globalfuncdeclcollector implements ASTvisitor{
 
     @Override
     public void visit(binaryexprNode node){
+
     }
 
 
@@ -142,7 +143,6 @@ public class globalfuncdeclcollector implements ASTvisitor{
     @Override
     public void visit(funccallexprNode node){
     }
-
 
     @Override
     public void visit(IDexprNode node){

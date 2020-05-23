@@ -227,7 +227,7 @@ public class semanticchecker implements ASTvisitor{
             case GEQ:
             case LT:{
                 if(lhs.isString()&&rhs.isString()){
-                    node.setCat(exprNode.Category.LVALUE);
+                    node.setCat(exprNode.Category.RVALUE);
                     node.settype(boolsymbol);
                 }
                 else if(lhs.isInteger()&&rhs.isInteger()){
@@ -366,7 +366,6 @@ public class semanticchecker implements ASTvisitor{
                 node.settype(new arraytype(tp,node.getNumDims()));
               }
         }
-
 
 
     @Override

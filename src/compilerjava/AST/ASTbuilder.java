@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+
 public class ASTbuilder extends MXBaseVisitor<Node>{
 
 	@Override
@@ -246,19 +247,15 @@ public class ASTbuilder extends MXBaseVisitor<Node>{
             new position(ctx.getStart()));
     }
 
-
-
 	@Override
 	public Node visitBreakstmt(MXParser.BreakstmtContext ctx) {
 	        return new breakNode(new position(ctx.getStart()));
 	}
 
-
 	@Override
 	public Node visitContinuestmt(MXParser.ContinuestmtContext ctx) {
 	       return new continueNode(new position(ctx.getStart()));
 	}
-
 
 	@Override
 	public Node visitUnaryexpr(MXParser.UnaryexprContext ctx) {
@@ -288,36 +285,30 @@ public class ASTbuilder extends MXBaseVisitor<Node>{
 	    return new unaryexprNode((exprNode)visit(ctx.expr()),op,new position(ctx.getStart()));
 	}
 
-
 	@Override
 	public Node visitIdentifier(MXParser.IdentifierContext ctx) {
 	        return new IDexprNode(ctx.ID().getText(),new position(ctx.getStart()));
 	}
-
 
 	@Override
 	public Node visitThisexpr(MXParser.ThisexprContext ctx) {
 	        return new thisexprNode(new position(ctx.getStart()));
 	}
 
-
 	@Override
 	public Node visitSubscript(MXParser.SubscriptContext ctx) {
 	        return new arrayindexNode((exprNode)visit(ctx.array),(exprNode)visit(ctx.index),new position(ctx.getStart()));
 	}
 
-
 	@Override
-	public Node visitMemberaccess(MXParser.MemberaccessContext ctx) {
+	public Node visitMemberaccess(MXParser.MemberaccessContext ctx){
 	        return new classmemberNode((exprNode)visit(ctx.expr()),ctx.ID().getText(),new position(ctx.getStart()));
 	}
-
 
 	@Override
 	public Node visitNewexpr(MXParser.NewexprContext ctx) {
 	        return visit(ctx.creator());
 	}
-
 
 	@Override
 	public Node visitFunctioncall(MXParser.FunctioncallContext ctx) {

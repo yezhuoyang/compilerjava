@@ -4,29 +4,27 @@ import compilerjava.IR.function;
 import compilerjava.IR.IRroot;
 import compilerjava.IR.instruction.*;
 import compilerjava.IR.operand.*;
+import compilerjava.config;
 
 
 
 
+public class InstructionAdjust extends pass{
 
-class InstructionAdjust extends pass{
 
 
-    InstructionAdjust(IRroot irroot){
+    public InstructionAdjust(IRroot irroot){
         super(irroot);
     }
 
 
     @Override
-    boolean run() {
+    public boolean run() {
         Irroot.getFunctionMap().values().forEach(this::adjustImmpos);
         Irroot.getFunctionMap().values().forEach(function -> {
             calcDefUseChain(function);
-
             mergeCmpwithBranch(function);
-
         });
-
         return true;
     }
 
@@ -41,11 +39,6 @@ class InstructionAdjust extends pass{
                         irinst.replaceInstruction(((cmp) irinst).inverseInst());
                     }
                 }
-
-
-
-
-
             }
         });
     }
@@ -64,7 +57,7 @@ class InstructionAdjust extends pass{
                         ((branch)BB.tail).setCond(null);
                         ((branch)BB.tail).defOfCond=defOfCond;
                     }else{
-                        cmp newCmp=new cmp(BB,cmp.Op.EQ,cond,new immediate(1),null);
+                        cmp newCmp=new cmp(BB,cmp.Op.EQ,cond,new immediate(1,config.boolsize),null);
                         ((branch)BB.tail).setCond(null);
                         ((branch)BB.tail).defOfCond=newCmp;
                     }
@@ -72,6 +65,7 @@ class InstructionAdjust extends pass{
              }
         });
     }
+
 
 
 

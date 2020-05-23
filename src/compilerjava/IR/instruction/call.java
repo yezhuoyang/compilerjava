@@ -146,7 +146,7 @@ public class call extends IRinst {
             use.add((virtualregister)objectPointer);
         if(result instanceof virtualregister&& !(result instanceof globalvar))def.add((virtualregister)result);
         def.addAll(callerSaveVRegisters);
-        def.remove(vrsp);
+        def.remove(vsp);
     }
 
     @Override

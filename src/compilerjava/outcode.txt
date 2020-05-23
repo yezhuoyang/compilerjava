@@ -1,57 +1,30 @@
-default rel
-
-global main
-global __builtin_string_add
-global __builtin_string_equal
-global __builtin_string_inequal
-global __builtin_string_less
-global __builtin_string_less_equal
-global __builtin_string_great
-global __builtin_string_great_equal
-global __builtin_print
-global __builtin_println
-global __builtin_printInt
-global __builtin_printlnInt
-global __builtin_getString
-global __builtin_getInt
-global __builtin_toString
-global __builtin_string_substring
-global __builtin_string_parseInt
-global __builtin_string_ord
-
-extern _IO_getc
-extern stdin
-extern scanf
-extern __stack_chk_fail
-extern _IO_putc
-extern stdout
-extern puts
-extern __printf_chk
-extern strcmp
-extern memcpy
-extern malloc
-extern _GLOBAL_OFFSET_TABLE_
-
-section .text
-
+.section	.sdata,"aw",@progbits
+.globl	func					 # -- Begin function func
+.p2align	2
+.type	func,@function
+func_entry_1:
+       sub	sp, sp, 16
+       add	a0, a0, a1
+       addi	sp, sp, 16
+       ret
+								 # -- End function
+.globl	main					 # -- Begin function main
+.p2align	2
+.type	main,@function
 main_entry_1:
-        push r15
-        push r14
-        push r13
-        push r12
-        push rbx
-        push rbp
-        mov rbp, rsp
-        sub rsp, 8
-        imul 10, 8
-        add rdi, 8
-        call malloc
-        mov rdx, rax
-        mov rdx, 10
-        add rdx, 8
-        add rdx, rdi
-
-main_for_cond_1:
-        cmp r10, r8
-        setl r13b
-        movzx r13, r13b
+       sub	sp, sp, 16
+       li	a0, 3
+       li	a1, 4
+       call	func
+       addi	sp, sp, 16
+       ret
+								 # -- End function
+.globl	__init					 # -- Begin function __init
+.p2align	2
+.type	__init,@function
+main:
+       sub	sp, sp, 16
+       call	main
+       addi	sp, sp, 16
+       ret
+								 # -- End function
