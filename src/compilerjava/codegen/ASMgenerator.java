@@ -61,17 +61,17 @@ public class ASMgenerator implements IRvisitor{
 
     @Override
     public void visit(IRroot irroot){
-
-        out.println(".section\t.sdata,\"aw\",@progbits");
-        for(globalvar _globalvar:  irroot.getGlobalvarList()){
-                printGlobal((global64Value)_globalvar);
-        }
-        for(staticstring _staticstring:  irroot.getStaticStringList()){
-                printStaticstring(_staticstring);
-        }
+        out.println(indent+".text\n");
         for(Map.Entry<String,function> entry: irroot.getFunctionMap().entrySet()){
             currentfunc=entry.getValue();
             entry.getValue().accept(this);
+        }
+        out.println(indent+".section\t.sdata,\"aw\",@progbits");
+        for(globalvar _globalvar:  irroot.getGlobalvarList()){
+            printGlobal((global64Value)_globalvar);
+        }
+        for(staticstring _staticstring:  irroot.getStaticStringList()){
+            printStaticstring(_staticstring);
         }
     }
 
@@ -83,7 +83,7 @@ public class ASMgenerator implements IRvisitor{
         int stackframsize=func.getStackSize();
 
         if(stackframsize!=0)
-            entryBB.head.prependInstruction(new binary(entryBB,binary.Op.SUB,sp,new immediate(stackframsize,config.intsize),sp));
+            entryBB.head.prependInstruction(new binary(entryBB,binary.Op.ADD,sp,new immediate(-stackframsize,config.intsize),sp));
 
 
         if(stackframsize!=0)
@@ -96,11 +96,11 @@ public class ASMgenerator implements IRvisitor{
     @Override
     public void visit(function func){
         currentpush=0;
-        out.println(".globl\t"+func.getName()+"\t\t\t\t\t # -- Begin function "+func.getName());
-        out.println(".p2align\t2");
-        out.println(".type\t"+func.getName()+",@function");
+        out.println(indent+".globl\t"+getLabel(func.getEntryBB())+"\t\t\t\t\t # -- Begin function "+getLabel(func.getEntryBB()));
+        out.println(indent+".p2align\t2");
+        out.println(indent+".type\t"+getLabel(func.getEntryBB())+",@function");
         func.getReversePostOrderDFSBBList().forEach(this::visit);
-        out.println("\t\t\t\t\t\t\t\t # -- End function");
+        out.println("\t\t\t\t\t\t # -- End function");
     }
 
 
@@ -215,7 +215,7 @@ public class ASMgenerator implements IRvisitor{
 
     @Override
     public void visit(call inst){
-        printInst("call"+'\t'+inst.getCallee().getName());
+        printInst("call"+'\t'+getLabel(inst.getCallee().getEntryBB()));
     }
 
 

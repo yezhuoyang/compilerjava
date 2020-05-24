@@ -6,6 +6,7 @@ import compilerjava.IR.instruction.IRinst;
 import compilerjava.IR.instruction.back;
 import compilerjava.IR.operand.globalvar;
 import compilerjava.IR.operand.register;
+import compilerjava.IR.operand.stackdata;
 import compilerjava.IR.operand.virtualregister;
 import compilerjava.config;
 
@@ -18,6 +19,7 @@ public class function {
     public functioninfo funcinfo;
     public LinkedList<call> callerInstList=new LinkedList<>();
     public int argumentLimit;
+    private HashMap<register,stackdata>  saveArgumentMap;
     public int temporaryCnt=0;
     public int stackframsize=0;
 
@@ -43,6 +45,16 @@ public class function {
         this.name=name;
         this.funcinfo=new functioninfo();
         this.stackSize=0;
+    }
+
+    public void saveArgument(int i,stackdata stac){
+        saveArgumentMap.put(parameterList.get(i),stac);
+    }
+
+    public stackdata stackForArgument(int i){
+        stackdata stac=saveArgumentMap.get(parameterList.get(i));
+        if(stac==null)assert false;
+        return stac;
     }
 
 

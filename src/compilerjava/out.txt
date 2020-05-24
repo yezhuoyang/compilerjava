@@ -1,20 +1,115 @@
-define i64 @func  %a_1 %b_1 {
+define i64 @func  %a1_1 %a2_1 %a3_1 %a4_1 %a5_1 %a6_1 %a7_1 %a8_1 %a9_1 %a10_1 {
 func_entry_1:
-   %t_1 = add %a_1 %b_1
-   ret %va0_1
+   store %vs11_1 %vsp_1 null 0 44
+   store %vs8_1 %vsp_1 null 0 40
+   store %vs7_1 %vsp_1 null 0 36
+   store %vs10_1 %vsp_1 null 0 32
+   store %vs3_1 %vsp_1 null 0 28
+   store %vs1_1 %vsp_1 null 0 24
+   store %vs9_1 %vsp_1 null 0 20
+   store %vs5_1 %vsp_1 null 0 16
+   store %vs6_1 %vsp_1 null 0 12
+   store %vs4_1 %vsp_1 null 0 8
+   store %vs2_1 %vsp_1 null 0 4
+   store %ra %vsp_1 null 0 0
+   %a10_1 = load %vsp_1 null 0 4
+   %a9_1 = load %vsp_1 null 0 0
+   %t_1 = add %a1_1 %a2_1
+   %t_2 = add %t_1 %a3_1
+   %t_3 = add %t_2 %a4_1
+   %t_4 = add %t_3 %a5_1
+   %t_5 = add %t_4 %a6_1
+   %t_6 = add %t_5 %a7_1
+   %t_7 = add %t_6 %a8_1
+   %t_8 = add %t_7 %a9_1
+   %t_9 = add %t_8 %a10_1
+   %a0 = move %t_10
+   %ra = load %vsp_1 null 0 0
+   %vs2_1 = load %vsp_1 null 0 4
+   %vs4_1 = load %vsp_1 null 0 8
+   %vs6_1 = load %vsp_1 null 0 12
+   %vs5_1 = load %vsp_1 null 0 16
+   %vs9_1 = load %vsp_1 null 0 20
+   %vs1_1 = load %vsp_1 null 0 24
+   %vs3_1 = load %vsp_1 null 0 28
+   %vs10_1 = load %vsp_1 null 0 32
+   %vs7_1 = load %vsp_1 null 0 36
+   %vs8_1 = load %vsp_1 null 0 40
+   %vs11_1 = load %vsp_1 null 0 44
+   ret %a0
 }
 
 define i64 @main  {
 main_entry_1:
-   %b_2 = move 3
-   %c_1 = move 4
-   %va0_1 = call func %va0_1 %va1_1 
-   ret %va0_1
+   store %vs11_1 %vsp_1 null 0 52
+   store %vs8_1 %vsp_1 null 0 48
+   store %vs7_1 %vsp_1 null 0 44
+   store %vs10_1 %vsp_1 null 0 40
+   store %vs3_1 %vsp_1 null 0 36
+   store %vs1_1 %vsp_1 null 0 32
+   store %vs9_1 %vsp_1 null 0 28
+   store %vs5_1 %vsp_1 null 0 24
+   store %vs6_1 %vsp_1 null 0 20
+   store %vs4_1 %vsp_1 null 0 16
+   store %vs2_1 %vsp_1 null 0 12
+   store %ra %vsp_1 null 0 8
+   %a1_2 = move 2
+   %a2_2 = move 3
+   %a3_2 = move 4
+   %a4_2 = move 5
+   %a5_2 = move 6
+   %a6_2 = move 7
+   %a7_2 = move 8
+   %a8_2 = move 9
+   %a9_2 = move 10
+   %a10_2 = move 11
+   store %a9_2 %vsp_1 null 0 0
+   store %a10_2 %vsp_1 null 0 4
+   %t_11 = call func %va0_1 %va1_1 %va2_1 %va3_1 %va4_1 %va5_1 %va6_1 %va7_1 %a9_2 %a10_2 
+   %a0 = move %t_12
+   %ra = load %vsp_1 null 0 8
+   %vs2_1 = load %vsp_1 null 0 12
+   %vs4_1 = load %vsp_1 null 0 16
+   %vs6_1 = load %vsp_1 null 0 20
+   %vs5_1 = load %vsp_1 null 0 24
+   %vs9_1 = load %vsp_1 null 0 28
+   %vs1_1 = load %vsp_1 null 0 32
+   %vs3_1 = load %vsp_1 null 0 36
+   %vs10_1 = load %vsp_1 null 0 40
+   %vs7_1 = load %vsp_1 null 0 44
+   %vs8_1 = load %vsp_1 null 0 48
+   %vs11_1 = load %vsp_1 null 0 52
+   ret %a0
 }
 
 define i64 @__init  {
 __init_entry_1:
-   %va0_1 = call main 
-   ret %va0_1
+   store %vs11_1 %vsp_1 null 0 44
+   store %vs8_1 %vsp_1 null 0 40
+   store %vs7_1 %vsp_1 null 0 36
+   store %vs10_1 %vsp_1 null 0 32
+   store %vs3_1 %vsp_1 null 0 28
+   store %vs1_1 %vsp_1 null 0 24
+   store %vs9_1 %vsp_1 null 0 20
+   store %vs5_1 %vsp_1 null 0 16
+   store %vs6_1 %vsp_1 null 0 12
+   store %vs4_1 %vsp_1 null 0 8
+   store %vs2_1 %vsp_1 null 0 4
+   store %ra %vsp_1 null 0 0
+   %t_13 = call main 
+   %a0 = move %t_14
+   %ra = load %vsp_1 null 0 0
+   %vs2_1 = load %vsp_1 null 0 4
+   %vs4_1 = load %vsp_1 null 0 8
+   %vs6_1 = load %vsp_1 null 0 12
+   %vs5_1 = load %vsp_1 null 0 16
+   %vs9_1 = load %vsp_1 null 0 20
+   %vs1_1 = load %vsp_1 null 0 24
+   %vs3_1 = load %vsp_1 null 0 28
+   %vs10_1 = load %vsp_1 null 0 32
+   %vs7_1 = load %vsp_1 null 0 36
+   %vs8_1 = load %vsp_1 null 0 40
+   %vs11_1 = load %vsp_1 null 0 44
+   ret %a0
 }
 

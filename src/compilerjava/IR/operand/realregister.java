@@ -65,7 +65,7 @@ public class realregister extends register {
     public static final virtualregister va3   = new I64Value("va3", a3,config.registersize);
     public static final virtualregister va4   = new I64Value("va4", a4,config.registersize);
     public static final virtualregister va5   = new I64Value("va5", a5,config.registersize);
-    public static final virtualregister va6   = new I64Value("va6", a5,config.registersize);
+    public static final virtualregister va6   = new I64Value("va6", a6,config.registersize);
     public static final virtualregister va7   = new I64Value("va7", a7,config.registersize);
 
     public static final virtualregister vs2   = new I64Value("vs2", s2,config.registersize);
