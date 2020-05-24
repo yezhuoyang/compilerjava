@@ -1,0 +1,137 @@
+define i64 @tmp_tmp %a0 {
+tmp_tmp_entry_1:
+   store %s4 %sp null 0 44
+   store %s1 %sp null 0 40
+   store %s10 %sp null 0 36
+   store %s6 %sp null 0 32
+   store %s9 %sp null 0 28
+   store %s11 %sp null 0 24
+   store %s8 %sp null 0 20
+   store %s3 %sp null 0 16
+   store %s2 %sp null 0 12
+   store %s5 %sp null 0 8
+   store %s7 %sp null 0 4
+   store %ra %sp null 0 0
+   %s5 = add %a0 0
+   %s2 = move 4
+   store %s2 %s5
+   %s2 = add %a0 4
+   %s5 = move 5
+   store %s5 %s2
+   %a0 = move 0
+   %ra = load %sp null 0 0
+   %s7 = load %sp null 0 4
+   %s5 = load %sp null 0 8
+   %s2 = load %sp null 0 12
+   %s3 = load %sp null 0 16
+   %s8 = load %sp null 0 20
+   %s11 = load %sp null 0 24
+   %s9 = load %sp null 0 28
+   %s6 = load %sp null 0 32
+   %s10 = load %sp null 0 36
+   %s1 = load %sp null 0 40
+   %s4 = load %sp null 0 44
+   ret %a0
+}
+
+define i64 @tmp_fuck %a0 {
+tmp_fuck_entry_1:
+   store %s4 %sp null 0 44
+   store %s1 %sp null 0 40
+   store %s10 %sp null 0 36
+   store %s6 %sp null 0 32
+   store %s9 %sp null 0 28
+   store %s11 %sp null 0 24
+   store %s8 %sp null 0 20
+   store %s3 %sp null 0 16
+   store %s2 %sp null 0 12
+   store %s5 %sp null 0 8
+   store %s7 %sp null 0 4
+   store %ra %sp null 0 0
+   %s2 = add %a0 0
+   %s5 = add %a0 4
+   %s2 = load %s2
+   %s5 = load %s5
+   %a0 = add %s2 %s5
+   %ra = load %sp null 0 0
+   %s7 = load %sp null 0 4
+   %s5 = load %sp null 0 8
+   %s2 = load %sp null 0 12
+   %s3 = load %sp null 0 16
+   %s8 = load %sp null 0 20
+   %s11 = load %sp null 0 24
+   %s9 = load %sp null 0 28
+   %s6 = load %sp null 0 32
+   %s10 = load %sp null 0 36
+   %s1 = load %sp null 0 40
+   %s4 = load %sp null 0 44
+   ret %a0
+}
+
+define i64 @main  {
+main_entry_1:
+   store %s4 %sp null 0 44
+   store %s1 %sp null 0 40
+   store %s10 %sp null 0 36
+   store %s6 %sp null 0 32
+   store %s9 %sp null 0 28
+   store %s11 %sp null 0 24
+   store %s8 %sp null 0 20
+   store %s3 %sp null 0 16
+   store %s2 %sp null 0 12
+   store %s5 %sp null 0 8
+   store %s7 %sp null 0 4
+   store %ra %sp null 0 0
+   %a0 = move 8
+   %t1 = alloc 8
+   store %t1 %sp null 0 48
+   store %a0 %sp null 0 48
+   %a0 = load %sp null 0 48
+   call tmp_tmp %a0 
+   %a0 = load %sp null 0 48
+   %a0 = call tmp_fuck %a0 
+   %ra = load %sp null 0 0
+   %s7 = load %sp null 0 4
+   %s5 = load %sp null 0 8
+   %s2 = load %sp null 0 12
+   %s3 = load %sp null 0 16
+   %s8 = load %sp null 0 20
+   %s11 = load %sp null 0 24
+   %s9 = load %sp null 0 28
+   %s6 = load %sp null 0 32
+   %s10 = load %sp null 0 36
+   %s1 = load %sp null 0 40
+   %s4 = load %sp null 0 44
+   ret %a0
+}
+
+define i64 @__init  {
+__init_entry_1:
+   store %s4 %sp null 0 44
+   store %s1 %sp null 0 40
+   store %s10 %sp null 0 36
+   store %s6 %sp null 0 32
+   store %s9 %sp null 0 28
+   store %s11 %sp null 0 24
+   store %s8 %sp null 0 20
+   store %s3 %sp null 0 16
+   store %s2 %sp null 0 12
+   store %s5 %sp null 0 8
+   store %s7 %sp null 0 4
+   store %ra %sp null 0 0
+   %a0 = call main 
+   %ra = load %sp null 0 0
+   %s7 = load %sp null 0 4
+   %s5 = load %sp null 0 8
+   %s2 = load %sp null 0 12
+   %s3 = load %sp null 0 16
+   %s8 = load %sp null 0 20
+   %s11 = load %sp null 0 24
+   %s9 = load %sp null 0 28
+   %s6 = load %sp null 0 32
+   %s10 = load %sp null 0 36
+   %s1 = load %sp null 0 40
+   %s4 = load %sp null 0 44
+   ret %a0
+}
+

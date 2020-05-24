@@ -55,6 +55,14 @@ public class callingConvention {
                 function.getEntryBB().head.prependInstruction(new load(parameterList.get(i).getSize(), function.getEntryBB(), new stackdata(function, i - 8), parameterList.get(i)));
             }
 
+        back returnInst = (back) function.getExitBB().tail;
+
+        if (returnInst.getReturnValue() != null) {
+            returnInst.prependInstruction(new move(function.getExitBB(), returnInst.getReturnValue(), va0));
+            returnInst.setReturnValue(va0);
+        }
+
+
         function.getReversePostOrderDFSBBList().forEach(BB -> {
             for (IRinst irinst = BB.head; irinst != null; irinst = irinst.getNextInstruction()) {
                 if (irinst instanceof call) {
@@ -73,7 +81,6 @@ public class callingConvention {
                         inst.prependInstruction(new store(Size, BB, inst.getParameterList().get(i), new stackdata(function)));
                     }
 
-
                     int cnt = 0;
                     if (((call) irinst).getObjectPointer() != null) {
                         operand op = ((call) irinst).getObjectPointer();
@@ -81,13 +88,16 @@ public class callingConvention {
                         irinst.prependInstruction(new move(BB, op, argumentPassVRegisters.get(cnt++)));
                     }
 
-
                     for (int i = 0; i < Integer.min(8, ((call) irinst).getParameterList().size()); i++) {
                         operand op = ((call) irinst).getParameterList().get(i);
                         ((call) irinst).getParameterList().set(i, argumentPassVRegisters.get(cnt));
                         irinst.prependInstruction(new move(BB, op, argumentPassVRegisters.get(cnt++)));
                     }
 
+                    if(inst.getResult()!=null){
+                        irinst.postpendInstruction(new move(BB,va0,inst.getResult()));
+                        ((call) irinst).setResult(va0);
+                    }
 
                     irinst.updateUseRegs();
                 } else if (irinst instanceof alloc) {
@@ -106,7 +116,7 @@ public class callingConvention {
             if (vreg == vsp || vreg == vgp || vreg == vtp || vreg == vzero || vreg == vs0)
                 continue;
             stackdata stackloc = new stackdata(function);
-            function.getEntryBB().head.prependInstruction(new store(config.registersize, function.getEntryBB(), vreg, stackloc));
+            function.getEntryBB().addFirst(new store(config.registersize, function.getEntryBB(), vreg, stackloc));
             function.getExitBB().tail.prependInstruction(new load(config.registersize, function.getExitBB(), stackloc, vreg));
         }
     }
@@ -115,12 +125,6 @@ public class callingConvention {
     private void ModifyReturn(function function) {
         //modify return
         back returnInst = (back) function.getExitBB().tail;
-
-        if (returnInst.getReturnValue() != null) {
-            returnInst.prependInstruction(new move(function.getExitBB(), returnInst.getReturnValue(), a0));
-            returnInst.setReturnValue(a0);
-        }
-
 
         stackdata stackloc = new stackdata(function);
         function.getEntryBB().head.prependInstruction(new store(config.registersize, function.getExitBB(), ra, stackloc));

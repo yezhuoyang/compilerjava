@@ -201,13 +201,16 @@ public class ASMgenerator implements IRvisitor{
                 break;
         }
         if(inst.getThenBB().postOrderNumber==inst.getCurrentBB().postOrderNumber-1){
-            out.print(indent+inverseOp+" ");
+            out.print(indent+inverseOp+"\t");
             inst.defOfCond.getSrc1().accept(this);
             out.print(", ");
             inst.defOfCond.getSrc2().accept(this);
-            out.print(",  "+getLabel(inst.getElseBB()));
+            out.println(",  "+getLabel(inst.getElseBB()));
         }else{
-            out.print(indent+op);
+            out.print(indent+op+"\t");
+            inst.defOfCond.getSrc1().accept(this);
+            out.print(", ");
+            inst.defOfCond.getSrc2().accept(this);
             out.println(" "+getLabel(inst.getThenBB()));
         }
     }
@@ -309,7 +312,13 @@ public class ASMgenerator implements IRvisitor{
         out.print(indent+op+"\t");
         inst.getDst().accept(this);
         out.print(", ");
-        inst.getSrc().accept(this);
+        if(inst.getSrc() instanceof register){
+            out.print("0(");
+            inst.getSrc().accept(this);
+            out.print(")");
+        }
+        else
+            inst.getSrc().accept(this);
         out.println();
     }
 
@@ -356,7 +365,13 @@ public class ASMgenerator implements IRvisitor{
             out.print(indent+op+"\t");
             inst.getSrc().accept(this);
             out.print(", ");
-            inst.getDst().accept(this);
+            if(inst.getDst() instanceof register){
+                out.print("0(");
+                inst.getDst().accept(this);
+                out.print(")");
+            }
+            else
+                inst.getDst().accept(this);
             out.println();
     }
 

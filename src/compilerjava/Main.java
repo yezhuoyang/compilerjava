@@ -6,6 +6,7 @@ import compilerjava.codegen.*;
 import compilerjava.Parser.*;
 import compilerjava.semantic.*;
 import compilerjava.IR.*;
+import compilerjava.IR.IRInterpreter.*;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -34,11 +35,13 @@ public class Main{
 
     public static void main(String... args)throws Exception{
         InputStream in = new FileInputStream("/Users/yezhuoyang/Desktop/share/compilerjava/src/compilerjava/test.txt");
-        PrintStream out = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/src/compilerjava/out.txt");
+        PrintStream out = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/src/compilerjava/output.s");
         try{
 
             programNode ast=buildAST(in);
             globalfield _globalfield=(new builtinsymbolcollector(ast)).getglobalfield();
+
+
 
             new classdeclcollector(_globalfield).visit(ast);
             new globalfuncdeclcollector(_globalfield).visit(ast);
@@ -51,7 +54,15 @@ public class Main{
             IRcreator ircreator=new IRcreator(_globalfield);
             ircreator.visit(ast);
 
+
             IRroot irroot=ircreator.getIrRoot();
+
+
+
+            InputStream in2 = new FileInputStream("/Users/yezhuoyang/Desktop/share/compilerjava/src/compilerjava/out.txt");
+            PrintStream out2 = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/src/compilerjava/out2.txt");
+            DataInputStream data_in =new DataInputStream(new FileInputStream("/Users/yezhuoyang/Desktop/share/compilerjava/src/compilerjava/data_input.txt"));
+
 
 
             globalvarresolver _globalvarresolver=new globalvarresolver(irroot);
@@ -65,19 +76,15 @@ public class Main{
             callingConvention adjustToEmmit=new callingConvention(irroot);
             adjustToEmmit.run();
 
-
             new regAllocator(irroot).run();
 
 
-            IRprinter irprinter=new IRprinter(out);
+            IRprinter irprinter=new IRprinter(out2,true);
             irprinter.visit(irroot);
 
 
-
-            PrintStream out2 = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/src/compilerjava/outcode.txt");
-            ASMgenerator codegen=new ASMgenerator(irroot,out2);
+            ASMgenerator codegen=new ASMgenerator(irroot,out);
             codegen.run();
-
 
 
             /*

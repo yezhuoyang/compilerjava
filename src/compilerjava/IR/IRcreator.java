@@ -239,6 +239,7 @@ public class IRcreator implements ASTvisitor {
         if(node.getExpr()==null){
             currentBB.finish(new back(currentBB,null));
         }else{
+
             operand retValue=new I64Value(node.getExpr().getSize());
             assign(retValue,node.getExpr());
             currentBB.finish(new back(currentBB,retValue));

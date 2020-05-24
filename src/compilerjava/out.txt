@@ -1,115 +1,41 @@
-define i64 @func  %a1_1 %a2_1 %a3_1 %a4_1 %a5_1 %a6_1 %a7_1 %a8_1 %a9_1 %a10_1 {
-func_entry_1:
-   store %vs11_1 %vsp_1 null 0 44
-   store %vs8_1 %vsp_1 null 0 40
-   store %vs7_1 %vsp_1 null 0 36
-   store %vs10_1 %vsp_1 null 0 32
-   store %vs3_1 %vsp_1 null 0 28
-   store %vs1_1 %vsp_1 null 0 24
-   store %vs9_1 %vsp_1 null 0 20
-   store %vs5_1 %vsp_1 null 0 16
-   store %vs6_1 %vsp_1 null 0 12
-   store %vs4_1 %vsp_1 null 0 8
-   store %vs2_1 %vsp_1 null 0 4
-   store %ra %vsp_1 null 0 0
-   %a10_1 = load %vsp_1 null 0 4
-   %a9_1 = load %vsp_1 null 0 0
-   %t_1 = add %a1_1 %a2_1
-   %t_2 = add %t_1 %a3_1
-   %t_3 = add %t_2 %a4_1
-   %t_4 = add %t_3 %a5_1
-   %t_5 = add %t_4 %a6_1
-   %t_6 = add %t_5 %a7_1
-   %t_7 = add %t_6 %a8_1
-   %t_8 = add %t_7 %a9_1
-   %t_9 = add %t_8 %a10_1
-   %a0 = move %t_10
-   %ra = load %vsp_1 null 0 0
-   %vs2_1 = load %vsp_1 null 0 4
-   %vs4_1 = load %vsp_1 null 0 8
-   %vs6_1 = load %vsp_1 null 0 12
-   %vs5_1 = load %vsp_1 null 0 16
-   %vs9_1 = load %vsp_1 null 0 20
-   %vs1_1 = load %vsp_1 null 0 24
-   %vs3_1 = load %vsp_1 null 0 28
-   %vs10_1 = load %vsp_1 null 0 32
-   %vs7_1 = load %vsp_1 null 0 36
-   %vs8_1 = load %vsp_1 null 0 40
-   %vs11_1 = load %vsp_1 null 0 44
-   ret %a0
-}
-
 define i64 @main  {
 main_entry_1:
-   store %vs11_1 %vsp_1 null 0 52
-   store %vs8_1 %vsp_1 null 0 48
-   store %vs7_1 %vsp_1 null 0 44
-   store %vs10_1 %vsp_1 null 0 40
-   store %vs3_1 %vsp_1 null 0 36
-   store %vs1_1 %vsp_1 null 0 32
-   store %vs9_1 %vsp_1 null 0 28
-   store %vs5_1 %vsp_1 null 0 24
-   store %vs6_1 %vsp_1 null 0 20
-   store %vs4_1 %vsp_1 null 0 16
-   store %vs2_1 %vsp_1 null 0 12
-   store %ra %vsp_1 null 0 8
-   %a1_2 = move 2
-   %a2_2 = move 3
-   %a3_2 = move 4
-   %a4_2 = move 5
-   %a5_2 = move 6
-   %a6_2 = move 7
-   %a7_2 = move 8
-   %a8_2 = move 9
-   %a9_2 = move 10
-   %a10_2 = move 11
-   store %a9_2 %vsp_1 null 0 0
-   store %a10_2 %vsp_1 null 0 4
-   %t_11 = call func %va0_1 %va1_1 %va2_1 %va3_1 %va4_1 %va5_1 %va6_1 %va7_1 %a9_2 %a10_2 
-   %a0 = move %t_12
-   %ra = load %vsp_1 null 0 8
-   %vs2_1 = load %vsp_1 null 0 12
-   %vs4_1 = load %vsp_1 null 0 16
-   %vs6_1 = load %vsp_1 null 0 20
-   %vs5_1 = load %vsp_1 null 0 24
-   %vs9_1 = load %vsp_1 null 0 28
-   %vs1_1 = load %vsp_1 null 0 32
-   %vs3_1 = load %vsp_1 null 0 36
-   %vs10_1 = load %vsp_1 null 0 40
-   %vs7_1 = load %vsp_1 null 0 44
-   %vs8_1 = load %vsp_1 null 0 48
-   %vs11_1 = load %vsp_1 null 0 52
-   ret %a0
+   %t_1 = mul 3 4
+   %t_1 = add %t_1 4
+   %t_2 = alloc %t_1
+   store 3 %t_2
+   %t_3 = add %t_2 4
+   %t_4 = add %t_2 %t_1
+   jump main_for_cond_1
+main_for_cond_1:
+   %t_5 = slt %t_3 %t_4
+   br %t_5 main_for_body_1 main_for_merge_1
+main_for_merge_1:
+   %a_1 = move %t_2
+   %t_6 = mul 0 4
+   %t_7 = add %t_6 4
+   %t_8 = add %a_1 %t_7
+   %t_9 = load %t_8
+   %t_10 = load %t_9
+   %t_11 = move %t_10
+   ret %t_11
+main_for_body_1:
+   %t_12 = mul 3 4
+   %t_12 = add %t_12 4
+   %t_13 = alloc %t_12
+   store 3 %t_13
+   store %t_13 %t_3
+   jump main_for_step_1
+main_for_step_1:
+   %t_14 = add %t_3 4
+   %t_3 = move %t_14
+   jump main_for_cond_1
 }
 
 define i64 @__init  {
 __init_entry_1:
-   store %vs11_1 %vsp_1 null 0 44
-   store %vs8_1 %vsp_1 null 0 40
-   store %vs7_1 %vsp_1 null 0 36
-   store %vs10_1 %vsp_1 null 0 32
-   store %vs3_1 %vsp_1 null 0 28
-   store %vs1_1 %vsp_1 null 0 24
-   store %vs9_1 %vsp_1 null 0 20
-   store %vs5_1 %vsp_1 null 0 16
-   store %vs6_1 %vsp_1 null 0 12
-   store %vs4_1 %vsp_1 null 0 8
-   store %vs2_1 %vsp_1 null 0 4
-   store %ra %vsp_1 null 0 0
-   %t_13 = call main 
-   %a0 = move %t_14
-   %ra = load %vsp_1 null 0 0
-   %vs2_1 = load %vsp_1 null 0 4
-   %vs4_1 = load %vsp_1 null 0 8
-   %vs6_1 = load %vsp_1 null 0 12
-   %vs5_1 = load %vsp_1 null 0 16
-   %vs9_1 = load %vsp_1 null 0 20
-   %vs1_1 = load %vsp_1 null 0 24
-   %vs3_1 = load %vsp_1 null 0 28
-   %vs10_1 = load %vsp_1 null 0 32
-   %vs7_1 = load %vsp_1 null 0 36
-   %vs8_1 = load %vsp_1 null 0 40
-   %vs11_1 = load %vsp_1 null 0 44
-   ret %a0
+   %t_15 = call main 
+   %t_16 = move %t_15
+   ret %t_16
 }
 
