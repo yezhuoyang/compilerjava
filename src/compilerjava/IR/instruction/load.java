@@ -23,7 +23,11 @@ public class load extends IRinst {
         updateUseRegs();
     }
 
-    public load(int S,basicblock currentBB,operand src,operand dst,boolean isInsertedForGlobalVar){
+    public int getSize() {
+        return size;
+    }
+
+    public load(int S, basicblock currentBB, operand src, operand dst, boolean isInsertedForGlobalVar){
         super(currentBB);
         this.src=src;
         this.dst=dst;
@@ -94,11 +98,6 @@ public class load extends IRinst {
     }
 
     @Override
-    public IRinst getFakeInst(Map<basicblock,basicblock>fakeBBMap,Map<operand,operand>fakeRegMap){
-        return new load(-1,fakeBBMap.getOrDefault(currentBB,currentBB),fakeRegMap.getOrDefault(src,src),fakeRegMap.getOrDefault(dst,dst));
-    }
-
-    @Override
     public void calcUseAndDef(){
         use.clear();
         def.clear();
@@ -121,4 +120,10 @@ public class load extends IRinst {
            if(dst==oldVR) dst=newVR;
         }
     }
+
+    @Override
+    public IRinst getFakeInstruction(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap){
+        return new load(size,fakeBBMap.getOrDefault(currentBB,currentBB),fakeRegMap.getOrDefault(src,src),fakeRegMap.getOrDefault(dst,dst));
+    }
+
 }

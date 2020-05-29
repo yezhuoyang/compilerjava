@@ -12,13 +12,13 @@ public class stackdata extends dynamicdata{
     private int index;
     boolean fromCallee=false;
 
-    public stackdata(register base,register index,immediate offset,int Size){
-        super(base,index,offset,Size);
+    public stackdata(register base,immediate offset,int Size){
+        super(base,offset,Size);
     }
 
 
     public stackdata(function func,int index){
-        super(vsp,null,new immediate(index*4,config.pointersize()),4);
+        super(vsp,new immediate(index*4,config.pointersize()),4);
         this.func=func;
         this.index=index;
         this.fromCallee=true;
@@ -26,7 +26,7 @@ public class stackdata extends dynamicdata{
 
 
     public stackdata(function func){
-        super(vsp,null,new immediate(func.stackSize*4,config.pointersize()),4);
+        super(vsp,new immediate(func.stackSize*4,config.pointersize()),4);
         this.func=func;
         this.index=func.stackSize;
         func.stackSize++;
@@ -38,7 +38,6 @@ public class stackdata extends dynamicdata{
         }
         return 4*index+"(sp)";
     }
-
 
 
 }

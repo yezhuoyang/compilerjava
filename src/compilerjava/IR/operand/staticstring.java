@@ -13,7 +13,12 @@ public class staticstring extends staticdata{
     }
 
     public String getVal(){
-        return val;
+        String tmp=val.replace("\\", "\\\\");
+        tmp=tmp.replace("\n","\\n");
+        tmp=tmp.replace("\0", "");
+        tmp=tmp.replace("\t","\\t");
+        tmp=tmp.replace("\"", "\\\"");
+        return "\""+tmp+"\"";
     }
 
     public void accept(IRvisitor irvisitor){

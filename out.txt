@@ -1,6 +1,0 @@
-define i64 @main {
-main_entry_1:
-   %a_1 =move0
-   ret0
-}
-

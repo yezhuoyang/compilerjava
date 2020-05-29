@@ -48,7 +48,7 @@ public class semanticchecker implements ASTvisitor{
                     node.setExpr(new nullliteralNode(null));
                 }
                 else{
-                    node.setExpr(new stringliteralNode("ACM",null));
+                    node.setExpr(new stringliteralNode("newstr",null));
                 }
                 node.getExpr().accept(this);
             }

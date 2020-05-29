@@ -31,11 +31,6 @@ public class move extends IRinst {
 
 
     @Override
-    public IRinst getFakeInst(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap) {
-        return new alloc(fakeBBMap.getOrDefault(currentBB,currentBB),fakeRegMap.getOrDefault(src,src),fakeRegMap.getOrDefault(dst,dst));
-    }
-
-    @Override
     public void accept(IRvisitor irvisitor){
         irvisitor.visit(this);
     }
@@ -103,6 +98,14 @@ public class move extends IRinst {
     public void replaceDef(virtualregister oldVR,virtualregister newVR){
         if(dst==oldVR)dst=newVR;
     }
+
+
+
+    @Override
+    public IRinst getFakeInstruction(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap){
+        return new move(fakeBBMap.getOrDefault(currentBB, currentBB), fakeRegMap.getOrDefault(src, src), fakeRegMap.getOrDefault(dst, dst));
+    }
+
 
 
 }

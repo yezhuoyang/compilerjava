@@ -51,10 +51,7 @@ public class symbolcollector implements ASTvisitor{
         node.setTypeAfterresolve(_type);
         varsymbol _varsymbol=new varsymbol(node.getID(),_type,node);
         node.setvarsymbol(_varsymbol);
-
         currentfield.defvar(_varsymbol);
-
-
         if(currentfield==_globalfield)node.setGlobalVarible();
     }
 
@@ -198,8 +195,10 @@ public class symbolcollector implements ASTvisitor{
 
     @Override
     public void visit(funccallexprNode node){
+
         node.getFunction().accept(this);
         node.getParameterList().forEach(x->x.accept(this));
+
     }
 
     @Override

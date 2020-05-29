@@ -34,22 +34,20 @@ public class Main{
 
 
     public static void main(String... args)throws Exception{
-        InputStream in = new FileInputStream("/Users/yezhuoyang/Desktop/share/compilerjava/src/compilerjava/test.txt");
-        PrintStream out = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/src/compilerjava/output.s");
+        InputStream in = new FileInputStream("code.txt");
+        //PrintStream out = new PrintStream("test.s");
+        PrintStream out = new PrintStream(System.out);
         try{
 
             programNode ast=buildAST(in);
             globalfield _globalfield=(new builtinsymbolcollector(ast)).getglobalfield();
-
-
-
             new classdeclcollector(_globalfield).visit(ast);
             new globalfuncdeclcollector(_globalfield).visit(ast);
             new classmembercollector(_globalfield).visit(ast);
             new symbolcollector(_globalfield).visit(ast);
             new semanticchecker(_globalfield).visit(ast);
 
-            //new trivialboolExtractor().visit(ast);
+            new trivialboolExtractor().visit(ast);
 
             IRcreator ircreator=new IRcreator(_globalfield);
             ircreator.visit(ast);
@@ -57,11 +55,6 @@ public class Main{
 
             IRroot irroot=ircreator.getIrRoot();
 
-
-
-            InputStream in2 = new FileInputStream("/Users/yezhuoyang/Desktop/share/compilerjava/src/compilerjava/out.txt");
-            PrintStream out2 = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/src/compilerjava/out2.txt");
-            DataInputStream data_in =new DataInputStream(new FileInputStream("/Users/yezhuoyang/Desktop/share/compilerjava/src/compilerjava/data_input.txt"));
 
 
 
@@ -78,9 +71,6 @@ public class Main{
 
             new regAllocator(irroot).run();
 
-
-            IRprinter irprinter=new IRprinter(out2,true);
-            irprinter.visit(irroot);
 
 
             ASMgenerator codegen=new ASMgenerator(irroot,out);

@@ -44,11 +44,6 @@ public class cmp extends IRinst{
 
 
     @Override
-    public IRinst getFakeInst(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap) {
-        return new cmp(fakeBBMap.getOrDefault(currentBB,currentBB),op,fakeRegMap.getOrDefault(src1,src1),fakeRegMap.getOrDefault(src2,src2),fakeRegMap.getOrDefault(dst,dst));
-    }
-
-    @Override
     public void accept(IRvisitor irvisitor){
         irvisitor.visit(this);
     }
@@ -155,5 +150,13 @@ public class cmp extends IRinst{
     public enum Op{
         LT,LEQ,EQ,GEQ,GT,NEQ
     }
+
+
+    @Override
+    public IRinst getFakeInstruction(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap){
+        return new cmp(fakeBBMap.getOrDefault(currentBB, currentBB), op, fakeRegMap.getOrDefault(src1, src1),
+                fakeRegMap.getOrDefault(src2, src2), fakeRegMap.getOrDefault(dst, dst));
+    }
+
 
 }

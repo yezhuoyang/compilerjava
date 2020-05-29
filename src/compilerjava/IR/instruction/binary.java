@@ -52,11 +52,6 @@ public class binary extends IRinst {
 
 
     @Override
-    public IRinst getFakeInst(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap) {
-        return new binary(fakeBBMap.getOrDefault(currentBB,currentBB),op,fakeRegMap.getOrDefault(src1,src1),fakeRegMap.getOrDefault(src2,src2),fakeRegMap.getOrDefault(dst,dst));
-    }
-
-    @Override
     public void accept(IRvisitor irvisitor){
         irvisitor.visit(this);
     }
@@ -128,4 +123,12 @@ public class binary extends IRinst {
     public enum Op{
         ADD,SUB,MUL,DIV,MOD,BITL,BITR,BITAND,BITOR,XOR
     }
+
+
+    @Override
+    public IRinst getFakeInstruction(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap){
+        return new binary(fakeBBMap.getOrDefault(currentBB, currentBB), op, fakeRegMap.getOrDefault(src1, src1), fakeRegMap.getOrDefault(src2, src2), fakeRegMap.getOrDefault(dst, dst));
+    }
+
+
 }

@@ -106,12 +106,14 @@ public abstract class IRinst {
 
     public abstract void setUseregs(Map<register,register> renameMap);
 
-    public abstract IRinst getFakeInst(Map<basicblock,basicblock> fakeBBMap,Map<operand,operand> fakeRegMap);
-
     protected Set<virtualregister> use=new HashSet<>();
     protected Set<virtualregister> def=new HashSet<>();
     protected Set<virtualregister> liveIn=new HashSet<>();
     protected Set<virtualregister> liveOut=new HashSet<>();
+
+
+    public abstract IRinst getFakeInstruction(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap);
+
 
 
     public abstract void renameDefRegForSSA();

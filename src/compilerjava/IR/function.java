@@ -26,6 +26,12 @@ public class function {
     public int stackSize;
 
 
+    boolean hasramain;
+
+    public void setHasramain(boolean hasramain) {
+        this.hasramain = hasramain;
+    }
+
     private basicblock entryBB=new basicblock(this,"entry");
     private basicblock exitBB=new basicblock(this,"exit");
     private List<back> returnInstList=new ArrayList<>();
@@ -192,6 +198,8 @@ public class function {
     public boolean reachable(basicblock BB){
         return visit.contains(BB);
     }
+
+
 
     public void updateCalleeSet(){
         calleeset.clear();

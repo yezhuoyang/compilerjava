@@ -43,9 +43,10 @@ public class callingConvention {
     private void argumentPass(function function) {
         //load function arguments
         parameterList.clear();
+
+        parameterList.addAll(function.getParameterList());
         if (function.getReferenceForClassMethod() != null)
             parameterList.add(function.getReferenceForClassMethod());
-        parameterList.addAll(function.getParameterList());
 
         for (int i = 0; i < parameterList.size(); i++)
             if (i < 8)
@@ -62,7 +63,6 @@ public class callingConvention {
             returnInst.setReturnValue(va0);
         }
 
-
         function.getReversePostOrderDFSBBList().forEach(BB -> {
             for (IRinst irinst = BB.head; irinst != null; irinst = irinst.getNextInstruction()) {
                 if (irinst instanceof call) {
@@ -70,11 +70,8 @@ public class callingConvention {
                     call inst = (call) irinst;
 
                     function.argumentLimit = Math.max(function.argumentLimit, inst.getObjectPointer() == null ? inst.getParameterList().size() : inst.getParameterList().size() + 1);
-
                     //pass arguments
                     int registerLimit = inst.getObjectPointer() == null ? 8 : 7;
-
-
                     int Size;
                     for (int i = 8; i < inst.getParameterList().size(); i++) {
                         Size = inst.getParameterList().get(i).getSize();
@@ -82,15 +79,14 @@ public class callingConvention {
                     }
 
                     int cnt = 0;
-                    if (((call) irinst).getObjectPointer() != null) {
-                        operand op = ((call) irinst).getObjectPointer();
-                        ((call) irinst).setObjectPointer(argumentPassVRegisters.get(cnt));
-                        irinst.prependInstruction(new move(BB, op, argumentPassVRegisters.get(cnt++)));
-                    }
-
                     for (int i = 0; i < Integer.min(8, ((call) irinst).getParameterList().size()); i++) {
                         operand op = ((call) irinst).getParameterList().get(i);
                         ((call) irinst).getParameterList().set(i, argumentPassVRegisters.get(cnt));
+                        irinst.prependInstruction(new move(BB, op, argumentPassVRegisters.get(cnt++)));
+                    }
+                    if (((call) irinst).getObjectPointer() != null) {
+                        operand op = ((call) irinst).getObjectPointer();
+                        ((call) irinst).setObjectPointer(argumentPassVRegisters.get(cnt));
                         irinst.prependInstruction(new move(BB, op, argumentPassVRegisters.get(cnt++)));
                     }
 
@@ -101,14 +97,15 @@ public class callingConvention {
 
                     irinst.updateUseRegs();
                 } else if (irinst instanceof alloc) {
-
                     irinst.prependInstruction(new move(BB, ((alloc) irinst).getSize(), va0));
-                    irinst.postpendInstruction(new move(BB, va0, ((alloc) irinst).getPointer()));
-
+                    irinst.postpendInstruction(new move(BB,va0,((alloc) irinst).getPointer()));
+                    ((alloc) irinst).setPointer(va0);
+                    ((alloc) irinst).setSize(va0);
                 }
             }
         });
     }
+
 
 
     private void calleeSave(function function) {
@@ -125,10 +122,9 @@ public class callingConvention {
     private void ModifyReturn(function function) {
         //modify return
         back returnInst = (back) function.getExitBB().tail;
-
         stackdata stackloc = new stackdata(function);
-        function.getEntryBB().head.prependInstruction(new store(config.registersize, function.getExitBB(), ra, stackloc));
-        returnInst.prependInstruction(new load(config.registersize, function.getExitBB(), stackloc, ra));
+        function.getEntryBB().head.prependInstruction(new store(config.registersize, function.getExitBB(), vra, stackloc));
+        returnInst.prependInstruction(new load(config.registersize, function.getExitBB(), stackloc, vra));
     }
 
 

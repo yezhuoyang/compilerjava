@@ -8,7 +8,6 @@ import java.util.List;
 
 public abstract class memory extends storage{
     private register base=null;
-    private register index=null;
     private immediate offset=new immediate(0,config.pointersize());
     private List<virtualregister> useregs=new ArrayList<>();
 
@@ -17,10 +16,9 @@ public abstract class memory extends storage{
         this.base=base;
     }
 
-    public memory(register base,register index,immediate offset,int Size){
+    public memory(register base,immediate offset,int Size){
         super(Size);
         this.base=base;
-        this.index=index;
         this.offset=offset;
     }
 
@@ -36,13 +34,6 @@ public abstract class memory extends storage{
         this.base=base;
     }
 
-    public register getIndex(){
-        return index;
-    }
-
-    public void setIndex(register index){
-        this.index=index;
-    }
 
     public immediate getOffset(){
         return offset;
@@ -55,12 +46,10 @@ public abstract class memory extends storage{
     public List<virtualregister> Useregs(){
         useregs.clear();
         if(base!=null && !(base instanceof  globalvar)) useregs.add((virtualregister)base);
-        if(index !=null && !(index instanceof globalvar)) useregs.add((virtualregister) index);
         return useregs;
     }
 
     public void replaceOperand(operand oldoperand,operand newoperand){
         if(base==oldoperand) base=(virtualregister)newoperand;
-        if(index==oldoperand) index=(virtualregister)newoperand;
     }
 }

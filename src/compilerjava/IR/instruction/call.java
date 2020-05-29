@@ -60,13 +60,6 @@ public class call extends IRinst {
         updateUseRegs();
     }
 
-    @Override
-    public IRinst getFakeInst(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap) {
-       call newcall=new call(fakeBBMap.getOrDefault(currentBB,currentBB),callee,fakeRegMap.getOrDefault(result,result));
-       parameterList.forEach(operand -> newcall.addParameter(fakeRegMap.getOrDefault(operand,operand)));
-       newcall.setObjectPointer(fakeRegMap.getOrDefault(objectPointer,objectPointer));
-       return newcall;
-    }
 
     @Override
     public void accept(IRvisitor irvisitor){
@@ -162,6 +155,15 @@ public class call extends IRinst {
     public void replaceDef(virtualregister oldVR,virtualregister newVR){
     }
 
+
+
+    @Override
+    public IRinst getFakeInstruction(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap){
+        call newCall = new call(fakeBBMap.getOrDefault(currentBB, currentBB), callee, fakeRegMap.getOrDefault(result, result));
+        parameterList.forEach(operand -> newCall.addParameter(fakeRegMap.getOrDefault(operand, operand)));
+        newCall.setObjectPointer(fakeRegMap.getOrDefault(objectPointer, objectPointer));
+        return newCall;
+    }
 
 
 

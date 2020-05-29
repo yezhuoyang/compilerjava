@@ -10,6 +10,7 @@ import java.util.Map;
 public class store extends IRinst{
     private operand src;
     private operand dst;
+    private global64Value storeforglobal;
     private boolean isInsertedForglobalvar;
     private int size;
 
@@ -23,11 +24,17 @@ public class store extends IRinst{
         updateUseRegs();
     }
 
-    public store(int S,basicblock currentBB,operand src,operand dst,boolean isInsertedForglobalvar){
+
+    public global64Value getStoreforglobal() {
+        return storeforglobal;
+    }
+
+    public store(int S, basicblock currentBB, operand src, operand dst, boolean isInsertedForglobalvar, global64Value storeforglobal){
         super(currentBB);
         this.src=src;
         this.dst=dst;
         this.isInsertedForglobalvar=isInsertedForglobalvar;
+        this.storeforglobal=storeforglobal;
         this.size=S;
         updateUseRegs();
     }
@@ -50,12 +57,6 @@ public class store extends IRinst{
 
     public boolean isInsertedForglobalvar(){
         return isInsertedForglobalvar;
-    }
-
-
-    @Override
-    public IRinst getFakeInst(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap) {
-        return new store(-1,fakeBBMap.getOrDefault(currentBB,currentBB),fakeRegMap.getOrDefault(src,src),fakeRegMap.getOrDefault(dst,dst));
     }
 
     @Override
@@ -140,6 +141,12 @@ public class store extends IRinst{
     @Override
     public void replaceDef(virtualregister oldVR,virtualregister newVR){
     }
+
+    @Override
+    public IRinst getFakeInstruction(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap){
+        return new store(size,fakeBBMap.getOrDefault(currentBB,currentBB),fakeRegMap.getOrDefault(src,src),fakeRegMap.getOrDefault(dst,dst));
+    }
+
 
 
 

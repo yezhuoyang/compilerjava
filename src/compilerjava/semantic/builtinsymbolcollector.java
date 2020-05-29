@@ -24,17 +24,19 @@ public class builtinsymbolcollector{
 
             //Class String
             string.deffunc(new funcsymbol("length",intsymbol,null,string));
+
             string.deffunc(new funcsymbol("substring",string,null,string){{
                     defvar(new varsymbol("left",intsymbol,null));
                     defvar(new varsymbol("right",intsymbol,null));
             }});
+
             string.deffunc(new funcsymbol("parseInt",intsymbol,null,string));
+
             string.deffunc(new funcsymbol("ord",intsymbol,null,string){{
                     defvar(new varsymbol("i",intsymbol,null));
             }});
 
             _globalfield.defclass(string);
-
             _globalfield.setIntsymbol(intsymbol);
             _globalfield.setBoolsymbol(boolsymbol);
             _globalfield.setVoidsymbol(voidsymbol);

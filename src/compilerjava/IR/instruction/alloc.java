@@ -9,7 +9,6 @@ import compilerjava.IR.operand.virtualregister;
 
 import java.lang.annotation.Inherited;
 import java.util.Map;
-
 import static compilerjava.IR.operand.realregister.*;
 
 public class alloc extends IRinst{
@@ -36,13 +35,8 @@ public class alloc extends IRinst{
         updateUseRegs();
     }
 
-    public void setPointer(operand pointer) {
+    public void setPointer(register pointer) {
         this.pointer = pointer;
-    }
-
-    @Override
-    public IRinst getFakeInst(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap) {
-        return new alloc(fakeBBMap.getOrDefault(currentBB,currentBB),fakeRegMap.getOrDefault(size,size),fakeRegMap.getOrDefault(pointer,pointer));
     }
 
     @Override
@@ -63,7 +57,6 @@ public class alloc extends IRinst{
         updateUseRegs();
     }
 
-
     @Override
     public void setDefReg(register newReg) {
         pointer=newReg;
@@ -71,7 +64,7 @@ public class alloc extends IRinst{
 
     @Override
     public register getDefReg() {
-        return null;
+            return (register)pointer;
     }
 
     @Override
@@ -100,7 +93,7 @@ public class alloc extends IRinst{
         if(size instanceof virtualregister && !(size instanceof globalvar)) use.add((virtualregister)size);
         if(pointer instanceof virtualregister && !(pointer instanceof globalvar))
             def.add((virtualregister)pointer);
-        def.addAll(calleeSaveVRegisters);
+        def.addAll(callerSaveVRegisters);
         def.remove(vsp);
     }
 
@@ -113,5 +106,14 @@ public class alloc extends IRinst{
     public void replaceDef(virtualregister oldVR,virtualregister newVR){
         if(pointer==oldVR)pointer=newVR;
     }
+
+
+    @Override
+    public IRinst getFakeInstruction(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap){
+        return new alloc(fakeBBMap.getOrDefault(currentBB,currentBB),fakeRegMap.getOrDefault(size,size),fakeRegMap.getOrDefault(pointer,pointer));
+    }
+
+
+
 
 }

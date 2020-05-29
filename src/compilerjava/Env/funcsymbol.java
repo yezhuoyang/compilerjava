@@ -60,7 +60,6 @@ public class funcsymbol extends symbol implements field{
 
     @Override
     public void defclass(classsymbol symbol){
-
     }
 
     @Override

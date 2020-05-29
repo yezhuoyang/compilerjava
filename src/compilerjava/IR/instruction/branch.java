@@ -49,11 +49,6 @@ public class branch extends IRinst {
     }
 
     @Override
-    public IRinst getFakeInst(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap) {
-        return new branch(fakeBBMap.getOrDefault(currentBB,currentBB),fakeRegMap.getOrDefault(cond,cond),fakeBBMap.getOrDefault(thenBB,thenBB),fakeBBMap.getOrDefault(elseBB,elseBB));
-    }
-
-    @Override
     public void accept(IRvisitor irvisitor){
         irvisitor.visit(this);
     }
@@ -124,6 +119,11 @@ public class branch extends IRinst {
     public void replaceDef(virtualregister oldVR,virtualregister newVR){
     }
 
+
+    @Override
+    public IRinst getFakeInstruction(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap){
+        return new branch(fakeBBMap.getOrDefault(currentBB, currentBB), fakeRegMap.getOrDefault(cond, cond), fakeBBMap.getOrDefault(thenBB, thenBB), fakeBBMap.getOrDefault(elseBB, elseBB));
+    }
 
 
 

@@ -320,28 +320,6 @@ public class IRprinter implements IRvisitor{
     }
 
     @Override
-    public void visit(lea inst){
-        inst.getDst().accept(this);
-        out.print(" = lea");
-        inst.getSrc().accept(this);
-        out.println();
-    }
-
-    @Override
-    public void visit(push inst){
-        out.print("push ");
-        inst.getSrc().accept(this);
-        out.println();
-    }
-
-    @Override
-    public void visit(pop inst){
-        out.print("pop ");
-        inst.getDst().accept(this);
-        out.println();
-    }
-
-    @Override
     public void visit(storage stor){
         if(stor instanceof register){
             if(stor instanceof globalvar) out.print("@" +getName(stor));
@@ -352,8 +330,8 @@ public class IRprinter implements IRvisitor{
             else
                 out.print("null");
             out.print(" ");
-            if(((memory)stor).getIndex()!=null){
-                visit(((memory)stor).getIndex());
+            if(((memory)stor).getOffset()!=null){
+                visit(((memory)stor).getOffset());
                 //out.print(" ");
                 //visit(((memory)stor).getScale());
             }else{

@@ -153,7 +153,7 @@ public class trivialboolExtractor implements ASTvisitor{
                     node.getrhs().accept(this);
                     trivialNodeMap.put(node,trivialNodeMap.get(node.getlhs())&trivialNodeMap.get(node.getrhs()));
                 }else{
-                    node.setOp(binaryexprNode.Optype.OR);
+                    node.setOp(binaryexprNode.Optype.BITOR);
                     node.getlhs().accept(this);
                     node.getrhs().accept(this);
                 }
@@ -165,7 +165,7 @@ public class trivialboolExtractor implements ASTvisitor{
                      node.getrhs().accept(this);
                      trivialNodeMap.put(node,trivialNodeMap.get(node.getlhs())&trivialNodeMap.get(node.getrhs()));
                  }else{
-                     node.setOp(binaryexprNode.Optype.AND);
+                     node.setOp(binaryexprNode.Optype.BITAND);
                      node.getlhs().accept(this);
                      node.getrhs().accept(this);
                  }

@@ -35,10 +35,6 @@ public class unary extends IRinst {
         return dst;
     }
 
-    @Override
-    public IRinst getFakeInst(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap) {
-        return new unary(fakeBBMap.getOrDefault(currentBB,currentBB),op,fakeRegMap.getOrDefault(src,src),fakeRegMap.getOrDefault(dst,dst));
-    }
 
     @Override
     public void accept(IRvisitor irvisitor){
@@ -109,5 +105,12 @@ public class unary extends IRinst {
     public enum Op{
         NOT,NEG,SUF_ADD,SUF_SUB,POS,BITNOT
     }
+
+    @Override
+    public IRinst getFakeInstruction(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap){
+        return new unary(fakeBBMap.getOrDefault(currentBB,currentBB),op,fakeRegMap.getOrDefault(src,src),fakeRegMap.getOrDefault(dst,dst));
+    }
+
+
 
 }

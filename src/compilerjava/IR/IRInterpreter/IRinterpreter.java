@@ -1,7 +1,6 @@
 package compilerjava.IR.IRInterpreter;
 
 import compilerjava.IR.instruction.IRinst;
-import jdk.internal.util.xml.impl.Input;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.*;

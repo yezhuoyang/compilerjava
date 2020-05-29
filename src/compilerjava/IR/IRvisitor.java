@@ -40,11 +40,6 @@ public interface IRvisitor {
 
     void visit(phi inst);
 
-    void visit(lea inst);
-
-    void visit(push inst);
-
-    void visit(pop inst);
 
     void visit(storage stor);
 

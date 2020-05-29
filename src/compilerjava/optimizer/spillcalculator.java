@@ -5,13 +5,20 @@ import compilerjava.IR.IRroot;
 import compilerjava.IR.instruction.IRinst;
 import compilerjava.IR.operand.virtualregister;
 
-class spillcalculator extends pass {
-    spillcalculator(IRroot irroot) {
+public class spillcalculator extends pass {
+    public spillcalculator(IRroot irroot) {
         super(irroot);
     }
 
     @Override
-    boolean run() {
+    public boolean run() {
+        Irroot.getFunctionMap().values().forEach(_function -> {
+            computePostDominateTree(_function);
+            computeReverseDominantFrontier(_function);
+            computeDominateTree(_function);
+            computeDominanceFrontier(_function);
+        });
+
         Irroot.getFunctionMap().values().forEach(_function -> {
             calcLoopInformation(_function);
             markSpillPriority(_function);

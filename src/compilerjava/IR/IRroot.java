@@ -8,22 +8,26 @@ import java.util.*;
 
 public class IRroot {
 
-    public function builtinStringLength=new function("string.length",null);
-    public function builtinSubstring=new function("string.substring","_builtin_string_substring");
-    public function builtinParseInt=new function("string.parseInt","_builtin_string_parseInt");
-    public function builtinOrd=new function("string.ord","_builtin_string_ord");
+    public function builtinStringLength=new function("string_length",null);
+    public function builtinSubstring=new function("string_substring","_builtin_string_substring");
+    public function builtinParseInt=new function("string_parseInt","_builtin_string_parseInt");
+    public function builtinOrd=new function("string_ord","_builtin_string_ord");
     public function builtinPrint=new function("print","_builtin_print");
+    public function builtinPrintInt=new function("printInt","_builtin_printInt");
+    public function builtinPrintlnInt=new function("printlnInt","_builtin_printlnInt");
     public function builtinPrintln=new function("println","_builtin_println");
     public function builtinGetString=new function("getString","_builtin_getString");
     public function builtinGetInt=new function("getInt","_builtin_getInt");
     public function builtinToString=new function("toString","_builtin_toString");
-    public function builtinStringAdd=new function("string.add","_builtin_string_add");
-    public function builtinStringLT=new function("string.lt","_builtin_string_less");
-    public function builtinStringLEQ=new function("string.leq","_builtin_string_less_equal");
-    public function builtinStringEQ=new function("string.eq","_builtin_string_equal");
-    public function builtinStringGEQ=new function("string.geq","_builtin_string_great_equal");
-    public function builtinStringGT=new function("string.gt","_builtin_string_great");
-    public function builtinStringNEQ=new function("string.neq","_builtin_string_inequal");
+    public function builtinStringAdd=new function("string_add","_builtin_string_add");
+    public function builtinStringLT=new function("string_lt","_builtin_string_less");
+    public function builtinStringLEQ=new function("string_leq","_builtin_string_less_equal");
+    public function builtinStringEQ=new function("string_eq","_builtin_string_equal");
+    public function builtinStringGEQ=new function("string_geq","_builtin_string_great_equal");
+    public function builtinStringGT=new function("string_gt","_builtin_string_great");
+    public function builtinStringNEQ=new function("string_neq","_builtin_string_inequal");
+
+
 
     private Map<String,function> functionMap=new LinkedHashMap<>();
     private List<staticstring>  staticStringList=new ArrayList<>();
@@ -63,6 +67,8 @@ public class IRroot {
         builtinfunction.add(builtinGetString);
         builtinfunction.add(builtinPrint);
         builtinfunction.add(builtinPrintln);
+        builtinfunction.add(builtinPrintlnInt);
+        builtinfunction.add(builtinPrintInt);
     }
 
     public void addfunction(function func){
@@ -93,6 +99,7 @@ public class IRroot {
     public List<globalvar> getGlobalvarList(){
         return globalvarList;
     }
+
 
     public void calcRecursiveCalleeSet(){
         functionMap.values().forEach(func->func.recursivecalleeset.clear());

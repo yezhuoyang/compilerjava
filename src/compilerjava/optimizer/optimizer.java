@@ -6,29 +6,21 @@ public class optimizer {
     private spillcalculator _spillcalculator;
     private DeadCodeEliminator _deadCodeEliminator;
 
-    /*
-    private SSAConstructor ssaConstructor;
-    private SSADestructor ssaDestructor;
+
+    private SSABuilder ssaConstructor;
+    private SSAremove ssaDestructor;
     private CFGSimplifier cfgSimplifier;
     private DeadCodeEliminator deadCodeEliminator;
-    private ConstantAndCopyPropagator constantAndCopyPropagator;
-    private InstructionCombiner instructionCombiner;
-    private CommonSubexpressionEliminator commonSubexpressionEliminator;
-    private ArithmeticTransformer arithmeticTransformer;
-    */
+    private CommonSubexprElim commonSubexpressionEliminator;
+
 
     public optimizer(IRroot irRoot) {
         _spillcalculator = new spillcalculator(irRoot);
         _deadCodeEliminator = new DeadCodeEliminator(irRoot);
-        /*
-        ssaConstructor = new SSAConstructor(irRoot);
-        ssaDestructor = new SSADestructor(irRoot);
+        ssaConstructor = new SSABuilder(irRoot);
+        ssaDestructor = new SSAremove(irRoot);
         cfgSimplifier = new CFGSimplifier(irRoot);
-        constantAndCopyPropagator = new ConstantAndCopyPropagator(irRoot);
-        instructionCombiner = new InstructionCombiner(irRoot);
-        commonSubexpressionEliminator = new CommonSubexpressionEliminator(irRoot);
-        arithmeticTransformer = new ArithmeticTransformer(irRoot);
-        */
+        commonSubexpressionEliminator = new CommonSubexprElim(irRoot);
     }
 
 
@@ -41,7 +33,7 @@ public class optimizer {
         return _deadCodeEliminator.run();
     }
 
-/*
+
     public boolean CFGSimplification() {
         return cfgSimplifier.run();
     }
@@ -58,10 +50,11 @@ public class optimizer {
         ssaDestructor.run();
     }
 
-    public boolean DeadCodeElimination() {
-        return deadCodeEliminator.run();
-    }
 
+    public boolean CommonSubexpressionElimination() {
+        return commonSubexpressionEliminator.run();
+    }
+/*
     public boolean ConstantAndCopyPropagation() {
         return constantAndCopyPropagator.run();
     }

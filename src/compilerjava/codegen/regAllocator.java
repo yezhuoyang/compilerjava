@@ -4,6 +4,7 @@ import compilerjava.IR.basicblock;
 import compilerjava.IR.function;
 import compilerjava.IR.IRroot;
 import compilerjava.IR.IRprinter;
+import compilerjava.IR.instruction.alloc;
 import compilerjava.IR.instruction.IRinst;
 import compilerjava.IR.instruction.load;
 import compilerjava.IR.instruction.move;
@@ -26,12 +27,13 @@ public class regAllocator {
     private IRroot _IRroot;
     private IRprinter _IRprinter;
     private PrintStream debug_out;
-    private boolean DEBUG = true;
+    private boolean DEBUG = false;
+
 
     private int iteration;
+
     private int K = 29;
     private Set<realregister> colors = new HashSet<>();
-
     private Set<virtualregister> precolored = new HashSet<>();
     private Set<virtualregister> initial = new HashSet<>();
     private Set<virtualregister> simplifyWorklist = new HashSet<>();
@@ -42,7 +44,6 @@ public class regAllocator {
     private Set<virtualregister> coloredNodes = new HashSet<>();
     private Stack<virtualregister> selectStack = new Stack<>();
     private Set<virtualregister> selectStackNodes = new HashSet<>();
-
     private Set<move> coalescedmoves = new HashSet<>();
     private Set<move> constrainedmoves = new HashSet<>();
     private Set<move> frozenmoves = new HashSet<>();
@@ -57,9 +58,10 @@ public class regAllocator {
         colors.addAll(allRegisters);
         colors.remove(sp);
         colors.remove(gp);
+        colors.remove(s0);
         colors.remove(tp);
         colors.remove(zero);
-        colors.remove(s0);
+        colors.remove(ra);
         try {
             debug_out = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/src/compilerjava/ir_debug.ll");
             _IRprinter = new IRprinter(debug_out, false, false);
@@ -143,6 +145,20 @@ public class regAllocator {
         cleanmove();
     }
 
+
+    // The alloc instruction must save its pointer in a0
+    private void allocInstAddust(function func){
+        _IRroot.getFunctionMap().values().forEach(function -> function.getReversePostOrderDFSBBList().forEach(basicblock -> {
+            for (IRinst IRinst = basicblock.head; IRinst != null; IRinst = IRinst.getNextInstruction())
+                if (IRinst instanceof alloc){
+                    ((virtualregister)((alloc) IRinst).getSize()).color=a0;
+                    ((virtualregister)((alloc) IRinst).getPointer()).color=a0;
+                }
+        }));
+    }
+
+
+
     private void cleanmove() {
         _IRroot.getFunctionMap().values().forEach(function -> function.getReversePostOrderDFSBBList().forEach(basicblock -> {
             for (IRinst IRinst = basicblock.head; IRinst != null; IRinst = IRinst.getNextInstruction())
@@ -174,19 +190,16 @@ public class regAllocator {
         coloredNodes.clear();
         selectStack.clear();
         selectStackNodes.clear();
-
         coalescedmoves.clear();
         constrainedmoves.clear();
         frozenmoves.clear();
         worklistmoves.clear();
         activemoves.clear();
-
         adjSet.clear();
     }
 
     private void allocate(function function){
         boolean finish;
-        iteration = 0;
         do {
             if (DEBUG)
                 debug_out.println("=====================" + function.getName() + " Iteration " + iteration + "=====================");
@@ -198,6 +211,7 @@ public class regAllocator {
                 dumpDebugInfo(function);
                 _IRprinter.visit(_IRroot);
             }
+            iteration=0;
             do {
                 if (!simplifyWorklist.isEmpty()) {
                     if (DEBUG) debug_out.println("===================== Simplify =====================");
@@ -227,7 +241,6 @@ public class regAllocator {
                     _IRprinter.visit(_IRroot);
                 }
             } else finish = true;
-            iteration++;
         } while (!finish);
     }
 
@@ -251,6 +264,10 @@ public class regAllocator {
         });
         initial.removeAll(precolored);
         initial.remove(vsp);
+        initial.remove(vzero);
+        initial.remove(vgp);
+        initial.remove(vra);
+        initial.remove(vtp);
         initial.remove(vs0);
         //solve
         boolean changed = true;
@@ -373,6 +390,7 @@ public class regAllocator {
         }
     }
 
+
     private void enablemoves(Set<virtualregister> nodes) {
         for (virtualregister n : nodes)
             for (move m : nodemoves(n))
@@ -486,9 +504,9 @@ public class regAllocator {
         Iterator<virtualregister> iterator = spillWorklist.iterator();
         //Heuristic
         virtualregister m = iterator.next();
-        for (; m.addForSpill && iterator.hasNext(); m = iterator.next()) ;
+        for(; m.addForSpill && iterator.hasNext(); m = iterator.next()) ;
         iterator = spillWorklist.iterator();
-        for (virtualregister now; iterator.hasNext(); ) {
+        for(virtualregister now; iterator.hasNext();){
             now = iterator.next();
             if (!now.addForSpill && now.spillPriority < m.spillPriority)
                 m = now;
@@ -589,6 +607,7 @@ public class regAllocator {
         virtualregister v;
 
         Edge(virtualregister u, virtualregister v) {
+            this.u = u;
             this.u = u;
             this.v = v;
         }

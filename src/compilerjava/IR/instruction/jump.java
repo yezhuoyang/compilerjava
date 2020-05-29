@@ -28,11 +28,6 @@ public class jump extends IRinst {
     }
 
     @Override
-    public IRinst getFakeInst(Map<basicblock,basicblock> fakeBBMap,Map<operand,operand> fakeRegMap){
-        return new jump(fakeBBMap.getOrDefault(currentBB,currentBB),fakeBBMap.getOrDefault(destBB,destBB));
-    }
-
-    @Override
     public void accept(IRvisitor irvisitor){
         irvisitor.visit(this);
     }
@@ -91,7 +86,10 @@ public class jump extends IRinst {
     }
 
 
-
+    @Override
+    public IRinst getFakeInstruction(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap){
+        return new jump(fakeBBMap.getOrDefault(currentBB,currentBB),fakeBBMap.getOrDefault(destBB,destBB));
+    }
 
 
 

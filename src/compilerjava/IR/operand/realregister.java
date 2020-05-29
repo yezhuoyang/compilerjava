@@ -2,11 +2,11 @@ package compilerjava.IR.operand;
 
 import compilerjava.IR.IRvisitor;
 import compilerjava.config;
-import sun.nio.cs.ext.IBM865;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
+
 
 public class realregister extends register {
     public static final realregister zero = new realregister("zero", false,config.registersize);

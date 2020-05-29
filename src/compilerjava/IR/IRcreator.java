@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.*;
 
-
 public class IRcreator implements ASTvisitor {
     private globalfield     _globalfield;
     private basicblock      currentBB;
@@ -63,9 +62,12 @@ public class IRcreator implements ASTvisitor {
     public void visit(vardeclNode node){
         varsymbol _varsymbol=node.getvarsymbol();
         if(node.isGlobalVarible()){
+
             virtualregister _globalvar=new global64Value(node.getID(),Node2Type(node.gettpNode(),_globalfield).getTypeSize());
             irRoot.addglobalvar((globalvar)_globalvar);
             _varsymbol.setVarstorage(_globalvar);
+
+
         }else{
             virtualregister _vregister = new I64Value(node.getID(),Node2Type(node.gettpNode(),_globalfield).getTypeSize());
             if(currentfunction!=null&&node.isParameterVariable())
@@ -208,6 +210,7 @@ public class IRcreator implements ASTvisitor {
         basicblock condBB = node.getCond() == null ? bodyBB : new basicblock(currentfunction, "for_cond");
         basicblock stepBB = node.getStep() == null ? condBB : new basicblock(currentfunction, "for_step");
         basicblock mergeBB = new basicblock(currentfunction, "for_merge");
+
         node.setStepBB(stepBB);
         node.setMergeBB(mergeBB);
         //generate init
@@ -261,12 +264,17 @@ public class IRcreator implements ASTvisitor {
         arraytype _arraytype=(arraytype) node.getArray().gettype();
         node.getArray().accept(this);
         node.getIndex().accept(this);
-        operand baseAddress=getOperandForValueUse(config.pointersize(),currentBB,node.getArray().getResultop());
-        operand indexValue=getOperandForValueUse(config.pointersize(),currentBB,node.getIndex().getResultop());
-        node.setResultop(new I64Pointer());
+        operand baseAddress=getOperandForValueUse(currentBB,node.getArray().getResultop());
+        operand indexValue=getOperandForValueUse(currentBB,node.getIndex().getResultop());
+
+
+        int Size=_arraytype.getDims()>1?config.pointersize():_arraytype.getBasetype().getTypeSize();
+        node.setResultop(new I64Pointer(Size));
+
         I64Value offset=new I64Value(config.pointersize());
         I64Value offset_2=new I64Value(config.pointersize());
-        currentBB.addInst(new binary(currentBB,binary.Op.MUL,indexValue,new immediate(_arraytype.getDims()>1?config.pointersize():_arraytype.getBasetype().getTypeSize(),config.pointersize()),offset));
+
+        currentBB.addInst(new binary(currentBB,binary.Op.MUL,indexValue,new immediate(Size,config.pointersize()),offset));
 
         currentBB.addInst(new binary(currentBB,binary.Op.ADD,offset,new immediate(config.registersize,config.pointersize()),offset_2));
 
@@ -285,8 +293,6 @@ public class IRcreator implements ASTvisitor {
         exprNode lhs=node.getlhs();
         exprNode rhs=node.getrhs();
         int Size=rhs.getSize();
-
-
         binary.Op op_binary=binary.Op.MUL;
         cmp.Op op_cmp=cmp.Op.LT;
         function callfunction=irRoot.builtinStringAdd;
@@ -362,8 +368,8 @@ public class IRcreator implements ASTvisitor {
             case BITOR:{
                 lhs.accept(this);
                 rhs.accept(this);
-                operand lhsValue=getOperandForValueUse(Size,currentBB,lhs.getResultop());
-                operand rhsValue=getOperandForValueUse(Size,currentBB,rhs.getResultop());
+                operand lhsValue=getOperandForValueUse(currentBB,lhs.getResultop());
+                operand rhsValue=getOperandForValueUse(currentBB,rhs.getResultop());
                 node.setResultop(new I64Value(config.intsize));
                 currentBB.addInst(new binary(currentBB,op_binary,lhsValue,rhsValue,node.getResultop()));
                 break;
@@ -371,10 +377,10 @@ public class IRcreator implements ASTvisitor {
             case ADD:{
                 lhs.accept(this);
                 rhs.accept(this);
-                operand lhsValue=getOperandForValueUse(Size,currentBB,lhs.getResultop());
-                operand rhsValue=getOperandForValueUse(Size,currentBB,rhs.getResultop());
+                operand lhsValue=getOperandForValueUse(currentBB,lhs.getResultop());
+                operand rhsValue=getOperandForValueUse(currentBB,rhs.getResultop());
                 if(lhs.isString()){
-                    node.setResultop(new I64Value(config.charsize));
+                    node.setResultop(new I64Value(config.pointersize()));
                     call _call=new call(currentBB,irRoot.builtinStringAdd,node.getResultop());
                     _call.addParameter(lhsValue);
                     _call.addParameter(rhsValue);
@@ -391,8 +397,8 @@ public class IRcreator implements ASTvisitor {
             case LT:{
                 lhs.accept(this);
                 rhs.accept(this);
-                operand lhsValue=getOperandForValueUse(Size,currentBB,lhs.getResultop());
-                operand rhsValue=getOperandForValueUse(Size,currentBB,rhs.getResultop());
+                operand lhsValue=getOperandForValueUse(currentBB,lhs.getResultop());
+                operand rhsValue=getOperandForValueUse(currentBB,rhs.getResultop());
                 node.setResultop(new I64Value(config.boolsize));
                 if(lhs.isString()){
                     call _call=new call(currentBB,callfunction,node.getResultop());
@@ -410,8 +416,8 @@ public class IRcreator implements ASTvisitor {
             case EQ:{
                 lhs.accept(this);
                 rhs.accept(this);
-                operand lhsValue=getOperandForValueUse(Size,currentBB,lhs.getResultop());
-                operand rhsValue=getOperandForValueUse(Size,currentBB,rhs.getResultop());
+                operand lhsValue=getOperandForValueUse(currentBB,lhs.getResultop());
+                operand rhsValue=getOperandForValueUse(currentBB,rhs.getResultop());
                 node.setResultop(new I64Value(config.boolsize));
                 if(lhs.isString()){
                     call _call=new call(currentBB,callfunction,node.getResultop());
@@ -470,21 +476,23 @@ public class IRcreator implements ASTvisitor {
     @Override
     public void visit(classmemberNode node){
         node.getExpr().accept(this);
-        operand base=getOperandForValueUse(node.getExpr().getSize(),currentBB,node.getExpr().getResultop());
+        operand base=getOperandForValueUse(currentBB,node.getExpr().getResultop());
 
         if(node.getExpr().isAccessable()){
             //class
             symbol membersymbol=node.getSym();
             if(membersymbol instanceof varsymbol){
                 //class variable
-                I64Pointer memberPointer=new I64Pointer();
+                I64Pointer memberPointer=new I64Pointer(membersymbol.gettype().getTypeSize());
                 //Offset and set result
                 currentBB.addInst(new binary(currentBB,binary.Op.ADD,base,new immediate(((varsymbol)membersymbol).getOffset(),config.intsize),memberPointer));
                 node.setResultop(memberPointer);
+
+
                 //Short-circuit evaluation
                 if(node.getThenBB()!=null){
                     I64Value tmp=new I64Value(config.boolsize);
-                    currentBB.addInst(new load(node.getSize(),currentBB,memberPointer,tmp));
+                    currentBB.addInst(new load(memberPointer.getObjsize(),currentBB,memberPointer,tmp));
                     currentBB.finish(new branch(currentBB,tmp,node.getThenBB(),node.getElseBB()));
                 }
             } else {
@@ -508,7 +516,7 @@ public class IRcreator implements ASTvisitor {
         _funcsymbol.getFunc().callerInstList.add(_call);
         node.getParameterList().forEach(x->{
             x.accept(this);
-            _call.addParameter(getOperandForValueUse(x.getSize(),currentBB,x.getResultop()));
+            _call.addParameter(getOperandForValueUse(currentBB,x.getResultop()));
         });
         //The object pointer will also be used as return value.
         if(_funcsymbol.isMemberFunc()){
@@ -517,7 +525,7 @@ public class IRcreator implements ASTvisitor {
         currentBB.addInst(_call);
         //Short-circuit evaluation
         if(node.getThenBB()!=null){
-            operand result=getOperandForValueUse(node.getSize(),currentBB,node.getResultop());
+            operand result=getOperandForValueUse(currentBB,node.getResultop());
             currentBB.finish(new branch(currentBB,result,node.getThenBB(),node.getElseBB()));
         }
     }
@@ -528,12 +536,12 @@ public class IRcreator implements ASTvisitor {
         symbol _symbol = node.getsymbol();
         if (_symbol.getfield() == currentclasssymbol){
             if (_symbol instanceof varsymbol) {
-                I64Pointer memberPointer = new I64Pointer();
+                I64Pointer memberPointer = new I64Pointer(_symbol.gettype().getTypeSize());
                 currentBB.addInst(new binary(currentBB, binary.Op.ADD, currentfunction.getReferenceForClassMethod(), new immediate(((varsymbol) _symbol).getOffset(),config.intsize), memberPointer));
                 node.setResultop(memberPointer);
                 if (node.getThenBB() != null) {
                     I64Value tmp = new I64Value(config.boolsize);
-                    currentBB.addInst(new load(node.getSize(),currentBB,memberPointer,tmp));
+                    currentBB.addInst(new load(memberPointer.getObjsize(),currentBB,memberPointer,tmp));
                     currentBB.finish(new branch(currentBB, tmp, node.getThenBB(), node.getElseBB()));
                 }
             } else {
@@ -604,7 +612,7 @@ public class IRcreator implements ASTvisitor {
             case PRE_SUB: {
                 exprNode.accept(this);
                 operand _operand = exprNode.getResultop();
-                operand _value = getOperandForValueUse(Size,currentBB, _operand);
+                operand _value = getOperandForValueUse(currentBB, _operand);
                 if (_operand instanceof pointer) {
                     I64Value tmp = new I64Value(config.intsize);
                     currentBB.addInst(new binary(currentBB, node.getOp() == unaryexprNode.Op.PRE_ADD ? binary.Op.ADD : binary.Op.SUB, _value, new immediate(1,config.intsize), tmp));
@@ -620,7 +628,7 @@ public class IRcreator implements ASTvisitor {
             case SUF_SUB: {
                 exprNode.accept(this);
                 operand _operand = exprNode.getResultop();
-                operand _value = getOperandForValueUse(Size,currentBB, _operand);
+                operand _value = getOperandForValueUse(currentBB, _operand);
                 if (_operand instanceof pointer) {
                     I64Value tmp = new I64Value(config.intsize);
                     currentBB.addInst(new binary(currentBB, node.getOp() == unaryexprNode.Op.SUF_ADD ? binary.Op.ADD : binary.Op.SUB, _value, new immediate(1,config.intsize), tmp));
@@ -636,16 +644,22 @@ public class IRcreator implements ASTvisitor {
             }
             case POS: {
                 exprNode.accept(this);
-                operand value = getOperandForValueUse(Size,currentBB, exprNode.getResultop());
+                operand value = getOperandForValueUse(currentBB, exprNode.getResultop());
                 node.setResultop(value);
                 break;
             }
-            case NEG:
+            case NEG:{
+                exprNode.accept(this);
+                operand value = getOperandForValueUse(currentBB, exprNode.getResultop());
+                node.setResultop(new I64Value(config.intsize));
+                currentBB.addInst(new unary(currentBB,op, value, node.getResultop()));
+                break;
+            }
             case BITNOT: {
                 exprNode.accept(this);
-                operand value = getOperandForValueUse(Size,currentBB, exprNode.getResultop());
+                operand value = getOperandForValueUse(currentBB, exprNode.getResultop());
                 node.setResultop(new I64Value(config.intsize));
-                currentBB.addInst(new unary(currentBB, op, value, node.getResultop()));
+                currentBB.addInst(new unary(currentBB,op, value, node.getResultop()));
                 break;
             }
             case NOT: {
@@ -679,25 +693,36 @@ public class IRcreator implements ASTvisitor {
         }
     }
 
+
     @Override
     public void visit(nullliteralNode node){
         node.setResultop(new immediate(0,config.pointersize()));
     }
 
+
+    private String processConstStr(String str){
+        str=str.replace("\\n","\n");
+        str=str.replace("\\t", "\t");
+        str=str.replace("\\\"","\"");
+        str=str.replace("\\\\","\\");
+        str+="\0";
+        return str;
+    }
+
     @Override
     public void visit(stringliteralNode node){
-        staticstring _staticstring=new staticstring(new global64Value("_str_const",true,config.charsize),StringEscapeUtils.unescapeJava(node.getVal().substring(1,node.getVal().length()-1)));
+        String str=processConstStr(node.getVal().substring(1,node.getVal().length()-1));
+        staticstring _staticstring=new staticstring(new global64Value("_str_const",true,config.pointersize()),str);
         node.setResultop(_staticstring.getBase());
+        ((global64Value)_staticstring.getBase()).setReferencedstring(_staticstring);
         irRoot.addstaticstring(_staticstring);
     }
 
     private void assign(operand lhs,exprNode rhsexpr){
         int Size=rhsexpr.getSize();
-
-
         //System.out.println(lhs.getName()+" "+rhsexpr.gettype().getTypeName());
         //&&!trivialboolExtractor.trivialNodeMap.get(rhsexpr)
-        if(rhsexpr.isBoolean()){
+        if(rhsexpr.isBoolean()&&!trivialboolExtractor.trivialNodeMap.get(rhsexpr)){
             basicblock thenBB=new basicblock(currentfunction,"thenBB");
             basicblock elseBB=new basicblock(currentfunction,"elseBB");
             basicblock mergeBB=new basicblock(currentfunction,"mergeBB");
@@ -705,8 +730,8 @@ public class IRcreator implements ASTvisitor {
             rhsexpr.setElseBB(elseBB);
             rhsexpr.accept(this);
             if(lhs instanceof pointer){
-                thenBB.addInst(new store(Size,thenBB,new immediate(1,config.boolsize),lhs));
-                elseBB.addInst(new store(Size,elseBB,new immediate(0,config.boolsize),lhs));
+                thenBB.addInst(new store(((pointer)lhs).getObjsize(),thenBB,new immediate(1,((pointer)lhs).getObjsize()),lhs));
+                elseBB.addInst(new store(((pointer)lhs).getObjsize(),elseBB,new immediate(0,((pointer)lhs).getObjsize()),lhs));
             }else{
                 thenBB.addInst(new move(thenBB,new immediate(1,config.boolsize),lhs));
                 elseBB.addInst(new move(elseBB,new immediate(0,config.boolsize),lhs));
@@ -715,15 +740,14 @@ public class IRcreator implements ASTvisitor {
             elseBB.finish(new jump(elseBB,mergeBB));
             currentBB=mergeBB;
         }else{
-
             rhsexpr.accept(this);
             if(rhsexpr.getResultop() instanceof pointer){
                 I64Value tmp_value=new I64Value(rhsexpr.getSize());
-                currentBB.addInst(new load(Size,currentBB,rhsexpr.getResultop(),tmp_value));
-                if(lhs instanceof pointer)currentBB.addInst(new store(Size,currentBB,tmp_value,lhs));
+                currentBB.addInst(new load(((pointer)(rhsexpr.getResultop())).getObjsize(),currentBB,rhsexpr.getResultop(),tmp_value));
+                if(lhs instanceof pointer)currentBB.addInst(new store(((pointer)(rhsexpr.getResultop())).getObjsize(),currentBB,tmp_value,lhs));
                 else currentBB.addInst(new move(currentBB,tmp_value,lhs));
             }else{
-                if(lhs instanceof pointer) currentBB.addInst(new store(Size,currentBB,rhsexpr.getResultop(),lhs));
+                if(lhs instanceof pointer) currentBB.addInst(new store(((pointer)lhs).getObjsize(),currentBB,rhsexpr.getResultop(),lhs));
                 else {
                     //System.out.println(lhs.getName()+" "+rhsexpr.getfuncsymbol().getWord());
                     currentBB.addInst(new move(currentBB,rhsexpr.getResultop(),lhs));
@@ -731,17 +755,17 @@ public class IRcreator implements ASTvisitor {
             }
         }
     }
-    
+
 
     private void arrayAlloc(newexprNode node,operand result,int depth){
         if(depth==node.getExprNodeList().size())return;
         exprNode indexExprNode=node.getExprNodeList().get(depth);
         indexExprNode.accept(this);
-        operand indexValue=getOperandForValueUse(config.pointersize(),currentBB,indexExprNode.getResultop());
+        operand indexValue=getOperandForValueUse(currentBB,indexExprNode.getResultop());
         I64Value allocateSize=new I64Value(config.intsize);
         if(depth==node.getExprNodeList().size()-1){
             //Final dimension
-            currentBB.addInst(new binary(currentBB,binary.Op.MUL,indexValue,new immediate(depth==node.getNumDims()-1? node.gettype().getTypeSize():config.pointersize(),config.intsize),allocateSize));
+            currentBB.addInst(new binary(currentBB,binary.Op.MUL,indexValue,new immediate(depth==node.getNumDims()-1? node.getBaseTypeAfterResolve().getTypeSize():config.pointersize(),config.intsize),allocateSize));
             currentBB.addInst(new binary(currentBB,binary.Op.ADD,allocateSize,new immediate(config.registersize,config.intsize),allocateSize));
             if(result instanceof pointer){
                 I64Value tmp=new I64Value(config.pointersize());
@@ -768,9 +792,10 @@ public class IRcreator implements ASTvisitor {
             basicblock condBB=new basicblock(currentfunction,"for_cond");
             basicblock stepBB=new basicblock(currentfunction,"for_step");
             basicblock mergBB=new basicblock(currentfunction,"for_merge");
-            I64Pointer nowPointer=new I64Pointer();
-            I64Pointer endPointer=new I64Pointer();
-            I64Pointer tempPointer=new I64Pointer();
+
+            I64Pointer nowPointer=new I64Pointer(config.pointersize());
+            I64Pointer endPointer=new I64Pointer(config.pointersize());
+            I64Pointer tempPointer=new I64Pointer(config.pointersize());
             //generate init
             if(result instanceof pointer){
                 currentBB.addInst(new binary(currentBB,binary.Op.ADD,tmp,new immediate(config.registersize,config.intsize),nowPointer));
@@ -800,24 +825,30 @@ public class IRcreator implements ASTvisitor {
         }
     }
 
-    private operand getOperandForValueUse(int S,basicblock currentBB,operand oprand){
+
+    private operand getOperandForValueUse(basicblock currentBB,operand oprand){
          if(oprand instanceof pointer){
-             I64Value val=new I64Value(S);
-             currentBB.addInst(new load(S,currentBB,oprand,val));
+             I64Value val=new I64Value(((pointer)oprand).getObjsize());
+             currentBB.addInst(new load(((pointer)oprand).getObjsize(),currentBB,oprand,val));
              return val;
          }else return oprand;
     }
+
 
     private void builtinFunctionSymbolInitialization(){
         ((funcsymbol)_globalfield.getString().resolvesymbol("length",null)).setFunc(irRoot.builtinStringLength);
         ((funcsymbol)_globalfield.getString().resolvesymbol("substring",null)).setFunc(irRoot.builtinSubstring);
         ((funcsymbol)_globalfield.getString().resolvesymbol("parseInt",null)).setFunc(irRoot.builtinParseInt);
-        ((funcsymbol)_globalfield.getString().resolvesymbol("ord",null)).setFunc(irRoot.builtinStringLength);
-        ((funcsymbol)_globalfield.getString().resolvesymbol("print",null)).setFunc(irRoot.builtinStringLength);
-        ((funcsymbol)_globalfield.getString().resolvesymbol("println",null)).setFunc(irRoot.builtinStringLength);
-        ((funcsymbol)_globalfield.getString().resolvesymbol("getString",null)).setFunc(irRoot.builtinStringLength);
-        ((funcsymbol)_globalfield.getString().resolvesymbol("getInt",null)).setFunc(irRoot.builtinStringLength);
-        ((funcsymbol)_globalfield.getString().resolvesymbol("toString",null)).setFunc(irRoot.builtinStringLength);
+        ((funcsymbol)_globalfield.getString().resolvesymbol("ord",null)).setFunc(irRoot.builtinOrd);
+
+        ((funcsymbol)_globalfield.resolvesymbol("print",null)).setFunc(irRoot.builtinPrint);
+        ((funcsymbol)_globalfield.resolvesymbol("printInt",null)).setFunc(irRoot.builtinPrintInt);
+
+        ((funcsymbol)_globalfield.resolvesymbol("printlnInt",null)).setFunc(irRoot.builtinPrintlnInt);
+        ((funcsymbol)_globalfield.resolvesymbol("println",null)).setFunc(irRoot.builtinPrintln);
+        ((funcsymbol)_globalfield.resolvesymbol("getString",null)).setFunc(irRoot.builtinGetString);
+        ((funcsymbol)_globalfield.resolvesymbol("getInt",null)).setFunc(irRoot.builtinGetInt);
+        ((funcsymbol)_globalfield.resolvesymbol("toString",null)).setFunc(irRoot.builtinToString);
     }
 
 
@@ -826,10 +857,9 @@ public class IRcreator implements ASTvisitor {
         String functionName=_funcsymbol.getWord();
         if(_funcsymbol.isMemberFunc() && functionName.equals("array.size")){
             node.getFunction().accept(this);
-            int Size=node.getSize();
             operand objpointer=node.getFunction().getResultop();
-            node.setResultop(new I64Value(Size));
-            currentBB.addInst(new load(Size,currentBB,objpointer,node.getResultop()));
+            node.setResultop(new I64Value(config.intsize));
+            currentBB.addInst(new load(config.intsize,currentBB,objpointer,node.getResultop()));
             return true;
         }else return false;
     }

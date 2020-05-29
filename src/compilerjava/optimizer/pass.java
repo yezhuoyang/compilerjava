@@ -94,6 +94,7 @@ public abstract class pass {
         computeDominateTreeAllSuccessors(function.getEntryBB());
     }
 
+
     private basicblock intersect(basicblock basicblock1, basicblock basicblock2) {
         basicblock finger1 = basicblock1;
         basicblock finger2 = basicblock2;
@@ -153,6 +154,7 @@ public abstract class pass {
         function.getReversePostOrderDFSBBList().forEach(basicblock -> basicblock.RDFSuccessors = new HashSet<>());
         basicblockList.forEach(basicblock -> basicblock.postIDOM.RDFSuccessors.add(basicblock));
     }
+
 
     private basicblock intersectPost(basicblock basicblock1, basicblock basicblock2) {
         basicblock finger1 = basicblock1;
@@ -235,4 +237,10 @@ public abstract class pass {
                     }
         }
     }
+
+
+
+
+
+
 }

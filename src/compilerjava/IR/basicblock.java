@@ -140,6 +140,7 @@ public class basicblock {
         finished=true;
     }
 
+
     public void deleteSelf(){
         getSuccessors().forEach(successor->{
               for(IRinst irinst=successor.head;;irinst=irinst.getNextInstruction()){

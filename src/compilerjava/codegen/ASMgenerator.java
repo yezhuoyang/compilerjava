@@ -1,5 +1,6 @@
 package compilerjava.codegen;
 
+
 import compilerjava.IR.basicblock;
 import compilerjava.IR.function;
 import compilerjava.IR.IRroot;
@@ -42,13 +43,21 @@ public class ASMgenerator implements IRvisitor{
     }
 
     private void printGlobal(global64Value _globalvar){
-        out.println(".globl\t"+getName(_globalvar)+"\t\t\t\t\t\t#@"+getName(_globalvar));
+        out.println(indent+".globl\t"+getName(_globalvar)+"\t\t\t\t\t\t#@"+getName(_globalvar));
+        if(_globalvar.getSize()==4)
+            out.println(indent+".p2align\t2");
+        out.println(getName(_globalvar)+":");
+        if(_globalvar.getSize()==1){
+            out.println(indent+".byte\t0");
+        }else if(_globalvar.getSize()==4){
+            out.println(indent+".word\t0");
+        }
     }
 
     private void printStaticstring(staticstring _staticstring){
-        out.println(".globl\t"+getName(_staticstring)+"\t\t\t\t\t\t#@"+getName(_staticstring));
-
-        out.println(".asciz\t"+_staticstring.getVal());
+        out.println(indent+".globl\t"+getName(_staticstring)+"\t\t\t\t\t\t#@"+getName(_staticstring));
+        out.println(getName(_staticstring)+":");
+        out.println(indent+".asciz\t"+_staticstring.getVal());
     }
 
     private void printInst(String msg){
@@ -62,6 +71,13 @@ public class ASMgenerator implements IRvisitor{
     @Override
     public void visit(IRroot irroot){
         out.println(indent+".text\n");
+
+        //ReverseCFGPostOrderNumber is used in codegen.
+        for(Map.Entry<String,function> entry: irroot.getFunctionMap().entrySet()){
+            currentfunc=entry.getValue();
+            entry.getValue().calcReverseCFGPostOrderNumber();
+        }
+
         for(Map.Entry<String,function> entry: irroot.getFunctionMap().entrySet()){
             currentfunc=entry.getValue();
             entry.getValue().accept(this);
@@ -76,21 +92,16 @@ public class ASMgenerator implements IRvisitor{
     }
 
 
-
     private void stackframeinit(function func){
         basicblock entryBB=func.getEntryBB();
         basicblock exitBB=func.getExitBB();
         int stackframsize=func.getStackSize();
+        if(stackframsize!=0)
+            entryBB.head.prependInstruction(new binary(entryBB,binary.Op.ADD,vsp,new immediate(-stackframsize,config.intsize),vsp));
 
         if(stackframsize!=0)
-            entryBB.head.prependInstruction(new binary(entryBB,binary.Op.ADD,sp,new immediate(-stackframsize,config.intsize),sp));
-
-
-        if(stackframsize!=0)
-            exitBB.tail.prependInstruction(new binary(exitBB,binary.Op.ADD,sp,new immediate(stackframsize,config.intsize),sp));
-
+            exitBB.tail.prependInstruction(new binary(exitBB,binary.Op.ADD,vsp,new immediate(stackframsize,config.intsize),vsp));
     }
-
 
 
     @Override
@@ -134,7 +145,7 @@ public class ASMgenerator implements IRvisitor{
             case DIV:
                 op="div";break;
             case MOD:
-                op="mod";break;
+                op="rem";break;
             case MUL:
                 op="mul";
                 break;
@@ -218,9 +229,12 @@ public class ASMgenerator implements IRvisitor{
 
     @Override
     public void visit(call inst){
-        printInst("call"+'\t'+getLabel(inst.getCallee().getEntryBB()));
+        if(irroot.builtinfunction.contains(inst.getCallee())){
+            printInst("call"+'\t'+inst.getCallee().getName());
+        }
+        else
+            printInst("call"+'\t'+getLabel(inst.getCallee().getEntryBB()));
     }
-
 
 
     @Override
@@ -275,8 +289,55 @@ public class ASMgenerator implements IRvisitor{
                     inst.getSrc2().accept(this);
                     out.println();
                     break;
+                //TODO
+                case LEQ:
+                    if(inst.getSrc2() instanceof immediate)
+                        out.print("slti"+'\t');
+                    else
+                        out.print("slt"+'\t');
+                    inst.getDst().accept(this);
+                    out.print(",");
+                    inst.getSrc1().accept(this);
+                    out.print(",");
+                    inst.getSrc2().accept(this);
+                    out.println();
+                    out.print(indent+"xori"+'\t');
+                    inst.getDst().accept(this);
+                    out.print(",");
+                    inst.getDst().accept(this);
+                    out.println(", 1");
+                    break;
+                case GT:
+                    if(inst.getSrc1() instanceof immediate)
+                        out.print("slti"+'\t');
+                    else
+                        out.print("slt"+'\t');
+                    inst.getDst().accept(this);
+                    out.print(",");
+                    inst.getSrc2().accept(this);
+                    out.print(",");
+                    inst.getSrc1().accept(this);
+                    out.println();
+                    break;
+                case GEQ:
+                    if(inst.getSrc1() instanceof immediate)
+                        out.print("slti"+'\t');
+                    else
+                        out.print("slt"+'\t');
+                    inst.getDst().accept(this);
+                    out.print(",");
+                    inst.getSrc2().accept(this);
+                    out.print(",");
+                    inst.getSrc1().accept(this);
+                    out.println();
+                    out.print(indent+"xori"+'\t');
+                    inst.getDst().accept(this);
+                    out.print(",");
+                    inst.getDst().accept(this);
+                    out.println(", 1");
+                    break;
                 default:
-                    out.println("Not done yet");
+                    assert false;
             }
         }
     }
@@ -287,41 +348,57 @@ public class ASMgenerator implements IRvisitor{
         printInst("j\t"+getLabel(inst.getDestBB()));
     }
 
-
     @Override
     public void visit(load inst){
         String op="";
-        if(inst.getSrc() instanceof staticstring) {
-            op = "la";
+        switch (((load)inst).getSize()){
+            case 1:
+                op = "lb";
+                break;
+            case 2:
+                op = "lh";
+                break;
+            case 4:
+                op = "lw";
+                break;
+            default:
+                op="FFF";
+                break;
+        }
+        if(inst.getSrc() instanceof globalvar &&((global64Value)inst.getSrc()).isString()){
+            op="la";
             out.print(indent+op+"\t");
             inst.getDst().accept(this);
-            visit((staticstring)inst.getSrc());
+            out.print(", ");
+            out.print(getName(((global64Value)inst.getSrc()).getReferencedstring()));
             out.println();
             return;
         }
-        switch (inst.getSrc().getSize()){
-            case 1:
-                op="lb";break;
-            case 2:
-                op="lh";break;
-            case 4:
-                op="lw";break;
-            default:
-                assert false;
+        // For global var, load means load the address
+        if(inst.getSrc() instanceof globalvar && inst.getDst() instanceof pointer){
+            op="lui";
+            out.print(indent+op+"\t");
+            inst.getDst().accept(this);
+            out.print(", ");
+            out.print("%hi(");
+            visit((global64Value)inst.getSrc());
+            out.print(")");
+            out.println();
+            return;
         }
         out.print(indent+op+"\t");
         inst.getDst().accept(this);
         out.print(", ");
-        if(inst.getSrc() instanceof register){
+        if(inst.getSrc() instanceof register&& !(inst.getSrc() instanceof global64Value)){
             out.print("0(");
             inst.getSrc().accept(this);
             out.print(")");
         }
-        else
+        else{
             inst.getSrc().accept(this);
+        }
         out.println();
     }
-
 
     @Override
     public void visit(move inst){
@@ -329,8 +406,14 @@ public class ASMgenerator implements IRvisitor{
         if(inst.getSrc() instanceof immediate){
             op="li";
         }
-        else if(inst.getSrc() instanceof staticstring){
+        else if(inst.getSrc() instanceof globalvar &&((global64Value)inst.getSrc()).isString()){
             op="la";
+            out.print(indent+op+"\t");
+            inst.getDst().accept(this);
+            out.print(", ");
+            out.print(getName(((global64Value)inst.getSrc()).getReferencedstring()));
+            out.println();
+            return;
         }
         else {
             op="mv";
@@ -349,11 +432,10 @@ public class ASMgenerator implements IRvisitor{
     }
 
 
-
     @Override
     public void visit(store inst){
             String op="";
-            switch (inst.getSrc().getSize()){
+            switch (((store)inst).getSize()){
                 case 1:
                     op="sb";break;
                 case 2:
@@ -365,7 +447,14 @@ public class ASMgenerator implements IRvisitor{
             out.print(indent+op+"\t");
             inst.getSrc().accept(this);
             out.print(", ");
-            if(inst.getDst() instanceof register){
+            if(inst.isInsertedForglobalvar()){
+                out.print("%lo(");
+                inst.getStoreforglobal().accept(this);
+                out.print(")(");
+                inst.getDst().accept(this);
+                out.print(")");
+            }
+            else if(inst.getDst() instanceof register){
                 out.print("0(");
                 inst.getDst().accept(this);
                 out.print(")");
@@ -375,45 +464,29 @@ public class ASMgenerator implements IRvisitor{
             out.println();
     }
 
-
     @Override
     public void visit(unary inst){
+        String op="";
+        switch (((unary)inst).getOp()){
+            case NEG:
+                op="neg";
+                break;
+            case NOT:
+                op="not";
+                break;
+            default:
+                assert false;
+        }
+        out.print(indent+op+"\t");
+        inst.getDst().accept(this);
+        out.print(", ");
+        inst.getSrc().accept(this);
+        out.println("");
     }
-
 
     @Override
     public void visit(phi inst){
     }
-
-    @Override
-    public void visit(lea inst){
-    }
-
-
-    @Override
-    public void visit(push inst){
-        currentpush=currentpush+1;
-        int offset=currentfunc.getStackframsize()-currentpush*config.registersize;
-        out.print(indent+"sw"+'\t');
-        inst.getSrc().accept(this);
-        out.print(", ");
-        out.print(offset);
-        out.println("(sp)");
-    }
-
-
-    @Override
-    public void visit(pop inst){
-        int offset=currentfunc.getStackframsize()-currentpush*config.registersize;
-        currentpush=currentpush-1;
-        out.print(indent+"lw"+'\t');
-        inst.getDst().accept(this);
-        out.print(", ");
-        out.print(offset);
-        out.println("(sp)");
-    }
-
-
 
     @Override
     public void visit(storage stor){
@@ -437,9 +510,8 @@ public class ASMgenerator implements IRvisitor{
                 visit(((memory)stor).getBase());
             }
         }
-       out.print("Not done yet");
+       out.print("FUCK!");
     }
-
 
 
     private String createName(storage stor, String name){
@@ -462,7 +534,12 @@ public class ASMgenerator implements IRvisitor{
                    return name;
             }
         }
-        return "FUCK";
+        else if(stor instanceof staticstring){
+            String name=storageStringMap.get(stor);
+            name=name!=null? name : createName(stor,stor.getName()==null ? "str" :stor.getName());
+            return name;
+        }
+        return "FUCK!";
     }
 
 

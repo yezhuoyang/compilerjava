@@ -65,11 +65,6 @@ public class back extends IRinst{
     }
 
     @Override
-    public IRinst getFakeInst(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap) {
-        return new back(fakeBBMap.getOrDefault(currentBB,currentBB),fakeRegMap.getOrDefault(returnValue,returnValue));
-    }
-
-    @Override
     public void replaceUseReg(operand oldop,operand newop){
         if(returnValue==oldop) returnValue=newop;
         updateUseRegs();
@@ -91,6 +86,11 @@ public class back extends IRinst{
     @Override
     public void replaceDef(virtualregister oldVR,virtualregister newVR){
 
+    }
+
+    @Override
+    public IRinst getFakeInstruction(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap){
+        return new back(fakeBBMap.getOrDefault(currentBB, currentBB), fakeRegMap.getOrDefault(returnValue, returnValue));
     }
 
 

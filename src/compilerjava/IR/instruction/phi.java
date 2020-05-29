@@ -98,13 +98,6 @@ public class phi extends IRinst{
         updateUseRegs();
     }
 
-
-    @Override
-    public IRinst getFakeInst(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap) {
-        return null;
-    }
-
-
     @Override
     public void calcUseAndDef() {
         use.clear();
@@ -121,5 +114,11 @@ public class phi extends IRinst{
     public void replaceDef(virtualregister oldVR, virtualregister newVR) {
 
     }
+
+    @Override
+    public IRinst getFakeInstruction(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap){
+        return null;
+    }
+
 
 }
