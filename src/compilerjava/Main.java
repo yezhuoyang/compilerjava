@@ -35,10 +35,9 @@ public class Main{
 
     public static void main(String... args)throws Exception{
         InputStream in = new FileInputStream("code.txt");
-        //PrintStream out = new PrintStream("test.s");
+        //PrintStream out = new PrintStream("test1.s");
         PrintStream out = new PrintStream(System.out);
         try{
-
             programNode ast=buildAST(in);
             globalfield _globalfield=(new builtinsymbolcollector(ast)).getglobalfield();
             new classdeclcollector(_globalfield).visit(ast);
