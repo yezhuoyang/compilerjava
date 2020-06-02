@@ -648,13 +648,7 @@ public class IRcreator implements ASTvisitor {
                 node.setResultop(value);
                 break;
             }
-            case NEG:{
-                exprNode.accept(this);
-                operand value = getOperandForValueUse(currentBB, exprNode.getResultop());
-                node.setResultop(new I64Value(config.intsize));
-                currentBB.addInst(new unary(currentBB,op, value, node.getResultop()));
-                break;
-            }
+            case NEG:
             case BITNOT: {
                 exprNode.accept(this);
                 operand value = getOperandForValueUse(currentBB, exprNode.getResultop());
@@ -722,13 +716,13 @@ public class IRcreator implements ASTvisitor {
         int Size=rhsexpr.getSize();
         //System.out.println(lhs.getName()+" "+rhsexpr.gettype().getTypeName());
         //&&!trivialboolExtractor.trivialNodeMap.get(rhsexpr)
-        if(rhsexpr.isBoolean()&&!trivialboolExtractor.trivialNodeMap.get(rhsexpr)){
+        if(rhsexpr.isBoolean()&&trivialboolExtractor.trivialNodeMap.containsKey(rhsexpr)&&!trivialboolExtractor.trivialNodeMap.get(rhsexpr)){
             basicblock thenBB=new basicblock(currentfunction,"thenBB");
             basicblock elseBB=new basicblock(currentfunction,"elseBB");
             basicblock mergeBB=new basicblock(currentfunction,"mergeBB");
             rhsexpr.setThenBB(thenBB);
             rhsexpr.setElseBB(elseBB);
-            rhsexpr.accept(this);
+            if(rhsexpr.getResultop()==null)rhsexpr.accept(this);
             if(lhs instanceof pointer){
                 thenBB.addInst(new store(((pointer)lhs).getObjsize(),thenBB,new immediate(1,((pointer)lhs).getObjsize()),lhs));
                 elseBB.addInst(new store(((pointer)lhs).getObjsize(),elseBB,new immediate(0,((pointer)lhs).getObjsize()),lhs));
@@ -740,7 +734,7 @@ public class IRcreator implements ASTvisitor {
             elseBB.finish(new jump(elseBB,mergeBB));
             currentBB=mergeBB;
         }else{
-            rhsexpr.accept(this);
+            if(rhsexpr.getResultop()==null)rhsexpr.accept(this);
             if(rhsexpr.getResultop() instanceof pointer){
                 I64Value tmp_value=new I64Value(rhsexpr.getSize());
                 currentBB.addInst(new load(((pointer)(rhsexpr.getResultop())).getObjsize(),currentBB,rhsexpr.getResultop(),tmp_value));

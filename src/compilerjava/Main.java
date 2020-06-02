@@ -47,7 +47,11 @@ public class Main{
             new symbolcollector(_globalfield).visit(ast);
             new semanticchecker(_globalfield).visit(ast);
 
+
             new trivialboolExtractor().visit(ast);
+            //new elimsideeffect(_globalfield).visit(ast);
+            //new irreleventcodeelim(_globalfield).visit(ast);
+
 
             IRcreator ircreator=new IRcreator(_globalfield);
             ircreator.visit(ast);
@@ -56,6 +60,7 @@ public class Main{
 
             globalvarresolver _globalvarresolver=new globalvarresolver(irroot);
             _globalvarresolver.run();
+
 
 
 
