@@ -1,0 +1,19 @@
+define i64 @func  %a_1 %b_1 {
+func_entry_1:
+   %t_1 = add %a_1 %b_1
+   %t_2 = move %t_1
+   ret %t_2
+}
+
+define i64 @main  {
+main_entry_1:
+   ret 0
+}
+
+define i64 @__init  {
+__init_entry_1:
+   %t_3 = call main 
+   %t_4 = move %t_3
+   ret %t_4
+}
+

@@ -36,6 +36,7 @@ public class Main{
     public static void main(String... args)throws Exception{
         InputStream in = new FileInputStream("code.txt");
         PrintStream out = new PrintStream("output.s");
+        //PrintStream out = new PrintStream("test.s");
         //PrintStream out = new PrintStream(System.out);
         try{
             programNode ast=buildAST(in);
@@ -57,12 +58,15 @@ public class Main{
             _globalvarresolver.run();
 
 
+
+            callingConvention adjustToEmmit=new callingConvention(irroot);
+            adjustToEmmit.run();
+
+
             InstructionAdjust _instructionAdjust=new InstructionAdjust(irroot);
             _instructionAdjust.run();
 
 
-            callingConvention adjustToEmmit=new callingConvention(irroot);
-            adjustToEmmit.run();
 
             new regAllocator(irroot).run();
 

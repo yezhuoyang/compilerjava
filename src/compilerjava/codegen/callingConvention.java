@@ -84,6 +84,13 @@ public class callingConvention {
                         ((call) irinst).getParameterList().set(i, argumentPassVRegisters.get(cnt));
                         irinst.prependInstruction(new move(BB, op, argumentPassVRegisters.get(cnt++)));
                     }
+
+
+                    while(inst.getParameterList().size()>8){
+                        inst.getParameterList().removeLast();
+                    }
+
+
                     if (((call) irinst).getObjectPointer() != null) {
                         operand op = ((call) irinst).getObjectPointer();
                         ((call) irinst).setObjectPointer(argumentPassVRegisters.get(cnt));
