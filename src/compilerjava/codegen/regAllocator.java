@@ -62,13 +62,15 @@ public class regAllocator {
         colors.remove(tp);
         colors.remove(zero);
         colors.remove(ra);
+        /*
         try {
-            debug_out = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/src/compilerjava/ir_debug.ll");
+            debug_out = new PrintStream("ir_debug.ll");
             _IRprinter = new IRprinter(debug_out, false, false);
             if (DEBUG) _IRprinter.visit(_IRroot);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+         */
     }
 
     private void dumpmove(move move) {
