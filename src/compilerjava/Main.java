@@ -47,7 +47,6 @@ public class Main{
             new symbolcollector(_globalfield).visit(ast);
             new semanticchecker(_globalfield).visit(ast);
 
-
             new trivialboolExtractor().visit(ast);
             //new elimsideeffect(_globalfield).visit(ast);
             //new irreleventcodeelim(_globalfield).visit(ast);
@@ -83,7 +82,6 @@ public class Main{
 
             /*
             IRroot irroot=ircreator.getIrRoot();
-
             new riscvconstraintResolver(irroot).run();
 
             new regAllocator(irroot).run();
