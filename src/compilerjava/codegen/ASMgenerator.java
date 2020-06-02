@@ -222,7 +222,7 @@ public class ASMgenerator implements IRvisitor{
             inst.defOfCond.getSrc1().accept(this);
             out.print(", ");
             inst.defOfCond.getSrc2().accept(this);
-            out.println(" "+getLabel(inst.getThenBB()));
+            out.println(", "+getLabel(inst.getThenBB()));
         }
     }
 
