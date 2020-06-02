@@ -202,6 +202,7 @@ public class regAllocator {
 
     private void allocate(function function){
         boolean finish;
+        iteration=0;
         do {
             if (DEBUG)
                 debug_out.println("=====================" + function.getName() + " Iteration " + iteration + "=====================");
@@ -213,7 +214,8 @@ public class regAllocator {
                 dumpDebugInfo(function);
                 _IRprinter.visit(_IRroot);
             }
-            iteration=0;
+            ++iteration;
+            System.out.println("allocating "+function.getName()+" "+iteration);
             do {
                 if (!simplifyWorklist.isEmpty()) {
                     if (DEBUG) debug_out.println("===================== Simplify =====================");
@@ -238,6 +240,7 @@ public class regAllocator {
             if (!spilledNodes.isEmpty()) {
                 finish = false;
                 rewriteProgram(function);
+                System.out.println("Rewriting "+function.getName()+" ");
                 if (DEBUG) {
                     debug_out.println("===================== IR after Rewrite =====================");
                     _IRprinter.visit(_IRroot);
