@@ -25,7 +25,6 @@ public class function {
 
     public int stackSize;
 
-
     boolean hasramain;
 
     public void setHasramain(boolean hasramain) {
@@ -183,8 +182,12 @@ public class function {
     }
 
     public void calcReverseCFGPostOrderNumber(){
-
-
+        visit=new HashSet<>();
+        reverseCFGPostOrderDFSBBList=new LinkedList<>();
+        reverseCFGPostOrderDFS(exitBB);
+        for(int i=0;i<reversePostOrderDFSBBList.size();i++){
+            reversePostOrderDFSBBList.get(i).reversePostOrderNumber=i;
+        }
     }
 
     private void reverseCFGPostOrderDFS(basicblock nowBB){

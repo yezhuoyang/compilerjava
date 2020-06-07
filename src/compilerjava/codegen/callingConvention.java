@@ -90,7 +90,6 @@ public class callingConvention {
                         inst.getParameterList().removeLast();
                     }
 
-
                     if (((call) irinst).getObjectPointer() != null) {
                         operand op = ((call) irinst).getObjectPointer();
                         ((call) irinst).setObjectPointer(argumentPassVRegisters.get(cnt));
@@ -112,7 +111,6 @@ public class callingConvention {
             }
         });
     }
-
 
 
     private void calleeSave(function function) {

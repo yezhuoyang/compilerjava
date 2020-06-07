@@ -31,7 +31,7 @@ public class SSABuilder extends pass {
         Set<virtualregister> varKill = new HashSet<>();
         for (basicblock basicblock : basicblockList) {
             varKill.clear();
-            for (IRinst IRinst = basicblock.head; ; IRinst = IRinst.getNextInstruction()) {
+            for (IRinst IRinst = basicblock.head; ; IRinst = IRinst.getNextInstruction()){
                 List<register> useregisters = IRinst.getUseregs();
                 register defregister = IRinst.getDefReg();
                 useregisters.forEach(useregister -> {
@@ -51,6 +51,7 @@ public class SSABuilder extends pass {
         }
     }
 
+
     private void insertphifunction(function function) {
         Queue<basicblock> workList = new LinkedList<>();
         Set<basicblock> visited = new HashSet<>();
@@ -58,10 +59,10 @@ public class SSABuilder extends pass {
             workList.clear();
             visited.clear();
             workList.addAll(x.info.defBB);
-            while (!workList.isEmpty()) {
+            while(!workList.isEmpty()){
                 basicblock b = workList.remove();
                 b.DF.forEach(d -> {
-                    if (!visited.contains(d)) {
+                    if(!visited.contains(d)){
                         visited.add(d);
                         d.addFirst(new phi(d, x));
                         workList.add(d);
@@ -72,7 +73,7 @@ public class SSABuilder extends pass {
     }
 
     private void rename(basicblock basicblock) {
-        for (IRinst IRinst = basicblock.head; IRinst != null; IRinst = IRinst.getNextInstruction()) {
+        for(IRinst IRinst = basicblock.head; IRinst != null; IRinst = IRinst.getNextInstruction()) {
             if (!(IRinst instanceof phi)) break;
             virtualregister dst = (virtualregister) ((phi) IRinst).getDst();
             ((phi) IRinst).setDst(dst.getSSARenameReg(dst.getNewId()));

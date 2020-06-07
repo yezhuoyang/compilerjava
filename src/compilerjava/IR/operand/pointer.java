@@ -1,5 +1,8 @@
 package compilerjava.IR.operand;
+import compilerjava.IR.IRvisitor;
 import compilerjava.config;
+
+import java.util.HashMap;
 
 
 public abstract class pointer extends virtualregister{
@@ -15,6 +18,7 @@ public abstract class pointer extends virtualregister{
         this.objsize=S;
     }
 
+
     public int getObjsize() {
         return objsize;
     }
@@ -22,4 +26,10 @@ public abstract class pointer extends virtualregister{
     public void setObjsize(int objsize) {
         this.objsize = objsize;
     }
+
+
+
+
+
+
 }

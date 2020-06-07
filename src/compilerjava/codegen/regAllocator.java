@@ -160,7 +160,6 @@ public class regAllocator {
     }
 
 
-
     private void cleanmove() {
         _IRroot.getFunctionMap().values().forEach(function -> function.getReversePostOrderDFSBBList().forEach(basicblock -> {
             for (IRinst IRinst = basicblock.head; IRinst != null; IRinst = IRinst.getNextInstruction())
@@ -200,6 +199,7 @@ public class regAllocator {
         adjSet.clear();
     }
 
+
     private void allocate(function function){
         boolean finish;
         iteration=0;
@@ -215,7 +215,7 @@ public class regAllocator {
                 _IRprinter.visit(_IRroot);
             }
             ++iteration;
-            System.out.println("allocating "+function.getName()+" "+iteration);
+            //System.out.println("allocating "+function.getName()+" "+iteration);
             do {
                 if (!simplifyWorklist.isEmpty()) {
                     if (DEBUG) debug_out.println("===================== Simplify =====================");
@@ -240,7 +240,6 @@ public class regAllocator {
             if (!spilledNodes.isEmpty()) {
                 finish = false;
                 rewriteProgram(function);
-                System.out.println("Rewriting "+function.getName()+" ");
                 if (DEBUG) {
                     debug_out.println("===================== IR after Rewrite =====================");
                     _IRprinter.visit(_IRroot);

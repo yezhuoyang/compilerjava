@@ -84,14 +84,25 @@ public class binary extends IRinst {
 
     @Override
     public void renameDefRegForSSA() {
+        if(!(dst instanceof globalvar)){
+            dst=((virtualregister)dst).getSSARenameReg(((virtualregister)dst).getNewId());
+        }
     }
 
     @Override
     public void renameUseRegForSSA() {
+        if(src1 instanceof virtualregister && !(src1 instanceof globalvar))
+            src1=((virtualregister)src1).getSSARenameReg(((virtualregister)src1).info.stack.peek());
+        if(src2 instanceof virtualregister && !(src2 instanceof globalvar))
+            src2=((virtualregister)src2).getSSARenameReg(((virtualregister)src2).info.stack.peek());
+        updateUseRegs();
     }
 
     @Override
     public void replaceUseReg(operand oldop,operand newop){
+        if(src1==oldop)src1=newop;
+        if(src2==oldop)src2=newop;
+        updateUseRegs();
     }
 
     @Override

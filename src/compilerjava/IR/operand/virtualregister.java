@@ -11,7 +11,7 @@ import java.util.*;
 
 public abstract class virtualregister extends register{
     public registerInfo info;
-    private Map<Integer,virtualregister> aliases=null;
+    public Map<Integer,virtualregister> aliases=null;
     private virtualregister origin=null;
     private int SSAID=-1;
 
@@ -60,6 +60,7 @@ public abstract class virtualregister extends register{
         }
         return alias;
     }
+
 
 
     public int getNewId(){

@@ -77,9 +77,6 @@ public class branch extends IRinst {
 
     @Override
     public void renameDefRegForSSA(){
-        if(cond instanceof virtualregister && !(cond instanceof globalvar))
-            cond=((virtualregister)cond).getSSARenameReg(((virtualregister)cond).info.stack.peek());
-        updateUseRegs();
     }
 
     @Override

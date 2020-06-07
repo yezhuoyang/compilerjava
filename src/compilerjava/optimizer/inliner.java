@@ -14,9 +14,9 @@ import java.util.Map;
 
 public class inliner {
     private IRroot IRroot;
-    private int inlinecalleeInstructionLimit = 150;
+    private int inlinecalleeInstructionLimit =150;
     private int inlineMaxDepth = 5;
-    
+
     private Map<function, Integer> functionInstructionCountMap = new HashMap<>();
     private Map<function, Integer> functioncalledCountMap = new HashMap<>();
     private Map<function, function> unlimitedfunctionWorks = new HashMap<>();
@@ -53,7 +53,7 @@ public class inliner {
             functionInstructionCountMap.put(function, instructionCount);
         });
     }
-    
+
     private function functionFaker(function function) {
         int fakeCount = functionFakerCountMap.getOrDefault(function, 0);
         fakeCount = fakeCount + 1;
@@ -64,10 +64,11 @@ public class inliner {
         function.getReversePostOrderDFSBBList().forEach(basicblock -> basicblockFakerMap.put(basicblock, new basicblock(fakefunction, basicblock.getName())));
         function.getReversePostOrderDFSBBList().forEach(basicblock -> {
             basicblock fakeBB = basicblockFakerMap.get(basicblock);
-            for (IRinst IRinst = basicblock.head; IRinst != null; IRinst = IRinst.getNextInstruction())
-                if (IRinst == basicblock.tail)
+            for(IRinst IRinst = basicblock.head; IRinst != null; IRinst = IRinst.getNextInstruction())
+                if(IRinst == basicblock.tail)
                     fakeBB.finish(IRinst.getFakeInstruction(basicblockFakerMap, registerFakerMap));
-                else fakeBB.addInst(IRinst.getFakeInstruction(basicblockFakerMap, registerFakerMap));
+                else
+                    fakeBB.addInst(IRinst.getFakeInstruction(basicblockFakerMap, registerFakerMap));
         });
         fakefunction.setEntryBB(basicblockFakerMap.get(function.getEntryBB()));
         fakefunction.setExitBB(basicblockFakerMap.get(function.getExitBB()));
@@ -75,7 +76,7 @@ public class inliner {
         fakefunction.setParameterList(function.getParameterList());
         return fakefunction;
     }
-    
+
     private void traceON() {
         unlimitedfunctionWorks.clear();
         for (function function : IRroot.getFunctionMap().values()) {
@@ -84,17 +85,17 @@ public class inliner {
             }
         }
     }
-    
+
     private boolean worthNonRecursiveInline(function callee) {
-        if (functioncalledCountMap.get(callee) == null) return false;
-        if (callee.recursivecalleeset.contains(callee)) return false;
-        if (callee.getReferenceForClassMethod() != null) return false;
+        if(functioncalledCountMap.get(callee) == null) return false;
+        if(callee.recursivecalleeset.contains(callee)) return false;
+        if(callee.getReferenceForClassMethod() != null) return false;
         return functionInstructionCountMap.get(callee) <= inlinecalleeInstructionLimit;
     }
     
     private boolean worthRecursiveInline(function callee) {
-        if (functioncalledCountMap.get(callee) == null) return false;
-        if (callee.getReferenceForClassMethod() != null) return false;
+        if(functioncalledCountMap.get(callee) == null) return false;
+        if(callee.getReferenceForClassMethod() != null) return false;
         return functionInstructionCountMap.get(callee) <= inlinecalleeInstructionLimit;
     }
 
@@ -107,19 +108,21 @@ public class inliner {
     private IRinst doInline(call callInst) {
         function caller = callInst.getCurrentBB().getCurrentfunction();
         function callee = unlimitedfunctionWorks.getOrDefault(callInst.getCallee(), callInst.getCallee());
+
         //split the block
         basicblock splitter = new basicblock(caller, "splitter");
-        callInst.getCurrentBB().getSuccessors().forEach(successor -> successor.replacePredecessor(callInst.getCurrentBB(), splitter));
+        callInst.getCurrentBB().getSuccessors().forEach(successor -> successor.replacePredecessor(callInst.getCurrentBB(),splitter));
+
         tmpIRinstList.clear();
-        for (IRinst IRinst = callInst.getCurrentBB().tail, nextInstruction; IRinst != callInst; IRinst = nextInstruction) {
+        for(IRinst IRinst = callInst.getCurrentBB().tail, nextInstruction; IRinst != callInst; IRinst = nextInstruction){
             nextInstruction = IRinst.getprevInstruction();
             callInst.getCurrentBB().removeInst();
             tmpIRinstList.add(IRinst);
         }
-        for (int i = tmpIRinstList.size() - 1; i >= 0; i--) {
+        for(int i = tmpIRinstList.size() - 1; i >= 0; i--){
             IRinst IRinst = tmpIRinstList.get(i);
             IRinst.setCurrentBB(splitter);
-            if (IRinst instanceof back || IRinst instanceof jump || IRinst instanceof branch)
+            if(IRinst instanceof back || IRinst instanceof jump || IRinst instanceof branch)
                 splitter.finish(IRinst);
             else splitter.addInst(IRinst);
         }
@@ -137,14 +140,14 @@ public class inliner {
             registerFakerMap.put(oldParameter, newParameter);
         }
         callInst.deleteSelf();
-        for (basicblock realBB : callee.getReversePostOrderDFSBBList()) {
+        for(basicblock realBB : callee.getReversePostOrderDFSBBList()){
             if (!basicblockFakerMap.containsKey(realBB))
                 basicblockFakerMap.put(realBB, new basicblock(caller, "faker_" + realBB.getName()));
         }
         IRinst splitterHead = splitter.head;
-        for (basicblock realBB : callee.getReversePostOrderDFSBBList()) {
-            basicblock fakeBB = basicblockFakerMap.get(realBB);
-            for (IRinst IRinst = realBB.head; IRinst != null; IRinst = IRinst.getNextInstruction()) {
+        for(basicblock realBB : callee.getReversePostOrderDFSBBList()){
+            basicblock fakeBB=basicblockFakerMap.get(realBB);
+            for(IRinst IRinst = realBB.head; IRinst != null; IRinst = IRinst.getNextInstruction()) {
                 for (register register : IRinst.getUseregs())
                     if (!registerFakerMap.containsKey(register)) {
                         registerFakerMap.put(register, new I64Value(register.getSize()));
@@ -174,13 +177,13 @@ public class inliner {
     }
 
     private void nonRecursiveInline() {
-        for (boolean changed = true; changed; ) {
+        for(boolean changed = true; changed;){
             changed = false;
-            for (function function : IRroot.getFunctionMap().values()) {
-                for (basicblock basicblock : function.getReversePostOrderDFSBBList()) {
+            for(function function : IRroot.getFunctionMap().values()){
+                for(basicblock basicblock : function.getReversePostOrderDFSBBList()){
                     for (IRinst IRinst = basicblock.head, nextInstruction; IRinst != null; IRinst = nextInstruction) {
                         nextInstruction = IRinst.getNextInstruction();
-                        if (IRinst instanceof call && worthNonRecursiveInline(((call) IRinst).getCallee())) {
+                        if(IRinst instanceof call && worthNonRecursiveInline(((call) IRinst).getCallee())) {
                             function callee = ((call) IRinst).getCallee();
                             changed = true;
                             nextInstruction = doInline((call) IRinst);
@@ -192,24 +195,24 @@ public class inliner {
                 function.recalcReversePostOrderDFSBBList();
             }
             for (Map.Entry<function, Integer> entry : functioncalledCountMap.entrySet()) {
-                if (entry.getValue() == 0 && !entry.getKey().getName().equals("__init"))
+                if(entry.getValue() == 0 && !entry.getKey().getName().equals("__init"))
                     IRroot.removefunction(entry.getKey());
             }
         }
         IRroot.getFunctionMap().values().forEach(function::updateCalleeSet);
         IRroot.calcRecursiveCalleeSet();
     }
-    
+
     private void recursiveInline() {
         boolean changed = true;
-        for (int i = 0; i < inlineMaxDepth && changed; i++) {
+        for(int i=0; i<inlineMaxDepth && changed; i++){
             changed = false;
             traceON();
-            for (function function : IRroot.getFunctionMap().values()) {
-                for (basicblock basicblock : function.getReversePostOrderDFSBBList()) {
-                    for (IRinst IRinst = basicblock.head, nextInstruction; IRinst != null; IRinst = nextInstruction) {
+            for(function function : IRroot.getFunctionMap().values()){
+                for(basicblock basicblock : function.getReversePostOrderDFSBBList()) {
+                    for(IRinst IRinst = basicblock.head, nextInstruction; IRinst != null; IRinst = nextInstruction) {
                         nextInstruction = IRinst.getNextInstruction();
-                        if (IRinst instanceof call && worthRecursiveInline(((call) IRinst).getCallee())) {
+                        if(IRinst instanceof call && worthRecursiveInline(((call) IRinst).getCallee())) {
                             function callee = ((call) IRinst).getCallee();
                             changed = true;
                             nextInstruction = doInline((call) IRinst);
@@ -223,4 +226,7 @@ public class inliner {
         IRroot.getFunctionMap().values().forEach(function::updateCalleeSet);
         IRroot.calcRecursiveCalleeSet();
     }
+
+
+
 }

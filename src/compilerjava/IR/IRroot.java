@@ -110,6 +110,7 @@ public class IRroot {
             for(function func : functionMap.values()){
                 newRecursivecalleeSet.clear();
                 newRecursivecalleeSet.addAll(func.calleeset);
+                func.calleeset.forEach(callee->newRecursivecalleeSet.addAll(callee.recursivecalleeset));
                 if(!newRecursivecalleeSet.equals(func.recursivecalleeset)){
                      func.recursivecalleeset.clear();
                      func.recursivecalleeset.addAll(newRecursivecalleeSet);

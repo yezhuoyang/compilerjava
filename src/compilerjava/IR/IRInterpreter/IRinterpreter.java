@@ -8,10 +8,12 @@ import java.lang.reflect.Array;
 import java.util.*;
 
 
+
+
 public class IRinterpreter{
 
     static private final Set<String> opnames1=new HashSet<>(Arrays.asList(
-            "store","br","jump","ret","call"
+            "cmp","store","br","jump","ret","call"
     ));
 
     static private final Set<String> opnames2=new HashSet<>(Arrays.asList(
@@ -40,21 +42,28 @@ public class IRinterpreter{
     private boolean allowPhi;
     private Map<String,Register> registers;
     private Map<String,Register> globalRegisters=new HashMap<>();
-    private Map<Long,String> stringObjects=new HashMap<>();
-    private Map<String,Long> tmpRegister=new HashMap<>();
-    private Map<Long,Byte>   memory=new HashMap<>();
-    private long heapTop=(int) (Math.random()*4096);
-    private long retValue;
+
+
+    private Map<String,String> globalaliase=new HashMap<>();
+    private Map<String,Boolean> cmpResult=new HashMap<>();
+
+
+    private Map<Integer,String> stringObjects=new HashMap<>();
+    private Map<String,Integer> tmpRegister=new HashMap<>();
+    private Map<Integer,Byte>   memory=new HashMap<>();
+    private int heapTop=(int) (Math.random()*4096);
+    private int retValue;
     private boolean ret;
     private int cntInst=0;
     private BasicBlock lastBB=null;
-    private long staticStringCnt=0;
+    private int staticStringCnt=0;
     //=====SSA check
     private boolean isReady=false;
 
     //======= run IR
-    private long exitcode=-1;
+    private int exitcode=-1;
     private boolean exception=false;
+    private boolean printMode=false;
     private int instLimit=Integer.MAX_VALUE;
 
     private DataInputStream data_in;
@@ -84,6 +93,12 @@ public class IRinterpreter{
               exitcode=-1;
               exception=true;
           }
+          cmpResult.put("slt", false);
+          cmpResult.put("sle", false);
+          cmpResult.put("seq", false);
+          cmpResult.put("sge", false);
+          cmpResult.put("sgt", false);
+          cmpResult.put("sne", false);
     }
 
     public static void main(String[] args) throws IOException{
@@ -135,19 +150,30 @@ public class IRinterpreter{
         }
         inst.lineno=lineno;
         inst.text=line;
-
         if(!inst.operator.equals("phi")){
             allowPhi=false;
             curBB.instructions.add(inst);
         }
         switch (inst.operator){
             case "store":
-                inst.op1=words.get(2);
-                inst.op2=words.get(1);
+                inst.op1=words.get(2);  //address
+                inst.op2=words.get(1);  //data
+                if(globalRegisters.containsKey(inst.op1)){
+                    inst.operator="move";
+                    inst.op1=inst.op2;
+                }else if(globalaliase.containsKey(inst.op1)){
+                    inst.operator="move";
+                    inst.dest=globalaliase.get(inst.op1);
+                    inst.op1=inst.op2;
+                }
                 return;
             case "load":
                 inst.dest=split[0].trim();
                 inst.op1=words.get(1);
+                if(globalRegisters.containsKey(inst.op1)){
+                    globalaliase.put(inst.dest,inst.op1);
+                    inst.operator="move";
+                }
                 return;
             case "alloc":
                 inst.dest=split[0].trim();
@@ -157,6 +183,10 @@ public class IRinterpreter{
                 if(split.length==2)inst.dest=split[0].trim();
                 inst.op1=words.get(1);
                 inst.args=words.subList(2,words.size());
+                return;
+            case "cmp":
+                inst.op1=words.get(1);
+                inst.op2=words.get(2);
                 return;
             case "br":
                 inst.dest=words.get(1);
@@ -174,7 +204,7 @@ public class IRinterpreter{
                     if(!label.endsWith(":"))throw new SemanticError("label should end with `:`");
                     if(!reg.startsWith("%")&&!reg.startsWith("@")&&!reg.equals("undef"))
                         throw new SemanticError("source of a phi node should be a register or `undef`");
-                    phi.paths.put(label,reg);
+                    phi.paths.put(label.substring(0,label.length()-1),reg);
                 }
                 curBB.phi.add(phi);
                 return;
@@ -194,8 +224,6 @@ public class IRinterpreter{
         curFunc.hasReturnValue=line.startsWith("define i64 ");
         curFunc.name=words.get(2).substring(1);
         curFunc.args=words.subList(3,words.size()-1);
-
-
         if(functions.containsKey(curFunc.name))
             throw new SemanticError("function `"+curFunc.name+"` has already been defined");
         functions.put(curFunc.name,curFunc);
@@ -205,14 +233,21 @@ public class IRinterpreter{
         }
     }
 
+    private String processConstStr(String str){
+        str=str.replace("\\n","\n");
+        str=str.replace("\\t", "\t");
+        str=str.replace("\\\"","\"");
+        str=str.replace("\\\\","\\");
+        return str;
+    }
+
     private void readGlobalVariable(){
         if(!line.startsWith("@"))throw new RuntimeException("global variable should start with '@'");
         if(line.contains("=")){
             String[] words=line.split("=",2);
             String name=words[0].trim();
             words[1]=words[1].trim();
-            String tmp=words[1].substring(1,words[1].length()-1);
-            String val=StringEscapeUtils.unescapeJava(tmp);
+            String val=processConstStr(words[1].substring(1,words[1].length()-1));
             Register reg=new Register();
             reg.value=staticStringCnt;
             reg.timestamp=0;
@@ -227,6 +262,7 @@ public class IRinterpreter{
         }
     }
 
+
     private void performSSACheck() throws SemanticError{
         Set<String> regDef=new HashSet<>();
         for(Function func:functions.values()){
@@ -234,7 +270,7 @@ public class IRinterpreter{
             for(BasicBlock BB:func.blocks.values()){
                 for(Instruction inst:BB.instructions)
                     if(inst.dest!=null&&!inst.operator.equals("br"))
-                        if(regDef.contains(inst.dest)){
+                        if(regDef.contains(inst.dest)&&!globalRegisters.containsKey(inst.dest)){
                             lineno=inst.lineno;
                             line=inst.text;
                             throw new SemanticError("a register should only be defined once");
@@ -246,32 +282,32 @@ public class IRinterpreter{
     }
 
 
-    private int memoryRead(long addr)throws RuntimeError{
+    private int memoryRead(int addr)throws RuntimeError{
         Byte data=memory.get(addr);
         if(data==null)throw new RuntimeError("memory read violation");
         return data&0xFF;
     }
 
-    private void memoryWrite(long addr,Byte value)throws RuntimeError{
+    private void memoryWrite(int addr,Byte value)throws RuntimeError{
         if(!memory.containsKey(addr))
             throw new RuntimeError("memory write violation");
         memory.put(addr,value);
     }
 
-    private long registerRead(String name)throws RuntimeError{
+    private int registerRead(String name)throws RuntimeError{
         Register reg=registers.get(name);
         if(reg==null)throw new RuntimeError("register `"+name+"` haven't been defined yet");
         return reg.value;
     }
 
-    private long globalRegisterRead(String name)throws RuntimeError{
+    private int globalRegisterRead(String name)throws RuntimeError{
         Register reg=globalRegisters.get(name);
         if(reg==null) throw new RuntimeError("global register `"+name+"` haven't been defined yet");
         return reg.value;
     }
 
 
-    private void registerWrite(String name,long value)throws RuntimeError{
+    private void registerWrite(String name,int value)throws RuntimeError{
         if(!name.startsWith("@")&&!name.startsWith("%"))throw new RuntimeError("not a register");
         if(name.startsWith("@")){
             Register reg=globalRegisters.get(name);
@@ -293,10 +329,10 @@ public class IRinterpreter{
     }
 
 
-    private long readSrc(String name)throws RuntimeError {
+    private int readSrc(String name)throws RuntimeError {
         if (name.startsWith("%")) return registerRead(name);
         else if (name.startsWith("@")) return globalRegisterRead(name);
-        else return Long.valueOf(name);
+        else return Integer.valueOf(name);
     }
 
     private void jump(String name)throws RuntimeError{
@@ -309,27 +345,28 @@ public class IRinterpreter{
 
 
     private void runInstruction()throws RuntimeError,IOException{
-
         if(++cntInst>=instLimit)throw new RuntimeError("instruction limit exceeded");
+        if(printMode)
+                printInst(curInst);
         switch (curInst.operator){
             case "load":
-                    long addr=readSrc(curInst.op1);
-                    curInst.size=8;
-                    long res=0;
+                    int addr=readSrc(curInst.op1);
+                    curInst.size=4;
+                    int res=0;
                     for(int i=0;i<curInst.size;++i)res=(res<<8)|memoryRead(addr+i);
                     registerWrite(curInst.dest,res);
                     return;
             case "store":
-                    long address=readSrc(curInst.op1);
-                    long data=readSrc(curInst.op2);
-                    curInst.size=8;
-                    for(long i=curInst.size-1;i>=0;--i){
+                    int address=readSrc(curInst.op1);
+                    int data=readSrc(curInst.op2);
+                    curInst.size=4;
+                    for(int i=curInst.size-1;i>=0;--i){
                         memoryWrite(address+i,(byte)(data&0xFF));
                         data>>=8;
                     }
                     return;
             case "alloc":
-                    long size=readSrc(curInst.op1);
+                    int size=readSrc(curInst.op1);
                     registerWrite(curInst.dest,heapTop);
                     for(int i=0;i<size;++i)memory.put(heapTop+i,(byte)(0));
                     heapTop+=size;
@@ -339,9 +376,25 @@ public class IRinterpreter{
                    if(curInst.op1!=null) retValue=readSrc(curInst.op1);
                    ret=true;
                    return;
+            case "cmp":
+                int op1 = readSrc(curInst.op1);
+                int op2 = readSrc(curInst.op2);
+                cmpResult.put("slt", op1 < op2);
+                cmpResult.put("sle", op1 <= op2);
+                cmpResult.put("seq", op1 == op2);
+                cmpResult.put("sge", op1 >= op2);
+                cmpResult.put("sgt", op1 > op2);
+                cmpResult.put("sne", op1 != op2);
+                return;
             case "br":
-                   long cond=readSrc(curInst.dest);
-                   jump(cond==0? curInst.op2:curInst.op1);
+                   if(cmpResult.containsKey(curInst.dest)){
+                       boolean cond=cmpResult.get(curInst.dest);
+                       jump(cond==false? curInst.op2:curInst.op1);
+                   }
+                   else {
+                       int cond=readSrc(curInst.dest);
+                       jump(cond==0? curInst.op2:curInst.op1);
+                   }
                    return;
             case "jump":
                    jump(curInst.op1);
@@ -349,24 +402,24 @@ public class IRinterpreter{
             case "call":
                 Function func=functions.get(curInst.op1);
                 switch (curInst.op1){
-                    case "string.length":{
+                    case "string_length":{
                         String str=stringObjects.get(readSrc(curInst.args.get(0)));
                         registerWrite(curInst.dest,str.length());
                         return;
                     }
-                    case "string.substring":{
+                    case "string_substring":{
                         String str=stringObjects.get(readSrc(curInst.args.get(0)));
-                        long left=readSrc(curInst.args.get(1));
-                        long right=readSrc(curInst.args.get(2));
+                        int left=readSrc(curInst.args.get(1));
+                        int right=readSrc(curInst.args.get(2));
                         String resStr=str.substring((int)left,(int)right);
                         registerWrite(curInst.dest,staticStringCnt);
                         stringObjects.put(staticStringCnt++,resStr);
                         return;
                     }
-                    case "string.parseInt":{
+                    case "string_parseInt":{
                         String str=stringObjects.get(readSrc(curInst.args.get(0)));
                         char[] charArray=str.toCharArray();
-                        long result=0;
+                        int result=0;
                         for(char ch: charArray){
                             if(ch<'0'||ch>'9')break;
                             result=result*10+ch-'0';
@@ -374,13 +427,13 @@ public class IRinterpreter{
                         registerWrite(curInst.dest,result);
                         return;
                     }
-                    case "string.ord":{
+                    case "string_ord":{
                         String str=stringObjects.get(readSrc(curInst.args.get(0)));
-                        long pos=readSrc(curInst.args.get(1));
+                        int pos=readSrc(curInst.args.get(1));
                         registerWrite(curInst.dest,(int)str.charAt((int)pos));
                         return;
                     }
-                    case "string.add":{
+                    case "string_add":{
                         String str1=stringObjects.get(readSrc(curInst.args.get(0)));
                         String str2=stringObjects.get(readSrc(curInst.args.get(1)));
                         String resStr=str1+str2;
@@ -388,37 +441,37 @@ public class IRinterpreter{
                         stringObjects.put(staticStringCnt++,resStr);
                         return;
                     }
-                    case "string.lt":{
+                    case "string_lt":{
                          String str1=stringObjects.get(readSrc(curInst.args.get(0)));
                          String str2=stringObjects.get(readSrc(curInst.args.get(1)));
                          registerWrite(curInst.dest,str1.compareTo(str2)<0?1:0);
                          return;
                     }
-                    case "string.leq":{
+                    case "string_leq":{
                          String str1=stringObjects.get(readSrc(curInst.args.get(0)));
                          String str2=stringObjects.get(readSrc(curInst.args.get(1)));
                          registerWrite(curInst.dest,str1.compareTo(str2)<=0?1:0);
                          return;
                     }
-                    case "string.eq":{
+                    case "string_eq":{
                           String str1=stringObjects.get(readSrc(curInst.args.get(0)));
                           String str2=stringObjects.get(readSrc(curInst.args.get(1)));
                           registerWrite(curInst.dest,str1.compareTo(str2)==0?1:0);
                           return;
                     }
-                    case "string.geq":{
+                    case "string_geq":{
                           String str1=stringObjects.get(readSrc(curInst.args.get(0)));
                           String str2=stringObjects.get(readSrc(curInst.args.get(1)));
                           registerWrite(curInst.dest,str1.compareTo(str2)>=0?1:0);
                           return;
                     }
-                    case "string.gt":{
+                    case "string_gt":{
                         String str1=stringObjects.get(readSrc(curInst.args.get(0)));
                         String str2=stringObjects.get(readSrc(curInst.args.get(1)));
                         registerWrite(curInst.dest,str1.compareTo(str2)>0?1:0);
                         return;
                     }
-                    case "string.neq":{
+                    case "string_neq":{
                         String str1=stringObjects.get(readSrc(curInst.args.get(0)));
                         String str2=stringObjects.get(readSrc(curInst.args.get(1)));
                         registerWrite(curInst.dest,str1.compareTo(str2)!=0?1:0);
@@ -429,14 +482,27 @@ public class IRinterpreter{
                         data_out.print(str);
                         return;
                     }
+                    case "printInt":{
+                        int str=readSrc(curInst.args.get(0));
+                        data_out.print(str);
+                        return;
+                    }
                     case "println":{
                         String str=stringObjects.get(readSrc(curInst.args.get(0)));
                         data_out.print(str);
                         data_out.print('\n');
                         return;
                     }
+                    case "printlnInt":{
+                        int str=readSrc(curInst.args.get(0));
+                        data_out.print(str);
+                        data_out.print('\n');
+                        return;
+                    }
                     case "getString":{
                         String resStr=scanner.next();
+                        //resStr=resStr.substring(1,resStr.length()-1);
+
                         registerWrite(curInst.dest,staticStringCnt);
                         stringObjects.put(staticStringCnt++,resStr);
                         return;
@@ -446,7 +512,7 @@ public class IRinterpreter{
                         return;
                     }
                     case "toString":{
-                        long i=readSrc(curInst.args.get(0));
+                        int i=readSrc(curInst.args.get(0));
                         String resStr=String.valueOf(i);
                         registerWrite(curInst.dest,staticStringCnt);
                         stringObjects.put(staticStringCnt++,resStr);
@@ -470,16 +536,13 @@ public class IRinterpreter{
                     reg.value=readSrc(curInst.args.get(i));
                     reg.timestamp=cntInst;
                 }
-
                 Map<String,Register> bakRegisters=registers;
                 BasicBlock bakCurBB=curBB;
                 BasicBlock bakLastBB=lastBB;
                 Instruction bakCurInst=curInst;
                 Function bakCurFunc=curFunc;
                 registers=regs;
-
                 runFunction(func);
-
                 ret=false;
                 curFunc=bakCurFunc;
                 curInst=bakCurInst;
@@ -571,11 +634,11 @@ public class IRinterpreter{
                     if(regName==null){
                         throw new RuntimeError("this phi node has no value from incoming block `"+lastBB.name+"`");
                     }else{
-                        long value=regName.equals("undef")?(int) (Math.random()*Integer.MAX_VALUE):readSrc(regName);
+                        int value=regName.equals("undef")?(int) (Math.random()*Integer.MAX_VALUE):readSrc(regName);
                         tmpRegister.put(phi.dest,value);
                     }
                 }
-                for(Map.Entry<String,Long> e: tmpRegister.entrySet()){
+                for(Map.Entry<String,Integer> e: tmpRegister.entrySet()){
                     registerWrite(e.getKey(),e.getValue());
                 }
             }
@@ -620,7 +683,7 @@ public class IRinterpreter{
     }
 
 
-    public long getExitcode(){
+    public int getExitcode(){
         return exitcode;
     }
 
@@ -633,12 +696,18 @@ public class IRinterpreter{
         String dest;
         String op1;
         String op2;
-        long size;
-        long offset;
+        int size;
+        int offset;
         List<String> args;
         int lineno;
         String text;
     }
+
+
+    private void printInst(Instruction inst){
+        System.out.println(inst.text);
+    }
+
 
     private static class PhiNode extends Instruction{
         HashMap<String,String> paths=new HashMap<>();
@@ -662,6 +731,9 @@ public class IRinterpreter{
         List<PhiNode> phi=new ArrayList<>();
     }
 
+
+
+
     private static class Function{
         boolean hasReturnValue;
         String name;
@@ -671,7 +743,7 @@ public class IRinterpreter{
     }
 
     private static class Register{
-        long value;
+        int value;
         int timestamp;
     }
 

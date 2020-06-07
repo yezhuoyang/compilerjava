@@ -11,15 +11,31 @@ public class load extends IRinst {
     private operand src;
     private operand dst;
     private boolean isInsertedForGlobalVar;
+    private boolean loadtoPointer=false;
     private int size;
 
 
-    public load(int S,basicblock currentBB,operand src,operand dst){
+    public boolean isLoadtoPointer() {
+        return loadtoPointer;
+    }
+
+    public void setLoadtoPointer(boolean loadtoPointer) {
+        this.loadtoPointer = loadtoPointer;
+    }
+
+    public void setInsertedForGlobalVar(boolean insertedForGlobalVar) {
+        isInsertedForGlobalVar = insertedForGlobalVar;
+    }
+
+    public load(int S, basicblock currentBB, operand src, operand dst){
         super(currentBB);
         this.src=src;
         this.dst=dst;
         this.isInsertedForGlobalVar=false;
         this.size=S;
+        if(dst instanceof pointer){
+            loadtoPointer=true;
+        }
         updateUseRegs();
     }
 
@@ -32,6 +48,9 @@ public class load extends IRinst {
         this.src=src;
         this.dst=dst;
         this.isInsertedForGlobalVar=isInsertedForGlobalVar;
+        if(dst instanceof pointer){
+            loadtoPointer=true;
+        }
         this.size=S;
         updateUseRegs();
     }
@@ -106,7 +125,6 @@ public class load extends IRinst {
         if(dst instanceof virtualregister && !(dst instanceof globalvar))def.add((virtualregister)dst);
     }
 
-
     @Override
     public void replaceUse(virtualregister oldVR,virtualregister newVR){
         if(src instanceof virtualregister){
@@ -122,8 +140,15 @@ public class load extends IRinst {
     }
 
     @Override
-    public IRinst getFakeInstruction(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap){
-        return new load(size,fakeBBMap.getOrDefault(currentBB,currentBB),fakeRegMap.getOrDefault(src,src),fakeRegMap.getOrDefault(dst,dst));
+    public IRinst getFakeInstruction(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap) {
+        load result = new load(size, fakeBBMap.getOrDefault(currentBB, currentBB), fakeRegMap.getOrDefault(src, src), fakeRegMap.getOrDefault(dst, dst));
+        if(isInsertedForGlobalVar){
+            result.setInsertedForGlobalVar(true);
+        }
+        if(isLoadtoPointer()){
+            result.setLoadtoPointer(true);
+        }
+        return result;
     }
 
 }

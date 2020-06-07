@@ -16,6 +16,7 @@ public class builtinsymbolcollector{
     private final static basesymbol  boolsymbol=new basesymbol("bool");
     private final static basesymbol  voidsymbol=new basesymbol("void");
 
+
     public builtinsymbolcollector(programNode ast){
 
             _globalfield.defbasetype(intsymbol);
@@ -42,25 +43,25 @@ public class builtinsymbolcollector{
             _globalfield.setVoidsymbol(voidsymbol);
             _globalfield.setString(string);
 
-            _globalfield.deffunc(new funcsymbol("print",voidsymbol,null,_globalfield){{
+            _globalfield.deffunc(new funcsymbol("print",voidsymbol,null,_globalfield,true){{
                 defvar(new varsymbol("str",string,null));
             }});
 
-            _globalfield.deffunc(new funcsymbol("println",voidsymbol,null,_globalfield){{
+            _globalfield.deffunc(new funcsymbol("println",voidsymbol,null,_globalfield,true){{
                 defvar(new varsymbol("str",string,null));
             }});
 
-            _globalfield.deffunc(new funcsymbol("printInt",voidsymbol,null,_globalfield){{
+            _globalfield.deffunc(new funcsymbol("printInt",voidsymbol,null,_globalfield,true){{
                 defvar(new varsymbol("str",intsymbol,null));
             }});
 
-            _globalfield.deffunc(new funcsymbol("printlnInt",voidsymbol,null,_globalfield){{
+            _globalfield.deffunc(new funcsymbol("printlnInt",voidsymbol,null,_globalfield,true){{
                 defvar(new varsymbol("str",intsymbol,null));
             }});
 
 
-            _globalfield.deffunc(new funcsymbol("getString",string,null,_globalfield));
-            _globalfield.deffunc(new funcsymbol("getInt",intsymbol,null,_globalfield));
+            _globalfield.deffunc(new funcsymbol("getString",string,null,_globalfield,true));
+            _globalfield.deffunc(new funcsymbol("getInt",intsymbol,null,_globalfield,true));
             _globalfield.deffunc(new funcsymbol("toString",string,null,_globalfield){{
                          defvar(new varsymbol("i",intsymbol,null));
             }});

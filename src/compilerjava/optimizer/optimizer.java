@@ -12,7 +12,9 @@ public class optimizer {
     private CFGSimplifier cfgSimplifier;
     private DeadCodeEliminator deadCodeEliminator;
     private CommonSubexprElim commonSubexpressionEliminator;
-
+    private InstructionAdjust  instructionCombiner;
+    private InstructionAdjust instructionAdjustor;
+    private ConstantAndCopy constantAndCopy;
 
     public optimizer(IRroot irRoot) {
         _spillcalculator = new spillcalculator(irRoot);
@@ -21,8 +23,14 @@ public class optimizer {
         ssaDestructor = new SSAremove(irRoot);
         cfgSimplifier = new CFGSimplifier(irRoot);
         commonSubexpressionEliminator = new CommonSubexprElim(irRoot);
+        instructionCombiner=new InstructionAdjust(irRoot);
+        instructionAdjustor=new InstructionAdjust(irRoot);
+        constantAndCopy=new ConstantAndCopy(irRoot);
     }
 
+    public boolean runConstAndCopy(){
+        return constantAndCopy.run();
+    }
 
     public void SpillPriorityCalculation() {
         _spillcalculator.run();
@@ -54,14 +62,22 @@ public class optimizer {
     public boolean CommonSubexpressionElimination() {
         return commonSubexpressionEliminator.run();
     }
+
+    public void InstructionCombination() {
+        instructionCombiner.run();
+    }
+
+
+    public void InstructionAdujust() {
+        instructionAdjustor.run();
+    }
+
+
 /*
     public boolean ConstantAndCopyPropagation() {
         return constantAndCopyPropagator.run();
     }
 
-    public void InstructionCombination() {
-        instructionCombiner.run();
-    }
 
     public boolean CommonSubexpressionElimination() {
         return commonSubexpressionEliminator.run();

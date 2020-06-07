@@ -247,13 +247,13 @@ public class ASMgenerator implements IRvisitor{
                         out.print("xori"+'\t');
                     else
                         out.print("xor"+'\t');
+                    inst.getDst().accept(this);
+                    out.print(",");
                     inst.getSrc1().accept(this);
                     out.print(",");
                     inst.getSrc2().accept(this);
-                    out.print(",");
-                    inst.getDst().accept(this);
                     out.println();
-                    out.print("sltiu"+'\t');
+                    out.print(indent+"sltiu"+'\t');
                     inst.getDst().accept(this);
                     out.print(",");
                     inst.getDst().accept(this);
@@ -375,7 +375,7 @@ public class ASMgenerator implements IRvisitor{
             return;
         }
         // For global var, load means load the address
-        if(inst.getSrc() instanceof globalvar && inst.getDst() instanceof pointer){
+        if(inst.getSrc() instanceof globalvar && inst.isLoadtoPointer()){
             op="lui";
             out.print(indent+op+"\t");
             inst.getDst().accept(this);
@@ -498,19 +498,13 @@ public class ASMgenerator implements IRvisitor{
             out.print(getName(stor));
             return;
         }else if(stor instanceof memory){
-            if(((memory)stor).getOffset().getImmediate()!=0){
                 visit(((memory)stor).getOffset());
-                if(((memory)stor).getBase()!=null){
-                    out.print("(");
-                    visit(((memory)stor).getBase());
-                    out.print(')');
-                }
-            }
-            else if(((memory)stor).getBase()!=null){
+                out.print("(");
                 visit(((memory)stor).getBase());
-            }
+                out.print(')');
+                return;
         }
-       out.print("FUCK!");
+        out.print("FUCK!");
     }
 
 

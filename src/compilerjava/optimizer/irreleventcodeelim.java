@@ -14,7 +14,7 @@ public class irreleventcodeelim implements ASTvisitor {
     private Set<varsymbol> outputRelevantSymbols = new HashSet<>();
     private Stack<Boolean> isAssign = new Stack<>();
 
-    private boolean DEBUG = false;
+    private boolean DEBUG = true;
     private boolean collectMode;
     private boolean solveMode;
     private boolean cleanMode;
@@ -82,6 +82,16 @@ public class irreleventcodeelim implements ASTvisitor {
             debugln("Output Relevant Symbols");
             outputRelevantSymbols.forEach(varsymbol -> debug(varsymbol.getWord() + " "));
             debugln("\n");
+
+            debugln("Before elimination");
+            debugMode = true;
+            solveMode=false;
+            node.getDeclNodeList().forEach(x -> {
+                if (x instanceof funcdeclNode) x.accept(this);
+            });
+            solveMode=true;
+            debugMode = false;
+
         }
         solveMode = false;
         cleanMode = true;
@@ -90,6 +100,8 @@ public class irreleventcodeelim implements ASTvisitor {
         });
         cleanMode = false;
         if (DEBUG) {
+
+            debugln("After elimination");
             debugMode = true;
             node.getDeclNodeList().forEach(x -> {
                 if (x instanceof funcdeclNode) x.accept(this);
@@ -125,15 +137,20 @@ public class irreleventcodeelim implements ASTvisitor {
         }
     }
 
+
     @Override
     public void visit(funcdeclNode node) {
         if (collectMode) {
             isAssign.push(false);
+            node.getParameterList().forEach(x -> {
+                if (x.gettpNode() instanceof arraytpNode)
+                   outputRelevantSymbols.add(x.getvarsymbol());
+            });
             node.getBlock().accept(this);
             isAssign.pop();
-        } else if (solveMode) {
+        } else if (solveMode){
             node.getBlock().accept(this);
-        } else if (cleanMode) {
+        } else if (cleanMode){
             instructionElimination(node.getBlock().getStmtList());
         } else if (debugMode) {
             debugln("funcdeclNode : " + node.getID());
@@ -709,7 +726,7 @@ public class irreleventcodeelim implements ASTvisitor {
     }
 
     private void propagate(Node parent, List<? extends Node> children) {
-        if (!irrelevant(parent)) {
+        if(!irrelevant(parent)){
             children.forEach(child -> {
                 if (child != null)
                     outputRelevantSymbols.addAll(uses.get(child));

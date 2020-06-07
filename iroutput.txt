@@ -1,0 +1,149 @@
+@MAXN_1
+@MAXM_1
+
+define i64 @__init  {
+__init_entry_1:
+   %MAXM_2 = load @MAXM_1
+   %MAXN_2 = load @MAXN_1
+   %MAXM_3 = load @MAXM_1
+   %MAXN_3 = load @MAXN_1
+   %MAXN_4 = move 10005
+   %MAXM_4 = move 10005
+   %t_1 = load @MAXN_1
+   store %MAXN_4 %t_1
+   %t_2 = load @MAXN_1
+   %t_3 = move 0
+   %t_4 = move 0
+   %t_5 = call getInt 
+   %t_6 = move %t_5
+   %t_7 = call getInt 
+   %t_8 = move %t_7
+   %t_9 = mul %t_2 4
+   %t_10 = add %t_9 4
+   %t_11 = alloc %t_10
+   store %t_2 %t_11
+   %t_12 = move %t_11
+   %t_13 = move %t_9
+   %t_14 = add %t_13 4
+   %t_15 = alloc %t_14
+   store %t_2 %t_15
+   %t_16 = move %t_15
+   %t_17 = move %t_9
+   %t_18 = add %t_17 4
+   %t_19 = alloc %t_18
+   store %t_2 %t_19
+   %t_20 = move %t_19
+   %t_21 = move 0
+   %t_22 = move 0
+   %t_23 = move 0
+   %t_24 = move %t_23
+   %t_25 = move %t_24
+   jump __init_faker_main_for_cond_1
+__init_faker_main_for_cond_1:
+   %t_26 = slt %t_24 %t_8
+   br %t_26 __init_faker_main_for_body_1 __init_faker_main_for_merge_1
+__init_faker_main_for_merge_1:
+   %t_27 = move 0
+   %t_28 = move %t_22
+   %t_29 = move %t_27
+   %t_30 = move %t_28
+   %t_28 = move %t_28
+   %t_30 = move %t_29
+   jump __init_faker_main_for_cond_2
+__init_faker_main_for_cond_2:
+   %t_31 = slt %t_29 %t_8
+   br %t_31 __init_faker_main_for_body_2 __init_splitter_1
+__init_splitter_1:
+   %t_32 = mul %t_6 4
+   %t_33 = add %t_32 4
+   %t_34 = add %t_20 %t_33
+   %t_35 = load %t_34
+   %t_36 = call toString %t_35 
+   call print %t_36 
+   %t_37 = move 0
+   %t_38 = move %t_37
+   %t_39 = move %t_38
+   ret %t_39
+__init_faker_main_for_body_2:
+   %t_40 = mul %t_29 4
+   %t_41 = add %t_40 4
+   %t_42 = add %t_16 %t_41
+   %t_43 = load %t_42
+   %t_44 = move %t_43
+   %t_45 = move %t_44
+   %t_46 = move %t_45
+   jump __init_faker_main_for_cond_3
+__init_faker_main_for_cond_3:
+   %t_47 = sle %t_45 %t_6
+   br %t_47 __init_faker_main_for_body_3 __init_faker_main_for_step_1
+__init_faker_main_for_step_1:
+   %t_48 = add %t_29 1
+   %t_28 = move %t_45
+   %t_29 = move %t_48
+   %t_49 = move %t_28
+   %t_28 = move %t_28
+   %t_49 = move %t_29
+   jump __init_faker_main_for_cond_2
+__init_faker_main_for_body_3:
+   %t_50 = mul %t_45 4
+   %t_51 = add %t_50 4
+   %t_52 = add %t_20 %t_51
+   %t_53 = mul %t_29 4
+   %t_54 = add %t_53 4
+   %t_55 = add %t_16 %t_54
+   %t_56 = load %t_55
+   %t_57 = sub %t_45 %t_56
+   %t_58 = mul %t_57 4
+   %t_59 = add %t_58 4
+   %t_60 = add %t_20 %t_59
+   %t_61 = move %t_53
+   %t_62 = add %t_61 4
+   %t_63 = add %t_12 %t_62
+   %t_64 = load %t_60
+   %t_65 = load %t_63
+   %t_66 = add %t_64 %t_65
+   %t_67 = load %t_52
+   %t_68 = sle %t_67 %t_66
+   br %t_68 __init_faker_main_if_then_1 __init_faker_main_for_step_2
+__init_faker_main_if_then_1:
+   %t_69 = move %t_50
+   %t_70 = add %t_69 4
+   %t_71 = add %t_20 %t_70
+   %t_72 = move %t_53
+   %t_73 = add %t_72 4
+   %t_74 = add %t_16 %t_73
+   %t_75 = load %t_74
+   %t_76 = sub %t_45 %t_75
+   %t_77 = mul %t_76 4
+   %t_78 = add %t_77 4
+   %t_79 = add %t_20 %t_78
+   %t_80 = move %t_53
+   %t_81 = add %t_80 4
+   %t_82 = add %t_12 %t_81
+   %t_83 = load %t_79
+   %t_84 = load %t_82
+   %t_85 = add %t_83 %t_84
+   store %t_85 %t_71
+   jump __init_faker_main_for_step_2
+__init_faker_main_for_step_2:
+   %t_86 = add %t_45 1
+   %t_45 = move %t_86
+   %t_87 = move %t_45
+   jump __init_faker_main_for_cond_3
+__init_faker_main_for_body_1:
+   %t_88 = mul %t_24 4
+   %t_89 = add %t_88 4
+   %t_90 = add %t_12 %t_89
+   %t_91 = call getInt 
+   store %t_91 %t_90
+   %t_92 = move %t_88
+   %t_93 = add %t_92 4
+   %t_94 = add %t_16 %t_93
+   %t_95 = call getInt 
+   store %t_95 %t_94
+   %t_96 = add %t_24 1
+   %t_24 = move %t_96
+   %t_97 = move %t_24
+   jump __init_faker_main_for_cond_1
+}
+

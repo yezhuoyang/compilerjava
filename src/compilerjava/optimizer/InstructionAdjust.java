@@ -274,7 +274,7 @@ public class InstructionAdjust extends pass{
     private void  adjustStore(function func){
         func.getReversePostOrderDFSBBList().forEach(BB->{
             for(IRinst irinst=BB.head;irinst!=null;irinst=irinst.getNextInstruction()) {
-                if (irinst instanceof store) {
+                if(irinst instanceof store){
                     if (((store) irinst).getSrc() instanceof immediate) {
                         virtualregister newSrc=new I64Value(((store) irinst).getSrc().getSize());
                         irinst.prependInstruction(new move(BB,((store) irinst).getSrc(),newSrc));

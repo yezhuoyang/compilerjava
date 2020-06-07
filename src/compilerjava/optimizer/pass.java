@@ -70,7 +70,7 @@ public abstract class pass {
         List<basicblock> RPO = function.getReversePostOrderDFSBBList();
         List<basicblock> basicblockList = RPO.subList(1, RPO.size());
         basicblockList.forEach(basicblock -> basicblock.IDOM = null);
-        function.getExitBB().IDOM = function.getEntryBB();
+        function.getEntryBB().IDOM = function.getEntryBB();
         boolean changed = true;
         while (changed) {
             changed = false;
@@ -111,7 +111,7 @@ public abstract class pass {
     void computeDominanceFrontier(function function) {
         List<basicblock> basicblockList = function.getReversePostOrderDFSBBList();
         basicblockList.forEach(basicblock -> basicblock.DF = new HashSet<>());
-        for (basicblock basicblock : basicblockList) {
+        for(basicblock basicblock : basicblockList){
             if (basicblock.getPredecessors().size() >= 2) {
                 for (basicblock predecessor : basicblock.getPredecessors()) {
                     basicblock runner = predecessor;
@@ -134,14 +134,16 @@ public abstract class pass {
         basicblockList.remove(function.getExitBB());
         function.getExitBB().postIDOM = function.getExitBB();
         boolean changed = true;
+        System.out.println("Start function: "+function.getName());
         while (changed) {
             changed = false;
             for (basicblock basicblock : basicblockList) {
+                System.out.println(basicblock.getName());
                 basicblock newPostIDOM = null;
                 for (basicblock successor : basicblock.getSuccessors()) {
                     if (successor.postIDOM != null) newPostIDOM = successor;
                 }
-                for (basicblock successor : basicblock.getSuccessors()) {
+                for(basicblock successor : basicblock.getSuccessors()){
                     if (successor != newPostIDOM && successor.postIDOM != null)
                         newPostIDOM = intersectPost(successor, newPostIDOM);
                 }
@@ -149,6 +151,7 @@ public abstract class pass {
                     basicblock.postIDOM = newPostIDOM;
                     changed = true;
                 }
+                System.out.println(basicblock.getName()+"Done");
             }
         }
         function.getReversePostOrderDFSBBList().forEach(basicblock -> basicblock.RDFSuccessors = new HashSet<>());
@@ -160,8 +163,12 @@ public abstract class pass {
         basicblock finger1 = basicblock1;
         basicblock finger2 = basicblock2;
         while (finger1 != finger2) {
-            while (finger1.reversePostOrderNumber < finger2.reversePostOrderNumber) finger1 = finger1.postIDOM;
-            while (finger2.reversePostOrderNumber < finger1.reversePostOrderNumber) finger2 = finger2.postIDOM;
+            while (finger1.reversePostOrderNumber < finger2.reversePostOrderNumber) {
+                finger1 = finger1.postIDOM;
+            }
+            while (finger2.reversePostOrderNumber < finger1.reversePostOrderNumber) {
+                finger2 = finger2.postIDOM;
+            }
         }
         return finger1;
     }

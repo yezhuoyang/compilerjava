@@ -23,7 +23,7 @@ public class elimsideeffect implements ASTvisitor {
             if (declNode instanceof funcdeclNode) {
                 currentfuncsymbol = ((funcdeclNode) declNode).getfuncsymbol();
                 calleeMap.put(currentfuncsymbol, new HashSet<>());
-                for (vardeclNode vardeclNode : ((funcdeclNode) declNode).getParameterList()) {
+                for(vardeclNode vardeclNode : ((funcdeclNode) declNode).getParameterList()) {
                     varsymbol varsymbol = vardeclNode.getvarsymbol();
                     if (!(varsymbol.gettype() instanceof basesymbol)
                             || (varsymbol.gettype() instanceof classsymbol && varsymbol.gettype() != _globalfield.getString())) {
@@ -32,11 +32,10 @@ public class elimsideeffect implements ASTvisitor {
                     }
                 }
                 isAssign.push(false);
-                if (!currentfuncsymbol.hasSideEffect) declNode.accept(this);
+                if(!currentfuncsymbol.hasSideEffect) declNode.accept(this);
                 isAssign.pop();
             }
         });
-
         boolean changed = true;
         for (; changed; ) {
             changed = false;
@@ -51,7 +50,7 @@ public class elimsideeffect implements ASTvisitor {
                 }
             }
         }
-        if (DEBUG) {
+        if (DEBUG){
             node.getDeclNodeList().forEach(declNode -> {
                 if (declNode instanceof funcdeclNode) {
                     System.err.println(((funcdeclNode) declNode).getID() + " " + ((funcdeclNode) declNode).getfuncsymbol().hasSideEffect);
@@ -223,7 +222,7 @@ public class elimsideeffect implements ASTvisitor {
 
     @Override
     public void visit(IDexprNode node) {
-        if (isAssign.peek()) {
+            if (isAssign.peek()) {
             if (node.getsymbol() instanceof varsymbol) {
                 if (node.getsymbol().getfield() == _globalfield) {
                     currentfuncsymbol.hasSideEffect = true;

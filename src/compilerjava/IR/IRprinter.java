@@ -45,11 +45,17 @@ public class IRprinter implements IRvisitor{
         this.printDefUse=printDefUse;
     }
 
+
+
     @Override
     public void visit(IRroot irroot){
         irroot.getGlobalvarList().forEach(globalvar -> out.println("@"+getName((storage)globalvar)));
-        irroot.getStaticStringList().forEach(staticstring -> out.println("@"+getName(staticstring.getBase())+" = \""+StringEscapeUtils.escapeJava(staticstring.getVal()+"\"")));
+        irroot.getStaticStringList().forEach(staticstring -> {
+            out.println("@"+getName(staticstring.getBase())+" = " +staticstring.getVal());
+        });
         if(!irroot.getGlobalvarList().isEmpty()||!irroot.getStaticStringList().isEmpty())out.println();
+
+
         for(Map.Entry<String,function>entry:irroot.getFunctionMap().entrySet())entry.getValue().accept(this);
     }
 
@@ -308,7 +314,7 @@ public class IRprinter implements IRvisitor{
         inst.getDst().accept(this);
         out.print(" =phi ");
         inst.getPaths().forEach((BB,op)->{
-            out.print(getLabel(BB)+" ");
+            out.print(getLabel(BB)+": ");
             if(op!=null){
                 op.accept(this);
             }else{

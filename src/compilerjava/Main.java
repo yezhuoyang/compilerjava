@@ -11,14 +11,13 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+
 import compilerjava.optimizer.*;
 
 
 import java.io.*;
 
-
 public class Main{
-
 
     private static programNode buildAST(InputStream in)throws Exception{
         MXLexer lexer = new MXLexer(CharStreams.fromStream(in));
@@ -31,7 +30,6 @@ public class Main{
         ASTbuilder ASTbuilder=new ASTbuilder();
         return (programNode)ASTbuilder.visit(tree);
     }
-
 
     public static void main(String... args)throws Exception{
         InputStream in = new FileInputStream("code.txt");
@@ -48,28 +46,58 @@ public class Main{
             new semanticchecker(_globalfield).visit(ast);
 
             new trivialboolExtractor().visit(ast);
-            //new elimsideeffect(_globalfield).visit(ast);
-            //new irreleventcodeelim(_globalfield).visit(ast);
-
+            new elimsideeffect(_globalfield).visit(ast);
+            new irreleventcodeelim(_globalfield).visit(ast);
 
             IRcreator ircreator=new IRcreator(_globalfield);
             ircreator.visit(ast);
             IRroot irroot=ircreator.getIrRoot();
 
+            new globalvarresolver(irroot).run();
 
-            globalvarresolver _globalvarresolver=new globalvarresolver(irroot);
-            _globalvarresolver.run();
+            new inliner(irroot).run();
+            new globalvarresolver(irroot).run();
+            optimizer optim=new optimizer(irroot);
+            //optim.DeadCodeElimination();
 
 
+            optim.CFGSimplification();
+            optim.SSAConstruction();
+            int round=0;
+            for (boolean changed = true; changed; ) {
+                changed=optim.CommonSubexpressionElimination();
+                changed|=optim.CFGSimplification();
+                //changed|=optim.DeadCodeElimination();
+                //changed|=optim.CFGSimplification();
+            }
+            optim.SSADestruction();
+            optim.CFGSimplification(true);
+
+/*
+            PrintStream out2 = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/iroutput.txt");
+
+            IRprinter irprinter=new IRprinter(out2);
+            irprinter.visit(irroot);
+
+            DataInputStream code_in =new DataInputStream(new FileInputStream("/Users/yezhuoyang/Desktop/share/compilerjava/iroutput.txt"));
+
+            DataInputStream data_in =new DataInputStream(new FileInputStream("/Users/yezhuoyang/Desktop/share/compilerjava/test.in"));
+
+            PrintStream out3 = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/test.out");
+
+            IRinterpreter IRint=new IRinterpreter(code_in,false,data_in,out3);
+            IRint.run();
+
+ */
+            optim.InstructionAdujust();
+            //optim.SSADestruction();
+
+
+            //optim.InstructionCombination();
 
 
             callingConvention adjustToEmmit=new callingConvention(irroot);
             adjustToEmmit.run();
-
-
-            InstructionAdjust _instructionAdjust=new InstructionAdjust(irroot);
-            _instructionAdjust.run();
-
 
 
             new regAllocator(irroot).run();
@@ -79,21 +107,15 @@ public class Main{
             ASMgenerator codegen=new ASMgenerator(irroot,out);
             codegen.run();
 
-
             /*
             IRroot irroot=ircreator.getIrRoot();
             new riscvconstraintResolver(irroot).run();
-
             new regAllocator(irroot).run();
-
             IRprinter irprinter=new IRprinter(out,true);
             irprinter.visit(irroot);
-
-
             PrintStream out2 = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/src/compilerjava/outcode.txt");
             new riscvcodeEmitter(irroot,out2).run();
             */
-
             /*
             IRprinter irprinter=new IRprinter(out);
             irprinter.visit(irroot);
@@ -115,10 +137,10 @@ public class Main{
             IRprinter irprinter=new IRprinter(out,true);
             irprinter.visit(irroot);
             */
+
+
             //PrintStream out2 = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/src/compilerjava/outcode.txt");
             //new X86CodeEmitter(irroot,out2).run();
-
-
         }catch (Exception e){
             e.printStackTrace();
             System.err.println(e.getMessage());

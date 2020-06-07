@@ -17,7 +17,7 @@ class CommonSubexprElim extends pass {
     public CommonSubexprElim(IRroot Irroot) {
         super(Irroot);
     }
-
+    
     @Override
     boolean run() {
         changed = false;
@@ -35,15 +35,15 @@ class CommonSubexprElim extends pass {
 
     private void commonSubexpressionElimination(basicblock basicblock) {
         visit.add(basicblock);
-        for (IRinst IRinst = basicblock.head; IRinst != null; IRinst = IRinst.getNextInstruction())
-            if (IRinst instanceof binary) {
+        for(IRinst IRinst = basicblock.head; IRinst != null; IRinst = IRinst.getNextInstruction())
+            if(IRinst instanceof binary){
                 binarycmpHash binarycmpHash = new binarycmpHash((binary) IRinst);
                 operand dst = binaryHashMap.get(binarycmpHash);
-                if (dst != null) {
+                if(dst != null){
                     changed = true;
                     ((binary) IRinst).previousResult = dst;
                     IRinst.replaceInstruction(new move(basicblock, dst, ((binary) IRinst).getDst()));
-                } else {
+                }else{
                     ((binary) IRinst).previousResult = null;
                     binaryHashMap.put(binarycmpHash, ((binary) IRinst).getDst());
                     if (((binary) IRinst).isCommutative()) {
@@ -51,8 +51,8 @@ class CommonSubexprElim extends pass {
                         binaryHashMap.put(binarycmpHashComm, ((binary) IRinst).getDst());
                     }
                 }
-            } else if (IRinst instanceof cmp) {
-                binarycmpHash binarycmpHash = new binarycmpHash((cmp) IRinst);
+            }else if(IRinst instanceof cmp){
+                binarycmpHash binarycmpHash=new binarycmpHash((cmp) IRinst);
                 operand dst = binaryHashMap.get(binarycmpHash);
                 if (dst != null) {
                     changed = true;

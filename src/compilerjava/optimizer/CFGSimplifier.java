@@ -39,7 +39,7 @@ public class CFGSimplifier extends pass {
         });
         return changed;
     }
-    
+
     private void convertClearbranch(function function) {
         function.getReversePostOrderDFSBBList().forEach(basicblock -> {
             if (basicblock.tail instanceof branch) {
@@ -96,7 +96,7 @@ public class CFGSimplifier extends pass {
     private void eliminateSinglebranchBB(function function) {
         function.getReversePostOrderDFSBBList().forEach(basicblock -> {
             if (basicblock != function.getEntryBB()) {
-                if (basicblock.head == basicblock.tail && basicblock.head instanceof jump) {
+                if(basicblock.head == basicblock.tail && basicblock.head instanceof jump) {
                     changed = true;
                     basicblock targetBB = ((jump) basicblock.head).getDestBB();
                     targetBB.getPredecessors().remove(basicblock);
