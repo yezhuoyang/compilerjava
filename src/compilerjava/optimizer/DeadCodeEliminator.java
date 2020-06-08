@@ -21,7 +21,6 @@ class DeadCodeEliminator extends pass {
     boolean run() {
         changed = false;
         Irroot.getFunctionMap().values().forEach(function -> {
-            System.out.println(function.getName());
             calcDefUseChain(function);
             computePostDominateTree(function);
             computeReverseDominantFrontier(function);
@@ -76,9 +75,9 @@ class DeadCodeEliminator extends pass {
     }
 
 
-    private void sweep(function function) {
+    private void sweep(function function){
         function.getReversePostOrderDFSBBList().forEach(basicblock -> {
-            for (IRinst IRinst = basicblock.head; IRinst != null; IRinst = IRinst.getNextInstruction()) {
+            for(IRinst IRinst = basicblock.head; IRinst != null; IRinst = IRinst.getNextInstruction()) {
                 if (!markSet.contains(IRinst)) {
                     if (IRinst instanceof branch) {
                         changed = true;
@@ -92,6 +91,7 @@ class DeadCodeEliminator extends pass {
             }
         });
     }
+
 
 
 }

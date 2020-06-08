@@ -46,7 +46,6 @@ public class IRprinter implements IRvisitor{
     }
 
 
-
     @Override
     public void visit(IRroot irroot){
         irroot.getGlobalvarList().forEach(globalvar -> out.println("@"+getName((storage)globalvar)));
@@ -54,8 +53,6 @@ public class IRprinter implements IRvisitor{
             out.println("@"+getName(staticstring.getBase())+" = " +staticstring.getVal());
         });
         if(!irroot.getGlobalvarList().isEmpty()||!irroot.getStaticStringList().isEmpty())out.println();
-
-
         for(Map.Entry<String,function>entry:irroot.getFunctionMap().entrySet())entry.getValue().accept(this);
     }
 
@@ -394,5 +391,30 @@ public class IRprinter implements IRvisitor{
         return name!=null? name:createLabel(BB,BB.getName());
     }
 
+
+    public void printAllBlock(IRroot irroot){
+        irroot.getFunctionMap().values().forEach(function -> {
+            System.out.println("=============================Now print  "+function.getName()+":======================");
+            printBlockstructure(function);
+            System.out.println("===================================Print done!=======================================");
+        });
+    }
+
+
+    public void printBlockstructure(function function){
+        function.getReversePostOrderDFSBBList().forEach(basicblock -> {
+            System.out.println("---------------------------"+getLabel(basicblock)+":"+"----------------------------");
+            System.out.print("Predecessor"+":     ");
+            basicblock.getPredecessors().forEach(predecessor->{
+                System.out.print(getLabel(predecessor)+",   ");
+            });
+            System.out.println(" ");
+            System.out.print("Sucessors"+":     ");
+            basicblock.getSuccessors().forEach(sucessor->{
+                System.out.print(getLabel(sucessor)+",   ");
+            });
+            System.out.println(" ");
+        });
+    }
 
 }

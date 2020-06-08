@@ -62,7 +62,6 @@ public class function {
         return stac;
     }
 
-
     public function(String name,String builtinname){
         this.name=name;
         this.builtinFunctionName=builtinname;
@@ -185,8 +184,8 @@ public class function {
         visit=new HashSet<>();
         reverseCFGPostOrderDFSBBList=new LinkedList<>();
         reverseCFGPostOrderDFS(exitBB);
-        for(int i=0;i<reversePostOrderDFSBBList.size();i++){
-            reversePostOrderDFSBBList.get(i).reversePostOrderNumber=i;
+        for(int i=0;i<reverseCFGPostOrderDFSBBList.size();i++){
+            reverseCFGPostOrderDFSBBList.get(i).reversePostOrderNumber=i;
         }
     }
 
@@ -201,8 +200,6 @@ public class function {
     public boolean reachable(basicblock BB){
         return visit.contains(BB);
     }
-
-
 
     public void updateCalleeSet(){
         calleeset.clear();

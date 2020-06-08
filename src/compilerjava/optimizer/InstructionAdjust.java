@@ -275,16 +275,28 @@ public class InstructionAdjust extends pass{
         func.getReversePostOrderDFSBBList().forEach(BB->{
             for(IRinst irinst=BB.head;irinst!=null;irinst=irinst.getNextInstruction()) {
                 if(irinst instanceof store){
+                    boolean isForglobal=((store) irinst).isInsertedForglobalvar();
                     if (((store) irinst).getSrc() instanceof immediate) {
                         virtualregister newSrc=new I64Value(((store) irinst).getSrc().getSize());
                         irinst.prependInstruction(new move(BB,((store) irinst).getSrc(),newSrc));
-                        irinst.replaceInstruction(new store(((store) irinst).getSrc().getSize(),BB,newSrc,((store) irinst).getDst()));
+                        store newinst=new store(((store) irinst).getSrc().getSize(),BB,newSrc,((store) irinst).getDst());
+                        if(isForglobal){
+                            ((store)newinst).setStoreforglobal(((store) irinst).getStoreforglobal());
+                            ((store)newinst).setInsertedForglobalvar(true);
+                        }
+                        irinst.replaceInstruction(newinst);
                     }
-                    else if(((store) irinst).getSrc() instanceof globalvar){
+                    else if(((store) irinst).getSrc() instanceof global64Value && !((global64Value) ((store)irinst).getSrc()).isString()){
+                        virtualregister newSrc=new I64Value(((store) irinst).getSrc().getSize());
+                        irinst.prependInstruction(new load(((store) irinst).getSrc().getSize(),BB,((store) irinst).getSrc(),newSrc,true));
+                        irinst.replaceInstruction(new store(((store) irinst).getSrc().getSize(),BB,newSrc,((store) irinst).getDst(),true,(global64Value) ((store) irinst).getSrc()));
+                    }
+                    else if(((store) irinst).getSrc() instanceof global64Value && ((global64Value) ((store)irinst).getSrc()).isString()){
                         virtualregister newSrc=new I64Value(((store) irinst).getSrc().getSize());
                         irinst.prependInstruction(new load(((store) irinst).getSrc().getSize(),BB,((store) irinst).getSrc(),newSrc));
                         irinst.replaceInstruction(new store(((store) irinst).getSrc().getSize(),BB,newSrc,((store) irinst).getDst()));
                     }
+
                 }
             }
         });

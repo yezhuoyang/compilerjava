@@ -28,6 +28,8 @@ public class optimizer {
         constantAndCopy=new ConstantAndCopy(irRoot);
     }
 
+
+
     public boolean runConstAndCopy(){
         return constantAndCopy.run();
     }

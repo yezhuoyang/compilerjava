@@ -351,7 +351,7 @@ public class ASMgenerator implements IRvisitor{
     @Override
     public void visit(load inst){
         String op="";
-        switch (((load)inst).getSize()){
+        switch (((load)inst).getSize()) {
             case 1:
                 op = "lb";
                 break;
@@ -362,7 +362,7 @@ public class ASMgenerator implements IRvisitor{
                 op = "lw";
                 break;
             default:
-                op="FFF";
+                op = "FFF";
                 break;
         }
         if(inst.getSrc() instanceof globalvar &&((global64Value)inst.getSrc()).isString()){
@@ -533,7 +533,7 @@ public class ASMgenerator implements IRvisitor{
             name=name!=null? name : createName(stor,stor.getName()==null ? "str" :stor.getName());
             return name;
         }
-        return "FUCK!";
+        return "FUCKStorage!";
     }
 
 

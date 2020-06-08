@@ -28,7 +28,6 @@ public class IRroot {
     public function builtinStringNEQ=new function("string_neq","_builtin_string_inequal");
 
 
-
     private Map<String,function> functionMap=new LinkedHashMap<>();
     private List<staticstring>  staticStringList=new ArrayList<>();
     private List<globalvar> globalvarList=new ArrayList<>();
@@ -79,9 +78,10 @@ public class IRroot {
         functionMap.remove(func.getName());
     }
 
+
     public void addstaticstring(staticstring staticString){
         staticStringList.add(staticString);
-        staticstringvalMap.put((globalvar)staticString.getBase(),staticString.getVal());
+        staticstringvalMap.put((globalvar)staticString.getBase(),staticString.getString());
     }
 
     public void addglobalvar(globalvar gbvar){

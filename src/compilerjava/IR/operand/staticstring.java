@@ -12,6 +12,12 @@ public class staticstring extends staticdata{
         this.val=val;
     }
 
+    public String getString(){
+        String tmp=val.replace("\0", "");
+        return tmp;
+    }
+
+
     public String getVal(){
         String tmp=val.replace("\\", "\\\\");
         tmp=tmp.replace("\n","\\n");

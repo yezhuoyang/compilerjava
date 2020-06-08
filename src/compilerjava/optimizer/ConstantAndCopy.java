@@ -32,7 +32,7 @@ class ConstantAndCopy extends pass {
         while(!workList.isEmpty()){
             IRinst S = workList.poll();
             inQueue.remove(S);
-            if(S instanceof phi) {
+            if(S instanceof phi){
                 operand val = ((phi) S).getPaths().values().iterator().next();
                 if(val instanceof immediate) {
                     int c = ((immediate) val).getImmediate();
@@ -130,7 +130,7 @@ class ConstantAndCopy extends pass {
                     workList.add(newmove);
                     inQueue.add(newmove);
                 }
-            } else if (S instanceof cmp) {
+            } else if (S instanceof cmp){
                 cmp inst = (cmp) S;
                 if (inst.getSrc1() instanceof immediate && inst.getSrc2() instanceof immediate) {
                     changed = true;
@@ -160,7 +160,7 @@ class ConstantAndCopy extends pass {
                     workList.add(newmove);
                     inQueue.add(newmove);
                 }
-            } else if (S instanceof call) {
+            } else if (S instanceof call){
                 function callee = ((call) S).getCallee();
                 if (!Irroot.stringConstantfunctions.contains(callee)) continue;
                 boolean check0 = ((call) S).getObjectPointer() instanceof global64Value;
@@ -169,11 +169,15 @@ class ConstantAndCopy extends pass {
                 global64Value _this = check0 ? (global64Value) ((call) S).getObjectPointer() : null;
                 global64Value lhs = check1 ? (global64Value) ((call) S).getParameterList().get(0) : null;
                 global64Value rhs = check2 ? (global64Value) ((call) S).getParameterList().get(1) : null;
+
+
+
                 if (callee == Irroot.builtinStringAdd) {
                     if (check1 && check2) {
                         changed = true;
                         String res = Irroot.staticstringvalMap.get(lhs) + Irroot.staticstringvalMap.get(rhs);
-                        staticstring staticstring = new staticstring(new global64Value("__str_const", true,config.pointersize()), res);
+                        staticstring staticstring = new staticstring(new global64Value("_str_const", true,config.pointersize()), res);
+                        ((global64Value)staticstring.getBase()).setReferencedstring(staticstring);
                         Irroot.addstaticstring(staticstring);
                         S.replaceInstruction(new move(S.getCurrentBB(), staticstring.getBase(), ((call) S).getResult()));
                     }
@@ -217,7 +221,8 @@ class ConstantAndCopy extends pass {
                     if (((call) S).getParameterList().get(0) instanceof immediate) {
                         changed = true;
                         int res = ((immediate) ((call) S).getParameterList().get(0)).getImmediate();
-                        staticstring staticstring = new staticstring(new global64Value("__str_const", true,config.pointersize()), String.valueOf(res));
+                        staticstring staticstring = new staticstring(new global64Value("_str_const", true,config.pointersize()), String.valueOf(res));
+                        ((global64Value)staticstring.getBase()).setReferencedstring(staticstring);
                         Irroot.addstaticstring(staticstring);
                         S.replaceInstruction(new move(S.getCurrentBB(), staticstring.getBase(), ((call) S).getResult()));
                     }
@@ -232,9 +237,10 @@ class ConstantAndCopy extends pass {
                         if (((call) S).getParameterList().get(0) instanceof immediate && ((call) S).getParameterList().get(1) instanceof immediate) {
                             changed = true;
                             int left = ((immediate) ((call) S).getParameterList().get(0)).getImmediate();
-                            int right = ((immediate) ((call) S).getParameterList().get(1)).getImmediate() + 1;
+                            int right = ((immediate) ((call) S).getParameterList().get(1)).getImmediate();
                             String res = Irroot.staticstringvalMap.get(_this).substring(left, right);
-                            staticstring staticstring = new staticstring(new global64Value("__str__const", true,config.pointersize()), res);
+                            staticstring staticstring = new staticstring(new global64Value("_str__const", true,config.pointersize()), res);
+                            ((global64Value)staticstring.getBase()).setReferencedstring(staticstring);
                             Irroot.addstaticstring(staticstring);
                             S.replaceInstruction(new move(S.getCurrentBB(), staticstring.getBase(), ((call) S).getResult()));
                         }

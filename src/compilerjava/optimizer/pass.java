@@ -29,7 +29,7 @@ public abstract class pass {
 
     abstract boolean run();
 
-    void calcDefUseChain(function function) {
+    void calcDefUseChain(function function){
         def = new HashMap<>();
         use = new HashMap<>();
         function.getReversePostOrderDFSBBList().forEach(basicblock -> {
@@ -46,6 +46,7 @@ public abstract class pass {
             }
         });
     }
+
 
     LinkedList<IRinst> getAllStatements(function function) {
         allStatements = new LinkedList<>();
@@ -66,7 +67,7 @@ public abstract class pass {
         basicblock.DTSuccessors.forEach(successor -> basicblock.DTAllSuccessors.addAll(successor.DTAllSuccessors));
     }
 
-    void computeDominateTree(function function) {
+    void computeDominateTree(function function){
         List<basicblock> RPO = function.getReversePostOrderDFSBBList();
         List<basicblock> basicblockList = RPO.subList(1, RPO.size());
         basicblockList.forEach(basicblock -> basicblock.IDOM = null);
@@ -94,8 +95,7 @@ public abstract class pass {
         computeDominateTreeAllSuccessors(function.getEntryBB());
     }
 
-
-    private basicblock intersect(basicblock basicblock1, basicblock basicblock2) {
+    private basicblock intersect(basicblock basicblock1, basicblock basicblock2){
         basicblock finger1 = basicblock1;
         basicblock finger2 = basicblock2;
         while (finger1 != finger2) {
@@ -115,7 +115,7 @@ public abstract class pass {
             if (basicblock.getPredecessors().size() >= 2) {
                 for (basicblock predecessor : basicblock.getPredecessors()) {
                     basicblock runner = predecessor;
-                    while (runner != basicblock.IDOM) {
+                    while (runner != basicblock.IDOM){
                         runner.DF.add(basicblock);
                         runner = runner.IDOM;
                     }
@@ -124,23 +124,29 @@ public abstract class pass {
         }
     }
 
+
+    void printPostIDOM( List<basicblock> basicblockList){
+        for(basicblock basicblock: basicblockList){
+            System.out.print(basicblock.getName()+"("+basicblock.reversePostOrderNumber+")"+": "+(basicblock.postIDOM==null? "null":(basicblock.postIDOM.getName()+"("+basicblock.postIDOM.reversePostOrderNumber+")"))+"  ,");
+        }
+        System.out.println("");
+    }
+
     //Post-Dominator Tree Construction
     //This pass is a simple post-dominator construction algorithm for finding post-dominators.
     //LLVM Pass
-    void computePostDominateTree(function function) {
+    void computePostDominateTree(function function){
         function.calcReverseCFGPostOrderNumber();
         List<basicblock> basicblockList = new LinkedList<>(function.getReversePostOrderDFSBBList());
         Collections.reverse(basicblockList);
         basicblockList.remove(function.getExitBB());
         function.getExitBB().postIDOM = function.getExitBB();
         boolean changed = true;
-        System.out.println("Start function: "+function.getName());
         while (changed) {
             changed = false;
-            for (basicblock basicblock : basicblockList) {
-                System.out.println(basicblock.getName());
+            for(basicblock basicblock : basicblockList){
                 basicblock newPostIDOM = null;
-                for (basicblock successor : basicblock.getSuccessors()) {
+                for (basicblock successor : basicblock.getSuccessors()){
                     if (successor.postIDOM != null) newPostIDOM = successor;
                 }
                 for(basicblock successor : basicblock.getSuccessors()){
@@ -151,7 +157,6 @@ public abstract class pass {
                     basicblock.postIDOM = newPostIDOM;
                     changed = true;
                 }
-                System.out.println(basicblock.getName()+"Done");
             }
         }
         function.getReversePostOrderDFSBBList().forEach(basicblock -> basicblock.RDFSuccessors = new HashSet<>());
@@ -162,11 +167,11 @@ public abstract class pass {
     private basicblock intersectPost(basicblock basicblock1, basicblock basicblock2) {
         basicblock finger1 = basicblock1;
         basicblock finger2 = basicblock2;
-        while (finger1 != finger2) {
-            while (finger1.reversePostOrderNumber < finger2.reversePostOrderNumber) {
+        while (finger1 != finger2){
+            while (finger1.reversePostOrderNumber < finger2.reversePostOrderNumber){
                 finger1 = finger1.postIDOM;
             }
-            while (finger2.reversePostOrderNumber < finger1.reversePostOrderNumber) {
+            while (finger2.reversePostOrderNumber < finger1.reversePostOrderNumber){
                 finger2 = finger2.postIDOM;
             }
         }
@@ -176,7 +181,7 @@ public abstract class pass {
     //Post-Dominance Frontier Construction
     //This pass is a simple post-dominator construction algorithm for finding post-dominator frontiers.
     //LLVM Pass
-    void computeReverseDominantFrontier(function function) {
+    void computeReverseDominantFrontier(function function){
         List<basicblock> basicblockList = function.getReversePostOrderDFSBBList();
         basicblockList.forEach(basicblock -> basicblock.RDF = new HashSet<>());
         for (basicblock basicblock : basicblockList) {
@@ -244,8 +249,6 @@ public abstract class pass {
                     }
         }
     }
-
-
 
 
 
