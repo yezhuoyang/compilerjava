@@ -166,7 +166,7 @@ public class ASMgenerator implements IRvisitor{
                 op=(inst.getSrc2() instanceof immediate)? "xori":"xor";
                 break;
             case BITAND:
-                op=(inst.getSrc2() instanceof immediate)? "andi":"add";
+                op=(inst.getSrc2() instanceof immediate)? "andi":"and";
                 break;
             case BITOR:
                 op=(inst.getSrc2() instanceof immediate)? "xori":"xor";
@@ -471,7 +471,7 @@ public class ASMgenerator implements IRvisitor{
             case NEG:
                 op="neg";
                 break;
-            case NOT:
+            case BITNOT:
                 op="not";
                 break;
             default:

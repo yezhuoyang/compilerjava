@@ -34,7 +34,6 @@ public abstract class memory extends storage{
         this.base=base;
     }
 
-
     public immediate getOffset(){
         return offset;
     }

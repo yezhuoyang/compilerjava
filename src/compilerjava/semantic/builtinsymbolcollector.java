@@ -59,7 +59,6 @@ public class builtinsymbolcollector{
                 defvar(new varsymbol("str",intsymbol,null));
             }});
 
-
             _globalfield.deffunc(new funcsymbol("getString",string,null,_globalfield,true));
             _globalfield.deffunc(new funcsymbol("getInt",intsymbol,null,_globalfield,true));
             _globalfield.deffunc(new funcsymbol("toString",string,null,_globalfield){{

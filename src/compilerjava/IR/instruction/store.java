@@ -35,8 +35,6 @@ public class store extends IRinst{
         isInsertedForglobalvar = insertedForglobalvar;
     }
 
-
-
     public store(int S, basicblock currentBB, operand src, operand dst, boolean isInsertedForglobalvar, global64Value storeforglobal){
         super(currentBB);
         this.src=src;

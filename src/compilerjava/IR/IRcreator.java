@@ -488,7 +488,6 @@ public class IRcreator implements ASTvisitor {
                 currentBB.addInst(new binary(currentBB,binary.Op.ADD,base,new immediate(((varsymbol)membersymbol).getOffset(),config.intsize),memberPointer));
                 node.setResultop(memberPointer);
 
-
                 //Short-circuit evaluation
                 if(node.getThenBB()!=null){
                     I64Value tmp=new I64Value(config.boolsize);

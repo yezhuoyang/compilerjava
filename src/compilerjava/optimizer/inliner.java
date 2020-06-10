@@ -119,6 +119,7 @@ public class inliner {
             callInst.getCurrentBB().removeInst();
             tmpIRinstList.add(IRinst);
         }
+
         for(int i = tmpIRinstList.size() - 1; i >= 0; i--){
             IRinst IRinst = tmpIRinstList.get(i);
             IRinst.setCurrentBB(splitter);
@@ -126,14 +127,15 @@ public class inliner {
                 splitter.finish(IRinst);
             else splitter.addInst(IRinst);
         }
+
         splitter.head.setprevInstruction(null);
-        //set prolog and epilog
         basicblockFakerMap.clear();
         initregisterFakerMap();
         basicblockFakerMap.put(callee.getEntryBB(), callInst.getCurrentBB());
         basicblockFakerMap.put(callee.getExitBB(), splitter);
-        if (caller.getExitBB() == callInst.getCurrentBB()) caller.setExitBB(splitter);
-        for (int i = 0; i < callInst.getParameterList().size(); i++) {
+        if(caller.getExitBB() == callInst.getCurrentBB())
+            caller.setExitBB(splitter);
+        for(int i = 0; i < callInst.getParameterList().size(); i++){
             register oldParameter = callee.getAllParameterList().get(i);
             virtualregister newParameter = new I64Value(callee.getAllParameterList().get(i).getSize());
             callInst.prependInstruction(new move(callInst.getCurrentBB(), callInst.getParameterList().get(i), newParameter));
@@ -147,9 +149,9 @@ public class inliner {
         IRinst splitterHead = splitter.head;
         for(basicblock realBB : callee.getReversePostOrderDFSBBList()){
             basicblock fakeBB=basicblockFakerMap.get(realBB);
-            for(IRinst IRinst = realBB.head; IRinst != null; IRinst = IRinst.getNextInstruction()) {
-                for (register register : IRinst.getUseregs())
-                    if (!registerFakerMap.containsKey(register)) {
+            for(IRinst IRinst = realBB.head; IRinst != null; IRinst = IRinst.getNextInstruction()){
+                for(register register : IRinst.getUseregs())
+                    if(!registerFakerMap.containsKey(register)){
                         registerFakerMap.put(register, new I64Value(register.getSize()));
                     }
                 if (IRinst.getDefReg() != null) {
@@ -157,8 +159,8 @@ public class inliner {
                         registerFakerMap.put(IRinst.getDefReg(), new I64Value(IRinst.getDefReg().getSize()));
                     }
                 }
-                if (fakeBB == splitter) {
-                    if (IRinst != realBB.tail) {
+                if(fakeBB == splitter){
+                    if(IRinst != realBB.tail) {
                         splitterHead.prependInstruction(IRinst.getFakeInstruction(basicblockFakerMap, registerFakerMap));
                     }
                 } else {
@@ -171,7 +173,7 @@ public class inliner {
         if (!callInst.getCurrentBB().isFinished())
             callInst.getCurrentBB().finish(new jump(callInst.getCurrentBB(), splitter));
         back returnInst = (back) callee.getExitBB().tail;
-        if (returnInst.getReturnValue() != null)
+        if(returnInst.getReturnValue() != null)
             splitterHead.prependInstruction(new move(splitter, registerFakerMap.getOrDefault(returnInst.getReturnValue(), returnInst.getReturnValue()), callInst.getResult()));
         return splitter.head;
     }

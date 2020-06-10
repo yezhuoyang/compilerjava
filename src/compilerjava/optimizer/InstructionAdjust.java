@@ -22,12 +22,14 @@ public class InstructionAdjust extends pass{
         Irroot.getFunctionMap().values().forEach(this::adjustcmp);
         Irroot.getFunctionMap().values().forEach(this::adjustImm);
         Irroot.getFunctionMap().values().forEach(this::adjustStore);
+        Irroot.getFunctionMap().values().forEach(this::adjustLoad);
         Irroot.getFunctionMap().values().forEach(this::adjustNeg);
         Irroot.getFunctionMap().values().forEach(function -> {
             calcDefUseChain(function);
             mergeCmpwithBranch(function);
         });
         Irroot.getFunctionMap().values().forEach(this::inversecmp);
+        //Irroot.getFunctionMap().values().forEach(this::mergeAddrCalcWithloadAndstore);
         return true;
     }
 
@@ -294,15 +296,34 @@ public class InstructionAdjust extends pass{
                     else if(((store) irinst).getSrc() instanceof global64Value && ((global64Value) ((store)irinst).getSrc()).isString()){
                         virtualregister newSrc=new I64Value(((store) irinst).getSrc().getSize());
                         irinst.prependInstruction(new load(((store) irinst).getSrc().getSize(),BB,((store) irinst).getSrc(),newSrc));
-                        irinst.replaceInstruction(new store(((store) irinst).getSrc().getSize(),BB,newSrc,((store) irinst).getDst()));
+                        store newinst=new store(((store) irinst).getSrc().getSize(),BB,newSrc,((store) irinst).getDst());
+                        if(isForglobal){
+                            ((store)newinst).setStoreforglobal(((store) irinst).getStoreforglobal());
+                            ((store)newinst).setInsertedForglobalvar(true);
+                        }
+                        irinst.replaceInstruction(newinst);
                     }
-
                 }
             }
         });
     }
 
 
+    // The srouce of store must be a register
+    private void  adjustLoad(function func){
+        func.getReversePostOrderDFSBBList().forEach(BB->{
+            for(IRinst irinst=BB.head;irinst!=null;irinst=irinst.getNextInstruction()) {
+                if(irinst instanceof load){
+                    if (((load) irinst).getSrc() instanceof immediate) {
+                        virtualregister newSrc=new I64Value(((load) irinst).getSrc().getSize());
+                        irinst.prependInstruction(new move(BB,((load) irinst).getSrc(),newSrc));
+                        load newinst=new load(((load) irinst).getDst().getSize(),BB,newSrc,((load) irinst).getDst());
+                        irinst.replaceInstruction(newinst);
+                    }
+                }
+            }
+        });
+    }
 
 
     // The srouce of a unary operand must be a register

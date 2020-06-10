@@ -95,7 +95,7 @@ public class IRprinter implements IRvisitor{
                 out.println();
             }
         }
-        //out.println();
+        out.println();
     }
 
     @Override

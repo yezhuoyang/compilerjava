@@ -550,7 +550,7 @@ public class IRinterpreter{
                 curBB=bakCurBB;
                 registers=bakRegisters;
                 if(curInst.dest!=null) registerWrite(curInst.dest,retValue);
-                 return;
+                return;
             case "div":
                  if(readSrc(curInst.op2)==0) throw new RuntimeError("divide by zero");
                  registerWrite(curInst.dest,readSrc(curInst.op1)/readSrc(curInst.op2));

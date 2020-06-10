@@ -115,7 +115,7 @@ class ConstantAndCopy extends pass {
                         case SUF_ADD:
                             res = src + 1;
                             break;
-                        case NOT:
+                        case BITNOT:
                             res = ~src;
                             break;
                         case NEG:
@@ -161,17 +161,14 @@ class ConstantAndCopy extends pass {
                     inQueue.add(newmove);
                 }
             } else if (S instanceof call){
-                function callee = ((call) S).getCallee();
-                if (!Irroot.stringConstantfunctions.contains(callee)) continue;
+                function callee=((call) S).getCallee();
+                if(!Irroot.stringConstantfunctions.contains(callee)) continue;
                 boolean check0 = ((call) S).getObjectPointer() instanceof global64Value;
                 boolean check1 = ((call) S).getParameterList().size() > 0 && ((call) S).getParameterList().get(0) instanceof global64Value;
                 boolean check2 = ((call) S).getParameterList().size() > 1 && ((call) S).getParameterList().get(1) instanceof global64Value;
                 global64Value _this = check0 ? (global64Value) ((call) S).getObjectPointer() : null;
                 global64Value lhs = check1 ? (global64Value) ((call) S).getParameterList().get(0) : null;
                 global64Value rhs = check2 ? (global64Value) ((call) S).getParameterList().get(1) : null;
-
-
-
                 if (callee == Irroot.builtinStringAdd) {
                     if (check1 && check2) {
                         changed = true;
@@ -232,7 +229,7 @@ class ConstantAndCopy extends pass {
                         int res = Irroot.staticstringvalMap.get(_this).length();
                         S.replaceInstruction(new move(S.getCurrentBB(), new immediate(res,config.intsize), ((call) S).getResult()));
                     }
-                } else if (callee == Irroot.builtinSubstring) {
+                } else if (callee == Irroot.builtinSubstring){
                     if (check0) {
                         if (((call) S).getParameterList().get(0) instanceof immediate && ((call) S).getParameterList().get(1) instanceof immediate) {
                             changed = true;
@@ -283,7 +280,7 @@ class ConstantAndCopy extends pass {
                         changed = true;
                         use.get(oldoperand).remove(user);
                         user.replaceUseReg(oldoperand, newoperand);
-                        if (!inQueue.contains(user)) {
+                        if(!inQueue.contains(user)){
                             workList.add(user);
                             inQueue.add(user);
                         }
@@ -296,7 +293,7 @@ class ConstantAndCopy extends pass {
             Set<IRinst> newUses = use.get(newoperand);
             for(IRinst user : oldUses)
                 if(user != IRinst){
-                    if (!(user instanceof phi)){
+                    if(!(user instanceof phi)){
                         changed = true;
                         use.get(oldoperand).remove(user);
                         user.replaceUseReg(oldoperand, newoperand);

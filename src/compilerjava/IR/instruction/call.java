@@ -9,7 +9,6 @@ import compilerjava.IR.operand.operand;
 import compilerjava.IR.operand.register;
 import compilerjava.IR.operand.virtualregister;
 
-
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -59,7 +58,6 @@ public class call extends IRinst {
         this.result = result;
         updateUseRegs();
     }
-
 
     @Override
     public void accept(IRvisitor irvisitor){
@@ -137,7 +135,8 @@ public class call extends IRinst {
         });
         if(objectPointer instanceof virtualregister && !(objectPointer instanceof globalvar))
             use.add((virtualregister)objectPointer);
-        if(result instanceof virtualregister&& !(result instanceof globalvar))def.add((virtualregister)result);
+        if(result instanceof virtualregister&& !(result instanceof globalvar))
+                def.add((virtualregister)result);
         def.addAll(callerSaveVRegisters);
         def.remove(vsp);
     }
@@ -156,7 +155,6 @@ public class call extends IRinst {
     }
 
 
-
     @Override
     public IRinst getFakeInstruction(Map<basicblock, basicblock> fakeBBMap, Map<operand, operand> fakeRegMap){
         call newCall = new call(fakeBBMap.getOrDefault(currentBB, currentBB), callee, fakeRegMap.getOrDefault(result, result));
@@ -164,8 +162,6 @@ public class call extends IRinst {
         newCall.setObjectPointer(fakeRegMap.getOrDefault(objectPointer, objectPointer));
         return newCall;
     }
-
-
 
 
 

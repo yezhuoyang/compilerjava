@@ -37,7 +37,7 @@ public class SSAremove extends pass {
             predecessors.clear();
             predecessors.addAll(basicblock.getPredecessors());
             predecessors.forEach(predecessor -> {
-                if (predecessor.getSuccessors().size() > 1) {
+                if(predecessor.getSuccessors().size() > 1) {
                     basicblock pcBB = new basicblock(function, "parallel_copy");
                     pcBB.finish(new jump(pcBB, basicblock));
                     ((branch) predecessor.tail).replaceTarget(basicblock, pcBB);
@@ -52,7 +52,6 @@ public class SSAremove extends pass {
                 } else
                     PCmap.put(predecessor, parallelCopyInfo.get(predecessor));
             });
-
             IRinst IRinst = basicblock.head;
             for (; IRinst instanceof phi; IRinst = IRinst.getNextInstruction()) {
                 for (Map.Entry<basicblock, operand> entry : ((phi) IRinst).getPaths().entrySet()) {
@@ -62,7 +61,6 @@ public class SSAremove extends pass {
                     PCmap.get(comingbasicblock).add(new ParallelCopy((virtualregister) ((phi) IRinst).getDst(), comingRegister == null ? new immediate(0,4) : comingRegister));
                 }
             }
-
             basicblock.head = IRinst;
             basicblock.head.setprevInstruction(null);
         });
@@ -127,7 +125,6 @@ public class SSAremove extends pass {
     static class ParallelCopy {
         virtualregister dst;
         operand src;
-
         ParallelCopy(virtualregister dst, operand src) {
             this.dst = dst;
             this.src = src;

@@ -31,11 +31,29 @@ public class Main{
         return (programNode)ASTbuilder.visit(tree);
     }
 
+
+    public enum stage{
+        semantic,codegen,optim
+    }
+    static private stage process;
+
     public static void main(String[] args)throws Exception{
-        boolean semantic=false;
-        if(args.length>0 && (args[0]).equals("-s")){
-            semantic=true;
+
+
+        if(args.length==0){
+            process=stage.optim;
+        }else{
+            if((args[0]).equals("-s")){
+                process=stage.semantic;
+            }
+            else if((args[0]).equals("-c")){
+                process=stage.codegen;
+            }
+            else if((args[0]).equals("-o")){
+                process=stage.optim;
+            }
         }
+
         InputStream in = new FileInputStream("code.txt");
         PrintStream out = new PrintStream("output.s");
         //PrintStream out = new PrintStream("test.s");
@@ -49,7 +67,7 @@ public class Main{
             new symbolcollector(_globalfield).visit(ast);
             new semanticchecker(_globalfield).visit(ast);
 
-            if(!semantic){
+            if(process==stage.codegen||process==stage.optim){
                 new trivialboolExtractor().visit(ast);
                 new elimsideeffect(_globalfield).visit(ast);
                 new irreleventcodeelim(_globalfield).visit(ast);
@@ -58,7 +76,6 @@ public class Main{
                 ircreator.visit(ast);
                 IRroot irroot=ircreator.getIrRoot();
 
-                new globalvarresolver(irroot).run();
 
                 new inliner(irroot).run();
                 new globalvarresolver(irroot).run();
@@ -68,7 +85,6 @@ public class Main{
                 //optim.DeadCodeElimination();
 
                 //new IRprinter(out,false,false).printAllBlock(irroot);
-
                 optim.CFGSimplification();
                 optim.SSAConstruction();
                 int round=0;
@@ -79,49 +95,30 @@ public class Main{
                     changed|=optim.DeadCodeElimination();
                     changed|=optim.CFGSimplification();
                 }
+                optim.InstructionAdujust();
                 optim.SSADestruction();
                 optim.CFGSimplification(true);
 
-
 /*
-            PrintStream out2 = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/iroutput.txt");
-
-            IRprinter irprinter=new IRprinter(out2);
-            irprinter.visit(irroot);
-
-            DataInputStream code_in =new DataInputStream(new FileInputStream("/Users/yezhuoyang/Desktop/share/compilerjava/iroutput.txt"));
-
-            DataInputStream data_in =new DataInputStream(new FileInputStream("/Users/yezhuoyang/Desktop/share/compilerjava/test.in"));
-
-            PrintStream out3 = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/irtest.out");
-
-            IRinterpreter IRint=new IRinterpreter(code_in,false,data_in,out3);
-            IRint.run();
+                PrintStream out2 = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/iroutput.txt");
+                IRprinter irprinter=new IRprinter(out2);
+                irprinter.visit(irroot);
+                DataInputStream code_in =new DataInputStream(new FileInputStream("/Users/yezhuoyang/Desktop/share/compilerjava/iroutput.txt"));
+                DataInputStream data_in =new DataInputStream(new FileInputStream("/Users/yezhuoyang/Desktop/share/compilerjava/test.in"));
+                PrintStream out3 = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/irtest.out");
+                IRinterpreter IRint=new IRinterpreter(code_in,false,data_in,out3);
+                IRint.run();
 */
-
-                //optim.InstructionAdujust();
-                //optim.SSADestruction();
-
-
-                //optim.InstructionCombination();
-
 
                 callingConvention adjustToEmmit=new callingConvention(irroot);
                 adjustToEmmit.run();
-
-
                 optim.InstructionAdujust();
-
 
                 new regAllocator(irroot).run();
 
-
                 ASMgenerator codegen=new ASMgenerator(irroot,out);
                 codegen.run();
-
             }
-
-
         }catch (Exception e){
             e.printStackTrace();
             System.err.println(e.getMessage());
