@@ -34,6 +34,10 @@ public class InstructionAdjust extends pass{
     }
 
 
+    boolean inRange(int immediate){
+        return (immediate>=-2048)&&(immediate<=-2047);
+    }
+
     // Adjust the position of immediate of binary function.
     // If both parts of the instruction are immediate, replace it with move instruction.
     public void adjustImm(function func) {
@@ -52,14 +56,28 @@ public class InstructionAdjust extends pass{
                          }
                          else{
                                 srccondition=1;//Case when only src1 is an immediate
+                                imm1=((immediate) ((binary) irinst).getSrc1()).getImmediate();
                          }
                     }else {
                                 srccondition=2; //Case when only src2 is an immediate
+                                imm2=((immediate) ((binary) irinst).getSrc2()).getImmediate();
                     }
                     switch (((binary) irinst).getOp()){
                         case ADD:
-                             if(srccondition==2)continue;
-                             else if(srccondition==1)irinst.replaceInstruction(new binary(BB,binary.Op.ADD,((binary) irinst).getSrc2(),((binary) irinst).getSrc1(),((binary) irinst).getDst()));
+                             if(srccondition==2&&!inRange(imm2)){
+                                 virtualregister tempop=new I64Value(config.intsize);
+                                 irinst.prependInstruction(new move(BB,(immediate)(((binary) irinst).getSrc2()),tempop) );
+                                 irinst.replaceInstruction(new binary(BB,binary.Op.ADD,((binary) irinst).getSrc1(),tempop,((binary) irinst).getDst()));
+                             }
+                             else if(srccondition==1){
+                                 if(inRange(imm1))
+                                        irinst.replaceInstruction(new binary(BB,binary.Op.ADD,((binary) irinst).getSrc2(),((binary) irinst).getSrc1(),((binary) irinst).getDst()));
+                                 else{
+                                     virtualregister tempop=new I64Value(config.intsize);
+                                     irinst.prependInstruction(new move(BB,(immediate)(((binary) irinst).getSrc1()),tempop) );
+                                     irinst.replaceInstruction(new binary(BB,binary.Op.ADD,tempop,((binary) irinst).getSrc2(),((binary) irinst).getDst()));
+                                 }
+                             }
                              else{
                                  irinst.replaceInstruction(new move(BB,new immediate(imm1+imm2,((binary) irinst).getSrc1().getSize()),((binary) irinst).getDst()));
                              }
@@ -87,8 +105,20 @@ public class InstructionAdjust extends pass{
                             }
                             break;
                         case BITAND:
-                            if(srccondition==2)continue;
-                            else if(srccondition==1)irinst.replaceInstruction(new binary(BB,binary.Op.BITAND,((binary) irinst).getSrc2(),((binary) irinst).getSrc1(),((binary) irinst).getDst()));
+                            if(srccondition==2&&!inRange(imm2)){
+                                virtualregister tempop=new I64Value(config.intsize);
+                                irinst.prependInstruction(new move(BB,(immediate)(((binary) irinst).getSrc2()),tempop) );
+                                irinst.replaceInstruction(new binary(BB,binary.Op.BITAND,((binary) irinst).getSrc1(),tempop,((binary) irinst).getDst()));
+                            }
+                            else if(srccondition==1){
+                                if(inRange(imm1))
+                                    irinst.replaceInstruction(new binary(BB,binary.Op.BITAND,((binary) irinst).getSrc2(),((binary) irinst).getSrc1(),((binary) irinst).getDst()));
+                                else{
+                                    virtualregister tempop=new I64Value(config.intsize);
+                                    irinst.prependInstruction(new move(BB,(immediate)(((binary) irinst).getSrc1()),tempop) );
+                                    irinst.replaceInstruction(new binary(BB,binary.Op.BITAND,tempop,((binary) irinst).getSrc2(),((binary) irinst).getDst()));
+                                }
+                            }
                             else{
                                 irinst.replaceInstruction(new move(BB,new immediate(imm1&imm2,((binary) irinst).getSrc1().getSize()),((binary) irinst).getDst()));
                             }

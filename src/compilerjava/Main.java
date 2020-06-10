@@ -53,11 +53,10 @@ public class Main{
                 process=stage.optim;
             }
         }
-
         InputStream in = new FileInputStream("code.txt");
-        PrintStream out = new PrintStream("output.s");
+        //PrintStream out = new PrintStream("output.s");
         //PrintStream out = new PrintStream("test.s");
-        //PrintStream out = new PrintStream(System.out);
+        PrintStream out = new PrintStream(System.out);
         try{
             programNode ast=buildAST(in);
             globalfield _globalfield=(new builtinsymbolcollector(ast)).getglobalfield();
@@ -77,7 +76,7 @@ public class Main{
                 IRroot irroot=ircreator.getIrRoot();
 
 
-                //new inliner(irroot).run();
+                new inliner(irroot).run();
                 new globalvarresolver(irroot).run();
                 optimizer optim=new optimizer(irroot);
 
