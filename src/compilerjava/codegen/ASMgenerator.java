@@ -248,16 +248,16 @@ public class ASMgenerator implements IRvisitor{
                     else
                         out.print("xor"+'\t');
                     inst.getDst().accept(this);
-                    out.print(",");
+                    out.print(", ");
                     inst.getSrc1().accept(this);
-                    out.print(",");
+                    out.print(", ");
                     inst.getSrc2().accept(this);
                     out.println();
                     out.print(indent+"sltiu"+'\t');
                     inst.getDst().accept(this);
-                    out.print(",");
+                    out.print(", ");
                     inst.getDst().accept(this);
-                    out.print(",1");
+                    out.print(", 1");
                     out.println();
                     break;
                 case NEQ:
@@ -266,14 +266,14 @@ public class ASMgenerator implements IRvisitor{
                     else
                         out.print("xor"+'\t');
                     inst.getSrc1().accept(this);
-                    out.print(",");
+                    out.print(", ");
                     inst.getSrc2().accept(this);
-                    out.print(",");
+                    out.print(", ");
                     inst.getDst().accept(this);
                     out.println();
-                    out.print("sltu"+'\t');
+                    out.print(indent+"sltu"+'\t');
                     inst.getDst().accept(this);
-                    out.print(",zero,");
+                    out.print(", zero ,");
                     inst.getDst().accept(this);
                     out.println();
                     break;
@@ -283,27 +283,27 @@ public class ASMgenerator implements IRvisitor{
                     else
                         out.print("slt"+'\t');
                     inst.getDst().accept(this);
-                    out.print(",");
+                    out.print(", ");
                     inst.getSrc1().accept(this);
-                    out.print(",");
+                    out.print(", ");
                     inst.getSrc2().accept(this);
                     out.println();
                     break;
                 //TODO
                 case LEQ:
-                    if(inst.getSrc2() instanceof immediate)
+                    if(inst.getSrc1() instanceof immediate)
                         out.print("slti"+'\t');
                     else
                         out.print("slt"+'\t');
                     inst.getDst().accept(this);
-                    out.print(",");
-                    inst.getSrc1().accept(this);
-                    out.print(",");
+                    out.print(", ");
                     inst.getSrc2().accept(this);
+                    out.print(", ");
+                    inst.getSrc1().accept(this);
                     out.println();
                     out.print(indent+"xori"+'\t');
                     inst.getDst().accept(this);
-                    out.print(",");
+                    out.print(", ");
                     inst.getDst().accept(this);
                     out.println(", 1");
                     break;
@@ -313,26 +313,26 @@ public class ASMgenerator implements IRvisitor{
                     else
                         out.print("slt"+'\t');
                     inst.getDst().accept(this);
-                    out.print(",");
+                    out.print(", ");
                     inst.getSrc2().accept(this);
-                    out.print(",");
+                    out.print(", ");
                     inst.getSrc1().accept(this);
                     out.println();
                     break;
                 case GEQ:
-                    if(inst.getSrc1() instanceof immediate)
+                    if(inst.getSrc2() instanceof immediate)
                         out.print("slti"+'\t');
                     else
                         out.print("slt"+'\t');
                     inst.getDst().accept(this);
-                    out.print(",");
-                    inst.getSrc2().accept(this);
-                    out.print(",");
+                    out.print(", ");
                     inst.getSrc1().accept(this);
+                    out.print(", ");
+                    inst.getSrc2().accept(this);
                     out.println();
                     out.print(indent+"xori"+'\t');
                     inst.getDst().accept(this);
-                    out.print(",");
+                    out.print(", ");
                     inst.getDst().accept(this);
                     out.println(", 1");
                     break;

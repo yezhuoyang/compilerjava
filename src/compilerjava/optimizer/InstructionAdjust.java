@@ -218,7 +218,7 @@ public class InstructionAdjust extends pass{
                     if (!(((cmp) irinst).getSrc1() instanceof immediate)&&   (((cmp) irinst).getSrc2() instanceof immediate)){
                         switch (((cmp)irinst).getOp()){
                             case  LT:
-                            case  LEQ:
+                            case  GEQ:
                             case  EQ:
                             case  NEQ:
                                 break;
@@ -233,7 +233,7 @@ public class InstructionAdjust extends pass{
                         if(!(((cmp) irinst).getSrc2() instanceof immediate)){
                             switch (((cmp)irinst).getOp()){
                                 case  GT:
-                                case  GEQ:
+                                case  LEQ:
                                       break;
                                 default:{
                                     virtualregister loadop=new I64Value(config.intsize);
@@ -270,6 +270,7 @@ public class InstructionAdjust extends pass{
             }
         });
     }
+
 
 
     // The srouce of store must be a register

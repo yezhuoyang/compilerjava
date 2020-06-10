@@ -77,12 +77,13 @@ public class Main{
                 IRroot irroot=ircreator.getIrRoot();
 
 
-                new inliner(irroot).run();
+                //new inliner(irroot).run();
                 new globalvarresolver(irroot).run();
                 optimizer optim=new optimizer(irroot);
 
 
                 //optim.DeadCodeElimination();
+
 
                 //new IRprinter(out,false,false).printAllBlock(irroot);
                 optim.CFGSimplification();
@@ -95,7 +96,6 @@ public class Main{
                     changed|=optim.DeadCodeElimination();
                     changed|=optim.CFGSimplification();
                 }
-                optim.InstructionAdujust();
                 optim.SSADestruction();
                 optim.CFGSimplification(true);
 
