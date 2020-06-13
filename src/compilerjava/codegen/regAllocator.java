@@ -21,8 +21,7 @@ import java.util.Stack;
 
 import static compilerjava.IR.operand.realregister.*;
 
-//Graph Coloring
-//Build -> Simplify -> Coalesce -> Freeze -> Spill -> Select
+
 public class regAllocator {
     private IRroot _IRroot;
     private IRprinter _IRprinter;

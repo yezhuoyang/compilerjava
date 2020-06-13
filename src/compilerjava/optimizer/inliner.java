@@ -14,8 +14,8 @@ import java.util.Map;
 
 public class inliner {
     private IRroot IRroot;
-    private int inlinecalleeInstructionLimit =2000;
-    private int inlineMaxDepth =10;
+    private int inlinecalleeInstructionLimit =150;
+    private int inlineMaxDepth =5;
 
 
     private Map<function, Integer> functionInstructionCountMap = new HashMap<>();
@@ -36,6 +36,15 @@ public class inliner {
         nonRecursiveInline();
         recursiveInline();
     }
+
+    public void run(boolean force){
+        inlinecalleeInstructionLimit=150;
+        inlineMaxDepth=5;
+        collectStatistics();
+        nonRecursiveInline();
+        recursiveInline();
+    }
+
 
     private void collectStatistics() {
         IRroot.getFunctionMap().values().forEach(function -> functioncalledCountMap.put(function, 0));

@@ -25,12 +25,6 @@ public class function {
 
     public int stackSize;
 
-    boolean hasramain;
-
-    public void setHasramain(boolean hasramain) {
-        this.hasramain = hasramain;
-    }
-
     private basicblock entryBB=new basicblock(this,"entry");
     private basicblock exitBB=new basicblock(this,"exit");
     private List<back> returnInstList=new ArrayList<>();

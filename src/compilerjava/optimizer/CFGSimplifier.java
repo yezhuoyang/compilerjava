@@ -64,7 +64,6 @@ public class CFGSimplifier extends pass {
     }
 
     private void removeUnreachableBB(function function) {
-        //RPO remove orphan
         List<basicblock> removeList = new LinkedList<>();
         function.getReversePostOrderDFSBBList().forEach(basicblock -> basicblock.getPredecessors().forEach(predecessor -> {
             if (!function.reachable(predecessor)) {
@@ -77,7 +76,6 @@ public class CFGSimplifier extends pass {
     }
 
     private void mergeBB(function function) {
-        //PO merge BB
         for (int i = function.getReversePostOrderDFSBBList().size() - 1; i >= 0; i--) {
             basicblock basicblock = function.getReversePostOrderDFSBBList().get(i);
             if (basicblock.getSuccessors().size() == 1) {

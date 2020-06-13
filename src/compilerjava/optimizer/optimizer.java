@@ -15,6 +15,8 @@ public class optimizer {
     private InstructionAdjust  instructionCombiner;
     private InstructionAdjust instructionAdjustor;
     private ConstantAndCopy constantAndCopy;
+    private frameConstruct _frameConstruct;
+
 
     public optimizer(IRroot irRoot) {
         _spillcalculator = new spillcalculator(irRoot);
@@ -26,8 +28,12 @@ public class optimizer {
         instructionCombiner=new InstructionAdjust(irRoot);
         instructionAdjustor=new InstructionAdjust(irRoot);
         constantAndCopy=new ConstantAndCopy(irRoot);
+        _frameConstruct=new frameConstruct(irRoot);
     }
 
+    public void AddFrame(){
+        _frameConstruct.run();
+    }
 
 
     public boolean runConstAndCopy(){
@@ -42,7 +48,6 @@ public class optimizer {
     public boolean DeadCodeElimination() {
         return _deadCodeEliminator.run();
     }
-
 
     public boolean CFGSimplification() {
         return cfgSimplifier.run();
@@ -75,16 +80,8 @@ public class optimizer {
     }
 
 
+
 /*
-    public boolean ConstantAndCopyPropagation() {
-        return constantAndCopyPropagator.run();
-    }
-
-
-    public boolean CommonSubexpressionElimination() {
-        return commonSubexpressionEliminator.run();
-    }
-
     public void ArithmeticTransformation() {
         arithmeticTransformer.run();
     }

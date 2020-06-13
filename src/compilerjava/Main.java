@@ -77,6 +77,7 @@ public class Main{
 
 
                 new inliner(irroot).run();
+
                 new globalvarresolver(irroot).run();
                 optimizer optim=new optimizer(irroot);
 
@@ -106,6 +107,7 @@ public class Main{
                 IRinterpreter IRint=new IRinterpreter(code_in,false,data_in,out3);
                 IRint.run();
 */
+
                 callingConvention adjustToEmmit=new callingConvention(irroot);
                 adjustToEmmit.run();
                 optim.InstructionAdujust();
@@ -115,6 +117,7 @@ public class Main{
 
                 //optim.DeadCodeElimination();
                 optim.CFGSimplification(true);
+                optim.AddFrame();
 
 
                 ASMgenerator codegen=new ASMgenerator(irroot,out);

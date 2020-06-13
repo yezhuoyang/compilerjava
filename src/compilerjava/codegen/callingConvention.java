@@ -16,7 +16,6 @@ import java.util.Map;
 import static compilerjava.IR.operand.realregister.*;
 
 
-
 // Before send IR to emit ASMgenerator, serveral condition must be satisfied to simplyfy the process of codegen.
 //1. Only src2 can be immediate (For binary, cmp)
 //2. For IRinst cmp, only remain EQ, NEQ , LT
@@ -28,7 +27,6 @@ public class callingConvention {
     private LinkedList<register> parameterList = new LinkedList<>();
     private Map<virtualregister, virtualregister> calleeSaveVRTemporaryMap = new HashMap<>();
 
-
     public callingConvention(IRroot irroot) {
         this.irroot = irroot;
     }
@@ -36,7 +34,7 @@ public class callingConvention {
     public void run() {
         irroot.getFunctionMap().values().forEach(this::argumentPass);
         irroot.getFunctionMap().values().forEach(this::ModifyReturn);
-        irroot.getFunctionMap().values().forEach(this::calleeSave);
+        //irroot.getFunctionMap().values().forEach(this::calleeSave);
     }
 
 
@@ -52,7 +50,6 @@ public class callingConvention {
             if (i < 8)
                 function.getEntryBB().head.prependInstruction(new move(function.getEntryBB(), argumentPassVRegisters.get(i), parameterList.get(i)));
             else {
-                //TODO: Check callee convention
                 function.getEntryBB().head.prependInstruction(new load(parameterList.get(i).getSize(), function.getEntryBB(), new stackdata(function, i - 8), parameterList.get(i)));
             }
 
