@@ -82,8 +82,6 @@ public class Main{
 
 
                 //optim.DeadCodeElimination();
-
-
                 //new IRprinter(out,false,false).printAllBlock(irroot);
                 optim.CFGSimplification();
                 optim.SSAConstruction();
@@ -108,12 +106,16 @@ public class Main{
                 IRinterpreter IRint=new IRinterpreter(code_in,false,data_in,out3);
                 IRint.run();
 */
-
                 callingConvention adjustToEmmit=new callingConvention(irroot);
                 adjustToEmmit.run();
                 optim.InstructionAdujust();
 
+                optim.SpillPriorityCalculation();
                 new regAllocator(irroot).run();
+
+                //optim.DeadCodeElimination();
+                optim.CFGSimplification(true);
+
 
                 ASMgenerator codegen=new ASMgenerator(irroot,out);
                 codegen.run();

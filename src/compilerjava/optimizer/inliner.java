@@ -14,8 +14,9 @@ import java.util.Map;
 
 public class inliner {
     private IRroot IRroot;
-    private int inlinecalleeInstructionLimit =150;
-    private int inlineMaxDepth = 5;
+    private int inlinecalleeInstructionLimit =2000;
+    private int inlineMaxDepth =10;
+
 
     private Map<function, Integer> functionInstructionCountMap = new HashMap<>();
     private Map<function, Integer> functioncalledCountMap = new HashMap<>();
