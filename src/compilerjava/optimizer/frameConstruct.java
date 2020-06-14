@@ -34,7 +34,7 @@ public class frameConstruct extends pass{
 
     private void calleeSave(function function){
         for(virtualregister vreg : calleeSaveVRegisters){
-            if(vreg == vsp || vreg == vgp || vreg == vtp || vreg == vzero || vreg == vs0)
+            if(vreg == vsp ||vreg == vzero)
                 continue;
             calcMaymod(function);
             if(MayMod.contains(vreg.color)){

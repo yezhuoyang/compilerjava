@@ -56,13 +56,10 @@ public class regAllocator {
         precolored.addAll(allVRegisters);
         colors.addAll(allRegisters);
         colors.remove(sp);
-        colors.remove(gp);
-        colors.remove(s0);
-        colors.remove(tp);
         colors.remove(zero);
         colors.remove(ra);
         /*
-        try {c
+        try {
             debug_out = new PrintStream("ir_debug.ll");
             _IRprinter = new IRprinter(debug_out, false, false);
             if (DEBUG) _IRprinter.visit(_IRroot);
@@ -268,10 +265,7 @@ public class regAllocator {
         initial.removeAll(precolored);
         initial.remove(vsp);
         initial.remove(vzero);
-        initial.remove(vgp);
         initial.remove(vra);
-        initial.remove(vtp);
-        initial.remove(vs0);
         //solve
         boolean changed = true;
         for(; changed;){

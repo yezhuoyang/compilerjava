@@ -110,16 +110,6 @@ public class callingConvention {
     }
 
 
-    private void calleeSave(function function) {
-        for (virtualregister vreg : calleeSaveVRegisters) {
-            if (vreg == vsp || vreg == vgp || vreg == vtp || vreg == vzero || vreg == vs0)
-                continue;
-            stackdata stackloc = new stackdata(function);
-            function.getEntryBB().addFirst(new store(config.registersize, function.getEntryBB(), vreg, stackloc));
-            function.getExitBB().tail.prependInstruction(new load(config.registersize, function.getExitBB(), stackloc, vreg));
-        }
-    }
-
 
     private void ModifyReturn(function function) {
         //modify return

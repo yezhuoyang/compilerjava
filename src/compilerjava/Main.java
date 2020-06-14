@@ -113,7 +113,7 @@ public class Main{
                 optim.InstructionAdujust();
 
 
-                //optim.SpillPriorityCalculation();
+                optim.SpillPriorityCalculation();
 
 
                 new regAllocator(irroot).run();
