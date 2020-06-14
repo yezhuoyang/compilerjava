@@ -119,7 +119,6 @@ public class Main{
                 optim.addframe();
 
                 //optim.DeadCodeElimination();
-                optim.CFGSimplification(true);
                 optim.addframe();
 
 
