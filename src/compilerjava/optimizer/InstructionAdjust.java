@@ -29,13 +29,16 @@ public class InstructionAdjust extends pass{
             mergeCmpwithBranch(function);
         });
         Irroot.getFunctionMap().values().forEach(this::inversecmp);
-        //Irroot.getFunctionMap().values().forEach(this::mergeAddrCalcWithloadAndstore);
+        Irroot.getFunctionMap().values().forEach(function->{
+            calcDefUseChain(function);
+            mergeAddrCalcWithloadAndstore(function);
+        });
         return true;
     }
 
 
     boolean inRange(int immediate){
-        return (immediate>=-2048)&&(immediate<=-2047);
+        return (immediate>=-2048)&&(immediate<=2047);
     }
 
     // Adjust the position of immediate of binary function.
@@ -78,7 +81,7 @@ public class InstructionAdjust extends pass{
                                      irinst.replaceInstruction(new binary(BB,binary.Op.ADD,tempop,((binary) irinst).getSrc2(),((binary) irinst).getDst()));
                                  }
                              }
-                             else{
+                             else if(srccondition==0){
                                  irinst.replaceInstruction(new move(BB,new immediate(imm1+imm2,((binary) irinst).getSrc1().getSize()),((binary) irinst).getDst()));
                              }
                              break;
@@ -89,7 +92,7 @@ public class InstructionAdjust extends pass{
                                 irinst.prependInstruction(new move(BB,(immediate)(((binary) irinst).getSrc1()),tempop) );
                                 irinst.replaceInstruction(new binary(BB,binary.Op.BITL,tempop,((binary) irinst).getSrc2(),((binary) irinst).getDst()));
                             }
-                            else{
+                            else if(srccondition==0){
                                 irinst.replaceInstruction(new move(BB,new immediate(imm1<<imm2,((binary) irinst).getSrc1().getSize()),((binary) irinst).getDst()));
                             }
                             break;
@@ -100,7 +103,7 @@ public class InstructionAdjust extends pass{
                                 irinst.prependInstruction(new move(BB,(immediate)(((binary) irinst).getSrc1()),tempop) );
                                 irinst.replaceInstruction(new binary(BB,binary.Op.BITR,tempop,((binary) irinst).getSrc2(),((binary) irinst).getDst()));
                             }
-                            else{
+                            else if(srccondition==0){
                                 irinst.replaceInstruction(new move(BB,new immediate(imm1>>imm2,((binary) irinst).getSrc1().getSize()),((binary) irinst).getDst()));
                             }
                             break;
@@ -119,21 +122,21 @@ public class InstructionAdjust extends pass{
                                     irinst.replaceInstruction(new binary(BB,binary.Op.BITAND,tempop,((binary) irinst).getSrc2(),((binary) irinst).getDst()));
                                 }
                             }
-                            else{
+                            else if(srccondition==0){
                                 irinst.replaceInstruction(new move(BB,new immediate(imm1&imm2,((binary) irinst).getSrc1().getSize()),((binary) irinst).getDst()));
                             }
                             break;
                         case BITOR:
                             if(srccondition==2)continue;
                             else if(srccondition==1)irinst.replaceInstruction(new binary(BB,binary.Op.BITOR,((binary) irinst).getSrc2(),((binary) irinst).getSrc1(),((binary) irinst).getDst()));
-                            else{
+                            else if(srccondition==0){
                                 irinst.replaceInstruction(new move(BB,new immediate(imm1|imm2,((binary) irinst).getSrc1().getSize()),((binary) irinst).getDst()));
                             }
                             break;
                         case XOR:
                             if(srccondition==2)continue;
                             else if(srccondition==1)irinst.replaceInstruction(new binary(BB,binary.Op.XOR,((binary) irinst).getSrc2(),((binary) irinst).getSrc1(),((binary) irinst).getDst()));
-                            else{
+                            else if(srccondition==0){
                                 irinst.replaceInstruction(new move(BB,new immediate((imm1==1)||(imm2==1)?1:0,config.boolsize),((binary) irinst).getDst()));
                             }
                             break;
@@ -148,7 +151,7 @@ public class InstructionAdjust extends pass{
                                 irinst.prependInstruction(new move(BB,(immediate)(((binary) irinst).getSrc1())  ,tempop) );
                                 irinst.replaceInstruction(new binary(BB,binary.Op.SUB,tempop,((binary) irinst).getSrc2(),((binary) irinst).getDst()));
                             }
-                            else{
+                            else if(srccondition==0){
                                 irinst.replaceInstruction(new move(BB,new immediate(imm1-imm2,config.intsize),((binary) irinst).getDst()));
                             }
                             break;
@@ -163,7 +166,7 @@ public class InstructionAdjust extends pass{
                                 irinst.prependInstruction(new move(BB,(immediate)(((binary) irinst).getSrc1()),tempop) );
                                 irinst.replaceInstruction(new binary(BB,binary.Op.MUL,tempop,((binary) irinst).getSrc2(),((binary) irinst).getDst()));
                             }
-                            else{
+                            else if(srccondition==0){
                                 irinst.replaceInstruction(new move(BB,new immediate(imm1*imm2,config.intsize),((binary) irinst).getDst()));
                             }
                             break;
@@ -178,7 +181,7 @@ public class InstructionAdjust extends pass{
                                 irinst.prependInstruction(new move(BB,(immediate)(((binary) irinst).getSrc1()),tempop) );
                                 irinst.replaceInstruction(new binary(BB,binary.Op.DIV,tempop,((binary) irinst).getSrc2(),((binary) irinst).getDst()));
                             }
-                            else{
+                            else if(srccondition==0){
                                 irinst.replaceInstruction(new move(BB,new immediate(imm1/imm2,config.intsize),((binary) irinst).getDst()));
                             }
                             break;
@@ -193,7 +196,7 @@ public class InstructionAdjust extends pass{
                                 irinst.prependInstruction(new move(BB,(immediate)(((binary) irinst).getSrc1()),tempop) );
                                 irinst.replaceInstruction(new binary(BB,binary.Op.MOD,tempop,((binary) irinst).getSrc2(),((binary) irinst).getDst()));
                             }
-                            else{
+                            else if(srccondition==0){
                                 irinst.replaceInstruction(new move(BB,new immediate(imm1%imm2,config.intsize),((binary) irinst).getDst()));
                             }
                             break;
@@ -407,42 +410,32 @@ public class InstructionAdjust extends pass{
     }
 
 
-    private void mergeAddrCalcWithloadAndstore(function function) {
+    private void mergeAddrCalcWithloadAndstore(function function){
         function.getReversePostOrderDFSBBList().forEach(basicBlock -> {
             for (IRinst IRinst = basicBlock.head; IRinst != null; IRinst = IRinst.getNextInstruction())
-                if (IRinst instanceof load) {
-                    if (((load) IRinst).getSrc() instanceof virtualregister) {
+                if (IRinst instanceof load){
+                    if (((load) IRinst).getSrc() instanceof virtualregister){
                         virtualregister addr = (virtualregister) ((load) IRinst).getSrc();
-                        if (use.get(addr).size() == 1) {
-                            IRinst defOfAddr_tmp = def.get(addr);
-                            if(defOfAddr_tmp instanceof move && ((move)defOfAddr_tmp).getSrc() instanceof immediate){
+                        IRinst defOfAddr_tmp = def.get(addr);
+                        if(defOfAddr_tmp instanceof binary && ((binary)defOfAddr_tmp).getOp()==(binary.Op.ADD) && ((binary)defOfAddr_tmp).getSrc2() instanceof immediate){
+                            if(use.get(defOfAddr_tmp.getDefReg()).size()==1){
                                 defOfAddr_tmp.deleteSelf();
-                                for (register useregister : defOfAddr_tmp.getUseregs()) {
-                                    use.get(useregister).remove(defOfAddr_tmp);
-                                    use.get(useregister).add(IRinst);
-                                }
+                                calcDefUseChain(function);
                             }
-                            IRinst.replaceUseReg(((load) IRinst).getSrc(), new dynamicdata(((register) ((load) IRinst).getSrc()),new immediate(((immediate)((move)defOfAddr_tmp).getSrc()).getImmediate(),config.intsize),((load) IRinst).getSize()));
-                        }
-                        else{
-                            IRinst.replaceUseReg(((load) IRinst).getSrc(), new dynamicdata(((register) ((load) IRinst).getSrc()),  new immediate(0,config.intsize),((load) IRinst).getSize()));
+                            IRinst.replaceUseReg(((load) IRinst).getSrc(), new dynamicdata( (virtualregister)((binary)defOfAddr_tmp).getSrc1() ,new immediate(((immediate)((binary)defOfAddr_tmp).getSrc2()).getImmediate(),config.intsize),((load) IRinst).getSize()));
                         }
                     }
                 } else if (IRinst instanceof store){
                     if (((store) IRinst).getDst() instanceof virtualregister) {
                         virtualregister addr = (virtualregister) ((store) IRinst).getDst();
-                        if (use.get(addr).size() == 1) {
                             IRinst defOfAddr_tmp = def.get(addr);
-                            if (defOfAddr_tmp instanceof move && ((move) defOfAddr_tmp).getSrc() instanceof immediate) {
-                                defOfAddr_tmp.deleteSelf();
-                                for (register useregister : defOfAddr_tmp.getUseregs()) {
-                                    use.get(useregister).remove(defOfAddr_tmp);
-                                    use.get(useregister).add(IRinst);
+                            if(defOfAddr_tmp instanceof binary && ((binary)defOfAddr_tmp).getOp()==(binary.Op.ADD) && ((binary)defOfAddr_tmp).getSrc2() instanceof immediate){
+                                if(use.get(defOfAddr_tmp.getDefReg()).size()==1) {
+                                    defOfAddr_tmp.deleteSelf();
+                                    calcDefUseChain(function);
                                 }
-                            }
-                            IRinst.replaceUseReg(((store) IRinst).getDst(), new dynamicdata(((register) ((store) IRinst).getDst()), new immediate(((immediate) ((move) defOfAddr_tmp).getDst()).getImmediate(), config.intsize), ((store) IRinst).getSize()));
-                        } else {
-                            IRinst.replaceUseReg(((store) IRinst).getDst(), new dynamicdata(((register) ((store) IRinst).getDst()), new immediate(0, config.intsize), ((store) IRinst).getSize()));
+
+                            IRinst.replaceUseReg(((store) IRinst).getDst(), new dynamicdata( (virtualregister)((binary)defOfAddr_tmp).getSrc1(),new immediate(((immediate)((binary)defOfAddr_tmp).getSrc2()).getImmediate(),config.intsize),((store) IRinst).getSize()));
                         }
                     }
                 }

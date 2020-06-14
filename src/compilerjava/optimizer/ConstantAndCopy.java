@@ -39,16 +39,16 @@ class ConstantAndCopy extends pass {
                     if (((phi) S).getPaths().values().stream().allMatch(x -> (x == null) || (x instanceof immediate && ((immediate) x).getImmediate() == c)))
                         substituteoperand(workList, inQueue, S, ((phi) S).getDst(), val);
                 }
-            } else if (S instanceof move) {
-                if (((move) S).getSrc() instanceof immediate || ((move) S).getSrc() instanceof virtualregister) {
+            } else if (S instanceof move){
+                if(((move) S).getSrc() instanceof immediate || ((move) S).getSrc() instanceof virtualregister) {
                     substituteoperand(workList, inQueue, S, ((move) S).getDst(), ((move) S).getSrc());
                 }
-            } else if (S instanceof binary) {
+            } else if (S instanceof binary){
                 binary inst = (binary) S;
-                if (inst.getSrc1() instanceof immediate && inst.getSrc2() instanceof immediate) {
+                if(inst.getSrc1() instanceof immediate && inst.getSrc2() instanceof immediate) {
                     changed = true;
-                    int src1 = ((immediate) inst.getSrc1()).getImmediate(), src2 = ((immediate) inst.getSrc2()).getImmediate(), res=-1;
-                    switch (inst.getOp()) {
+                    int src1=((immediate) inst.getSrc1()).getImmediate(), src2 = ((immediate) inst.getSrc2()).getImmediate(), res=-1;
+                    switch (inst.getOp()){
                         case ADD:
                             res = src1 + src2;
                             break;
@@ -85,8 +85,8 @@ class ConstantAndCopy extends pass {
                     workList.add(newmove);
                     inQueue.add(newmove);
                 } else if (((binary) S).getOp() == binary.Op.ADD) {
-                    if (((binary) S).getSrc1() instanceof immediate) {
-                        if (((immediate) ((binary) S).getSrc1()).getImmediate() == 0) {
+                    if(((binary) S).getSrc1() instanceof immediate) {
+                        if(((immediate) ((binary) S).getSrc1()).getImmediate() == 0) {
                             changed = true;
                             move newmove = new move(inst.getCurrentBB(), ((binary) S).getSrc2(), inst.getDst());
                             S.replaceInstruction(newmove);
@@ -105,7 +105,7 @@ class ConstantAndCopy extends pass {
                 }
             } else if (S instanceof unary){
                 unary inst = (unary) S;
-                if (inst.getSrc() instanceof immediate) {
+                if (inst.getSrc() instanceof immediate){
                     changed = true;
                     int src = ((immediate) inst.getSrc()).getImmediate(), res=-1;
                     switch (inst.getOp()) {

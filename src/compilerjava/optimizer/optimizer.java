@@ -15,6 +15,8 @@ public class optimizer{
     private InstructionAdjust instructionAdjustor;
     private ConstantAndCopy constantAndCopy;
     private frameConstruct _frameConstruct;
+    private operandTransform _operandTrans;
+
 
     public optimizer(IRroot irRoot){
         _spillcalculator = new spillcalculator(irRoot);
@@ -27,6 +29,11 @@ public class optimizer{
         instructionAdjustor=new InstructionAdjust(irRoot);
         constantAndCopy=new ConstantAndCopy(irRoot);
         _frameConstruct=new frameConstruct(irRoot);
+        _operandTrans=new operandTransform(irRoot);
+    }
+
+    public boolean operandTrans(){
+        return _operandTrans.run();
     }
 
 

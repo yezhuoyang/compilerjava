@@ -53,9 +53,9 @@ public class Main{
             }
         }
         InputStream in = new FileInputStream("code.txt");
-        PrintStream out = new PrintStream("output.s");
+        //PrintStream out = new PrintStream("output.s");
         //PrintStream out = new PrintStream("test.s");
-        //PrintStream out = new PrintStream(System.out);
+        PrintStream out = new PrintStream(System.out);
         try{
             programNode ast=buildAST(in);
             globalfield _globalfield=(new builtinsymbolcollector(ast)).getglobalfield();
@@ -93,6 +93,7 @@ public class Main{
                     changed|=optim.DeadCodeElimination();
                     changed|=optim.CFGSimplification();
                 }
+                //optim.operandTrans();
                 optim.SSADestruction();
                 optim.CFGSimplification(true);
 
@@ -112,8 +113,7 @@ public class Main{
                 optim.InstructionAdujust();
 
 
-                if(process==stage.optim)
-                        optim.SpillPriorityCalculation();
+                optim.SpillPriorityCalculation();
 
 
                 new regAllocator(irroot).run();
