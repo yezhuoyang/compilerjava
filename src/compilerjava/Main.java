@@ -94,22 +94,7 @@ public class Main{
                     changed|=optim.CFGSimplification();
                 }
                 optim.SSADestruction();
-
-
-                PrintStream out2 = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/iroutput.txt");
-                IRprinter irprinter=new IRprinter(out2);
-                irprinter.visit(irroot);
-                //DataInputStream data_in =new DataInputStream(new FileInputStream("/Users/yezhuoyang/Desktop/share/compilerjava/test.in"));
-                //PrintStream out3 = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/irtest.out");
-                //IRinterpreter IRint=new IRinterpreter(code_in,false,data_in,out3);
-                //IRint.run();
-
                 optim.CFGSimplification(true);
-
-
-                PrintStream out3 = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/iroutput2.txt");
-                IRprinter irprinter2=new IRprinter(out3);
-                irprinter2.visit(irroot);
 
 /*
                 PrintStream out2 = new PrintStream("/Users/yezhuoyang/Desktop/share/compilerjava/iroutput.txt");
