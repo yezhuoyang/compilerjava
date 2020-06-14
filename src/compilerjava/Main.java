@@ -53,9 +53,9 @@ public class Main{
             }
         }
         InputStream in = new FileInputStream("code.txt");
-        //PrintStream out = new PrintStream("output.s");
+        PrintStream out = new PrintStream("output.s");
         //PrintStream out = new PrintStream("test.s");
-        PrintStream out = new PrintStream(System.out);
+        //PrintStream out = new PrintStream(System.out);
         try{
             programNode ast=buildAST(in);
             globalfield _globalfield=(new builtinsymbolcollector(ast)).getglobalfield();
@@ -117,14 +117,13 @@ public class Main{
 
 
                 new regAllocator(irroot).run();
-
+                //optim.deadloadelim();
                 optim.CFGSimplification(true);
 
 
                 optim.addframe();
 
                 //optim.DeadCodeElimination();
-                optim.addframe();
 
 
                 ASMgenerator codegen=new ASMgenerator(irroot,out);

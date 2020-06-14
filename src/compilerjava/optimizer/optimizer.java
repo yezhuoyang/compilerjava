@@ -16,7 +16,7 @@ public class optimizer{
     private ConstantAndCopy constantAndCopy;
     private frameConstruct _frameConstruct;
     private operandTransform _operandTrans;
-
+    private deadloadElim _deadloadelim;
 
     public optimizer(IRroot irRoot){
         _spillcalculator = new spillcalculator(irRoot);
@@ -30,6 +30,12 @@ public class optimizer{
         constantAndCopy=new ConstantAndCopy(irRoot);
         _frameConstruct=new frameConstruct(irRoot);
         _operandTrans=new operandTransform(irRoot);
+        _deadloadelim=new deadloadElim(irRoot);
+
+    }
+
+    public boolean deadloadelim(){
+        return _deadloadelim.run();
     }
 
     public boolean operandTrans(){
