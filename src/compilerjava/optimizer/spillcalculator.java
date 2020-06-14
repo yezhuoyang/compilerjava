@@ -6,6 +6,7 @@ import compilerjava.IR.instruction.IRinst;
 import compilerjava.IR.operand.virtualregister;
 
 public class spillcalculator extends pass {
+
     public spillcalculator(IRroot irroot) {
         super(irroot);
     }
@@ -18,7 +19,6 @@ public class spillcalculator extends pass {
             computeDominateTree(_function);
             computeDominanceFrontier(_function);
         });
-
         Irroot.getFunctionMap().values().forEach(_function -> {
             calcLoopInformation(_function);
             markSpillPriority(_function);
@@ -26,7 +26,7 @@ public class spillcalculator extends pass {
         return false;
     }
 
-    private void markSpillPriority(function _function) {
+    private void markSpillPriority(function _function){
         _function.getReversePostOrderDFSBBList().forEach(basicBlock -> {
             int loopLevel = belongingLoopHeaders.get(basicBlock) == null ? 0 : belongingLoopHeaders.get(basicBlock).size();
             int loopContribution = (int) Math.pow(10, loopLevel);
@@ -39,4 +39,5 @@ public class spillcalculator extends pass {
             }
         });
     }
+
 }

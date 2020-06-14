@@ -142,7 +142,10 @@ public abstract class pass {
         basicblockList.remove(function.getExitBB());
         function.getExitBB().postIDOM = function.getExitBB();
         boolean changed = true;
-        while (changed) {
+        for(basicblock basicblock : basicblockList){
+            basicblock.postIDOM=null;
+        }
+        while (changed){
             changed = false;
             for(basicblock basicblock : basicblockList){
                 basicblock newPostIDOM = null;
@@ -150,8 +153,9 @@ public abstract class pass {
                     if (successor.postIDOM != null) newPostIDOM = successor;
                 }
                 for(basicblock successor : basicblock.getSuccessors()){
-                    if (successor != newPostIDOM && successor.postIDOM != null)
+                    if (successor != newPostIDOM && successor.postIDOM != null){
                         newPostIDOM = intersectPost(successor, newPostIDOM);
+                    }
                 }
                 if (basicblock.postIDOM != newPostIDOM) {
                     basicblock.postIDOM = newPostIDOM;
@@ -163,10 +167,10 @@ public abstract class pass {
         basicblockList.forEach(basicblock -> basicblock.postIDOM.RDFSuccessors.add(basicblock));
     }
 
-
     private basicblock intersectPost(basicblock basicblock1, basicblock basicblock2) {
         basicblock finger1 = basicblock1;
         basicblock finger2 = basicblock2;
+        int round=0;
         while (finger1 != finger2){
             while (finger1.reversePostOrderNumber < finger2.reversePostOrderNumber){
                 finger1 = finger1.postIDOM;

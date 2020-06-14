@@ -220,7 +220,7 @@ public class irreleventcodeelim implements ASTvisitor {
     }
 
     @Override
-    public void visit(vardeclstmtNode node) {
+    public void visit(vardeclstmtNode node){
         if (collectMode) {
             init(node);
             node.getVardeclList().getDecls().forEach(x -> {

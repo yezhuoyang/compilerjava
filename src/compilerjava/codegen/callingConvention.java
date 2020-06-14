@@ -36,7 +36,7 @@ public class callingConvention {
     public void run() {
         irroot.getFunctionMap().values().forEach(this::argumentPass);
         irroot.getFunctionMap().values().forEach(this::ModifyReturn);
-        irroot.getFunctionMap().values().forEach(this::calleeSave);
+        //irroot.getFunctionMap().values().forEach(this::calleeSave);
     }
 
 

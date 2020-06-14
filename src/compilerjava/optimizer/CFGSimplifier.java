@@ -13,8 +13,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 
+public class CFGSimplifier extends pass{
 
-public class CFGSimplifier extends pass {
     public CFGSimplifier(IRroot irRoot) {
         super(irRoot);
     }
@@ -42,18 +42,18 @@ public class CFGSimplifier extends pass {
 
     private void convertClearbranch(function function) {
         function.getReversePostOrderDFSBBList().forEach(basicblock -> {
-            if (basicblock.tail instanceof branch) {
+            if(basicblock.tail instanceof branch){
                 branch branch = (branch) basicblock.tail;
-                if (branch.getThenBB() == branch.getElseBB()) {
+                if(branch.getThenBB() == branch.getElseBB()) {
                     changed = true;
                     branch.replaceInstruction(new jump(basicblock, branch.getThenBB()));
-                } else if (branch.getCond() instanceof immediate) {
+                }else if(branch.getCond() instanceof immediate){
                     changed = true;
                     int cond = ((immediate) branch.getCond()).getImmediate();
                     basicblock target = cond == 1 ? branch.getThenBB() : branch.getElseBB();
                     basicblock cut = cond == 1 ? branch.getElseBB() : branch.getThenBB();
                     branch.replaceInstruction(new jump(basicblock, target));
-                    for (IRinst IRinst = cut.head; IRinst instanceof phi; IRinst = IRinst.getNextInstruction())
+                    for(IRinst IRinst = cut.head; IRinst instanceof phi; IRinst = IRinst.getNextInstruction())
                         ((phi) IRinst).removePath(basicblock);
                     basicblock.getSuccessors().remove(cut);
                     cut.getPredecessors().remove(basicblock);
@@ -64,7 +64,6 @@ public class CFGSimplifier extends pass {
     }
 
     private void removeUnreachableBB(function function) {
-        //RPO remove orphan
         List<basicblock> removeList = new LinkedList<>();
         function.getReversePostOrderDFSBBList().forEach(basicblock -> basicblock.getPredecessors().forEach(predecessor -> {
             if (!function.reachable(predecessor)) {
@@ -76,31 +75,34 @@ public class CFGSimplifier extends pass {
         function.recalcReversePostOrderDFSBBList();
     }
 
-    private void mergeBB(function function) {
-        //PO merge BB
-        for (int i = function.getReversePostOrderDFSBBList().size() - 1; i >= 0; i--) {
+    private void mergeBB(function function){
+        for(int i = function.getReversePostOrderDFSBBList().size() - 1; i >= 0; i--){
             basicblock basicblock = function.getReversePostOrderDFSBBList().get(i);
-            if (basicblock.getSuccessors().size() == 1) {
+            if(basicblock.getSuccessors().size() == 1){
                 basicblock successor = basicblock.getSuccessors().iterator().next();
-                if (successor != function.getEntryBB() && successor.getPredecessors().size() == 1 && successor != basicblock) {
+                if(successor!=function.getEntryBB() && successor.getPredecessors().size() == 1 && successor != basicblock){
                     changed = true;
                     successor.mergeBB(basicblock);
-                    if (successor == function.getExitBB())
+                    if(successor == function.getExitBB())
                         function.setExitBB(basicblock);
                 }
             }
         }
         function.recalcReversePostOrderDFSBBList();
+
+
     }
 
-    private void eliminateSinglebranchBB(function function) {
+    private void eliminateSinglebranchBB(function function){
         function.getReversePostOrderDFSBBList().forEach(basicblock -> {
-            if (basicblock != function.getEntryBB()) {
-                if(basicblock.head == basicblock.tail && basicblock.head instanceof jump) {
+            if(basicblock != function.getEntryBB()){
+                if(basicblock.head == basicblock.tail && basicblock.head instanceof jump){
                     changed = true;
                     basicblock targetBB = ((jump) basicblock.head).getDestBB();
+
                     targetBB.getPredecessors().remove(basicblock);
-                    for (basicblock predecessor : basicblock.getPredecessors()) {
+
+                    for(basicblock predecessor : basicblock.getPredecessors()){
                         predecessor.getSuccessors().remove(basicblock);
                         predecessor.getSuccessors().add(targetBB);
                         targetBB.getPredecessors().add(predecessor);
@@ -110,9 +112,13 @@ public class CFGSimplifier extends pass {
                             ((branch) predecessor.tail).replaceTarget(basicblock, targetBB);
                         }
                     }
+
                 }
             }
         });
         function.recalcReversePostOrderDFSBBList();
     }
+
+
+
 }

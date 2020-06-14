@@ -153,7 +153,6 @@ public class basicblock {
         getPredecessors().forEach(predecessor->predecessor.removeSuccessor(this));
     }
 
-
     public void mergeBB(basicblock newBB){
         getSuccessors().forEach(successor->{
             for(IRinst irinst=successor.head;;irinst=irinst.getNextInstruction()){
@@ -172,7 +171,6 @@ public class basicblock {
             if(!irinst.hasNextInstruction()) break;
         }
     }
-
     private Set<virtualregister> use=new HashSet<>();
     private Set<virtualregister> def=new HashSet<>();
     private Set<virtualregister> liveIn=new HashSet<>();

@@ -2,10 +2,9 @@ package compilerjava.optimizer;
 
 import compilerjava.IR.IRroot;
 
-public class optimizer {
+public class optimizer{
     private spillcalculator _spillcalculator;
     private DeadCodeEliminator _deadCodeEliminator;
-
 
     private SSABuilder ssaConstructor;
     private SSAremove ssaDestructor;
@@ -15,8 +14,9 @@ public class optimizer {
     private InstructionAdjust  instructionCombiner;
     private InstructionAdjust instructionAdjustor;
     private ConstantAndCopy constantAndCopy;
+    private frameConstruct _frameConstruct;
 
-    public optimizer(IRroot irRoot) {
+    public optimizer(IRroot irRoot){
         _spillcalculator = new spillcalculator(irRoot);
         _deadCodeEliminator = new DeadCodeEliminator(irRoot);
         ssaConstructor = new SSABuilder(irRoot);
@@ -26,9 +26,13 @@ public class optimizer {
         instructionCombiner=new InstructionAdjust(irRoot);
         instructionAdjustor=new InstructionAdjust(irRoot);
         constantAndCopy=new ConstantAndCopy(irRoot);
+        _frameConstruct=new frameConstruct(irRoot);
     }
 
 
+    public void addframe(){
+        _frameConstruct.run();
+    }
 
     public boolean runConstAndCopy(){
         return constantAndCopy.run();
@@ -38,11 +42,9 @@ public class optimizer {
         _spillcalculator.run();
     }
 
-
     public boolean DeadCodeElimination() {
         return _deadCodeEliminator.run();
     }
-
 
     public boolean CFGSimplification() {
         return cfgSimplifier.run();
@@ -60,7 +62,6 @@ public class optimizer {
         ssaDestructor.run();
     }
 
-
     public boolean CommonSubexpressionElimination() {
         return commonSubexpressionEliminator.run();
     }
@@ -69,11 +70,9 @@ public class optimizer {
         instructionCombiner.run();
     }
 
-
     public void InstructionAdujust() {
         instructionAdjustor.run();
     }
-
 
 /*
     public boolean ConstantAndCopyPropagation() {
@@ -89,5 +88,6 @@ public class optimizer {
         arithmeticTransformer.run();
     }
  */
+
 }
 

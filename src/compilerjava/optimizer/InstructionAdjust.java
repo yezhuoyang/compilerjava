@@ -240,7 +240,6 @@ public class InstructionAdjust extends pass{
         });
     }
 
-
     private void  inversecmp(function func){
         func.getReversePostOrderDFSBBList().forEach(BB->{
             for(IRinst irinst=BB.head;irinst!=null;irinst=irinst.getNextInstruction()){
@@ -300,7 +299,6 @@ public class InstructionAdjust extends pass{
             }
         });
     }
-
 
 
     // The srouce of store must be a register
