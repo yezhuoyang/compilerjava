@@ -62,7 +62,7 @@ public class regAllocator {
         colors.remove(zero);
         colors.remove(ra);
         /*
-        try {
+        try {c
             debug_out = new PrintStream("ir_debug.ll");
             _IRprinter = new IRprinter(debug_out, false, false);
             if (DEBUG) _IRprinter.visit(_IRroot);

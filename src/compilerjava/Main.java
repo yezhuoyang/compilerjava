@@ -111,8 +111,13 @@ public class Main{
                 adjustToEmmit.run();
                 optim.InstructionAdujust();
 
-                optim.SpillPriorityCalculation();
+
+                if(process==stage.optim)
+                        optim.SpillPriorityCalculation();
+
+
                 new regAllocator(irroot).run();
+
                 optim.CFGSimplification(true);
 
 
