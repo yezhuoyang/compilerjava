@@ -135,7 +135,7 @@ public class Main{
 
                 //optim.DeadCodeElimination();
                 optim.CFGSimplification(true);
-                optim.AddFrame();
+                optim.addframe();
 
 
                 ASMgenerator codegen=new ASMgenerator(irroot,out);
