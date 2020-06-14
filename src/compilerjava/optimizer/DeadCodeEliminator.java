@@ -13,7 +13,7 @@ import java.util.Set;
 class DeadCodeEliminator extends pass {
     private Set<IRinst> markSet = new HashSet<>();
 
-    DeadCodeEliminator(IRroot irRoot) {
+    DeadCodeEliminator(IRroot irRoot){
         super(irRoot);
     }
 

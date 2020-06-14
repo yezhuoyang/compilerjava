@@ -33,7 +33,7 @@ class CommonSubexprElim extends pass {
         return changed;
     }
 
-    private void commonSubexpressionElimination(basicblock basicblock) {
+    private void commonSubexpressionElimination(basicblock basicblock){
         visit.add(basicblock);
         for(IRinst IRinst = basicblock.head; IRinst != null; IRinst = IRinst.getNextInstruction())
             if(IRinst instanceof binary){

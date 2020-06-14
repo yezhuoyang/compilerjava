@@ -76,13 +76,12 @@ public class Main{
 
 
                 new inliner(irroot).run();
+
                 new globalvarresolver(irroot).run();
                 optimizer optim=new optimizer(irroot);
 
 
                 //optim.DeadCodeElimination();
-
-
                 //new IRprinter(out,false,false).printAllBlock(irroot);
                 optim.CFGSimplification();
                 optim.SSAConstruction();
@@ -133,6 +132,11 @@ public class Main{
 
 
                 optim.addframe();
+
+                //optim.DeadCodeElimination();
+                optim.CFGSimplification(true);
+                optim.AddFrame();
+
 
                 ASMgenerator codegen=new ASMgenerator(irroot,out);
                 codegen.run();

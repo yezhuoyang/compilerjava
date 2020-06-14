@@ -287,7 +287,7 @@ class ConstantAndCopy extends pass {
                     } else hasphi = true;
                 }
             if (!hasphi) IRinst.deleteSelf();
-        } else if (newoperand instanceof virtualregister) {
+        } else if (newoperand instanceof virtualregister){
             boolean hasphi = false;
             Set<IRinst> oldUses = new HashSet<>(use.get(oldoperand));
             Set<IRinst> newUses = use.get(newoperand);

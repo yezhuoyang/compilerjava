@@ -35,7 +35,7 @@ public abstract class pass {
         function.getReversePostOrderDFSBBList().forEach(basicblock -> {
             for (IRinst IRinst = basicblock.head; IRinst != null; IRinst = IRinst.getNextInstruction()) {
                 register defregister = IRinst.getDefReg();
-                if (defregister != null) {
+                if(defregister != null) {
                     def.put(defregister, IRinst);
                     use.computeIfAbsent(defregister, k -> new HashSet<>());
                 }
@@ -58,9 +58,7 @@ public abstract class pass {
     }
 
     //Dominator Tree Construction
-    //This pass is a simple dominator construction algorithm for finding forward dominators.
-    //LLVM Pass
-    private void computeDominateTreeAllSuccessors(basicblock basicblock) {
+    private void computeDominateTreeAllSuccessors(basicblock basicblock){
         basicblock.DTAllSuccessors = new HashSet<>();
         basicblock.DTAllSuccessors.add(basicblock);
         basicblock.DTSuccessors.forEach(this::computeDominateTreeAllSuccessors);
@@ -106,9 +104,7 @@ public abstract class pass {
     }
 
     //Dominance Frontier Construction
-    //This pass is a simple dominator construction algorithm for finding forward dominator frontiers.
-    //LLVM Pass
-    void computeDominanceFrontier(function function) {
+    void computeDominanceFrontier(function function){
         List<basicblock> basicblockList = function.getReversePostOrderDFSBBList();
         basicblockList.forEach(basicblock -> basicblock.DF = new HashSet<>());
         for(basicblock basicblock : basicblockList){
@@ -133,8 +129,6 @@ public abstract class pass {
     }
 
     //Post-Dominator Tree Construction
-    //This pass is a simple post-dominator construction algorithm for finding post-dominators.
-    //LLVM Pass
     void computePostDominateTree(function function){
         function.calcReverseCFGPostOrderNumber();
         List<basicblock> basicblockList = new LinkedList<>(function.getReversePostOrderDFSBBList());
@@ -183,8 +177,6 @@ public abstract class pass {
     }
 
     //Post-Dominance Frontier Construction
-    //This pass is a simple post-dominator construction algorithm for finding post-dominator frontiers.
-    //LLVM Pass
     void computeReverseDominantFrontier(function function){
         List<basicblock> basicblockList = function.getReversePostOrderDFSBBList();
         basicblockList.forEach(basicblock -> basicblock.RDF = new HashSet<>());
@@ -202,9 +194,6 @@ public abstract class pass {
     }
 
     //Natural Loop Information
-    //This analysis is used to identify natural loops and determine the loop depth of various nodes of the CFG.
-    //Note that the loops identified may actually be several natural loops that share the same header node not just a single natural loop.
-    //LLVM Pass
     void calcLoopInformation(function function) {
         computeDominateTree(function);
         //mark loop headers and record loop backers
