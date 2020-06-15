@@ -53,9 +53,9 @@ public class Main{
             }
         }
         InputStream in = new FileInputStream("code.txt");
-        PrintStream out = new PrintStream("output.s");
+        //PrintStream out = new PrintStream("output.s");
         //PrintStream out = new PrintStream("right.s");
-        //PrintStream out = new PrintStream(System.out);
+        PrintStream out = new PrintStream(System.out);
         try{
             programNode ast=buildAST(in);
             globalfield _globalfield=(new builtinsymbolcollector(ast)).getglobalfield();
@@ -64,7 +64,7 @@ public class Main{
             new classmembercollector(_globalfield).visit(ast);
             new symbolcollector(_globalfield).visit(ast);
             new semanticchecker(_globalfield).visit(ast);
-
+            
             if(process==stage.codegen||process==stage.optim){
                 new trivialboolExtractor().visit(ast);
                 new elimsideeffect(_globalfield).visit(ast);
@@ -93,7 +93,7 @@ public class Main{
                     changed|=optim.DeadCodeElimination();
                     changed|=optim.CFGSimplification();
                 }
-                //optim.operandTrans();
+                optim.operandTrans();
                 optim.SSADestruction();
                 optim.CFGSimplification(true);
 

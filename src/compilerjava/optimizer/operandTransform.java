@@ -23,7 +23,7 @@ class operandTransform extends pass {
                     if (IRinst instanceof binary) {
                         binary inst = (binary) IRinst;
                         if ((inst.getOp() == binary.Op.DIV || inst.getOp() == binary.Op.MOD) && inst.getSrc2() instanceof immediate) {
-                            int N = 32;
+                            int N =16;
                             int d = ((immediate) inst.getSrc2()).getImmediate();
                             if ((d & (d - 1)) == 0 && inst.getOp() == binary.Op.DIV) {
                                 int shift = (int) Math.floor(Math.log(d) / Math.log(2));
