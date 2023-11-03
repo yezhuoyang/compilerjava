@@ -2,10 +2,6 @@
 
 A  compiler implemented in java, transform a mini c-like language to riscv assembly, whic is one of the big projects in acm honor class 2020.
 
-(I tried to implemented in C++ at first and failed)
-
-I have to admit I mainly refer to the code of git@github.com:spectrometerHBH/Daedalus.git.
-
 Follows are several optimizations I implememted:
 
 
